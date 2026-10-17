@@ -22,6 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Crypto Dashboard"
+rootProject.name = "CryptoDashboard"
 include(":app")
- 

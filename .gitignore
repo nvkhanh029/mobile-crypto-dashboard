@@ -13,24 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
-
-# --- More secrets ---
-*.jks
-*.keystore
-secrets.properties
-
-# --- Build output in any module (covers app/build too) ---
-build/
-
-# --- Android Studio per-machine settings: ignore the whole folder to avoid merge conflicts between 6 people ---
-.idea/
-
-# --- Logs, temp, OS files ---
-*.log
-*.hprof
-Thumbs.db
-
-# --- Personal API capture work (S1): raw captures and headers stay local.
-# Frozen files we share are copied into app/src/main/assets/fake/ on purpose.
-s1-capture/
-headers_*.txt
+/.idea
+/.kotlin
