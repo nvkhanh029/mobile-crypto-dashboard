@@ -49,6 +49,8 @@ Dependencies point down only: UI → ViewModel → Domain ← Data
 
 **Repositories and data sources inside the Data layer:** a repository decides *when* to get data (in-memory data, refresh intervals, the pause after a 429); a data source decides *where* the data comes from (the CoinGecko API through Volley, or the JSON files in `assets/fake`). Only repositories talk to data sources; ViewModels and everything above never do. The Android data layer guide describes the same split: the repository is the only entry point of the data layer, and it can keep an in-memory cache as its source of truth (section 18). The data source interfaces are internal to the Data layer, so they are not a contract between members (section 12).
 
+**Coin icons are not market data:** they are pictures shown by the UI, so their loader is a shared UI helper in `core/image`, not a data source (D20).
+
 ---
 
 ## 3. Package structure and owners
@@ -63,6 +65,7 @@ core/
   format/            price, compact number, percent, date formatters        Hải
   currency/          CurrencySettings, currency selector                    Hải
   favorite/          FavoriteStore, FavoriteButton                          Bảo Linh
+  image/             CoinImageLoader (coin icons, C8)                       Vân Khánh
 domain/
   model/             Coin, CoinDetail, ChartPoint, Timeframe, Currency,
                      AppError                                               Vân Khánh
@@ -75,7 +78,6 @@ data/
                      JSON mappers                                           Vân Khánh
   fake/              fake data sources (read JSON from assets/fake)         Vân Khánh
   repository/        repository implementations, RefreshPolicy              Vân Khánh
-  image/             CoinImageLoader                                        Vân Khánh
 features/
   marketlist/        fragment, ViewModel, coin row + adapter, sparkline,
                      filter and sort logic                                  An Khánh
@@ -184,6 +186,7 @@ Each screen has one `ViewModel` (an Android Jetpack class) that exposes `LiveDat
 - the Volley `RequestQueue`,
 - the background `ExecutorService` and the main-thread `Handler`,
 - the data sources (remote or fake, chosen by the build setting, section 10) and, on top of them, the repositories (the same repository classes in both modes),
+- the `CoinImageLoader` (on the same `RequestQueue`),
 - `CurrencySettings` and `FavoriteStore`.
 
 Other classes receive what they need from `CryptoApp` (manual dependency injection: no framework). The Android guide recommends dependency injection (and names Hilt); we do the same idea by hand because it is a few lines, has no annotation processing, and is easy to explain.
@@ -195,9 +198,9 @@ Other classes receive what they need from `CryptoApp` (manual dependency injecti
 ### 8.1 Networking
 - A single `CoinGeckoRequest` (extends Volley's `StringRequest`) adds the `x-cg-demo-api-key` header and decodes the body as UTF-8. It is used by the remote data sources only.
 - **Timeout and no retry:** the request uses `DefaultRetryPolicy(timeoutMs, 0, 1f)` with a 15-second timeout, 0 retries and backoff multiplier 1, so Volley never retries by itself (FR-ERR-04).
-- **Nothing is cached by Volley:** the shared queue is created as `RequestQueue(NoCache(), BasicNetwork(HurlStack()))`. `NoCache` stores nothing, so no response of any request is written to the device's disk (FR-DATA-02). This is used for the whole queue, not per request with `setShouldCache(false)`, so no one can forget it on a new request. The app's own in-memory data and refresh intervals decide freshness (section 8.2). Used in the S2 scratch project for API requests; the combination with `ImageLoader` is not tested yet.
+- **Nothing is cached by Volley:** the shared queue is created as `RequestQueue(NoCache(), BasicNetwork(HurlStack()))`. `NoCache` stores nothing, so no response of any request is written to the device's disk (FR-DATA-02). This is used for the whole queue, not per request with `setShouldCache(false)`, so no one can forget it on a new request. The app's own in-memory data and refresh intervals decide freshness (section 8.2). Used in the S2 scratch project for API requests; the combination with `ImageLoader` is covered in the next point.
 - **HTTPS on Android 7.0 (API 24):** Android 7.0 does not trust the certificate root that the CoinGecko hosts need (ISRG Root X1 is trusted from Android 7.1.1, ISRG Root X2 from Android 14). In S2 the first request on the API 24 emulator failed for this reason. The fix is a Network Security Configuration (`res/xml/network_security_config.xml`, referenced from the manifest): a `domain-config` for `coingecko.com` (including subdomains, so both `api.coingecko.com` and `coin-images.coingecko.com` are covered) whose trust anchors are the two root certificates stored as PEM files in `res/raw`, plus the system certificates. Verified in S2: after this, both hosts returned 200 on API 24. The app never disables certificate checks and never trusts all certificates. The two PEM files are copied from the official Let's Encrypt page (section 18). The Android documentation says a config like this is the supported way to add trusted certificates on older versions.
-- Coin icons go through `CoinImageLoader` (Volley `ImageLoader` with an in-memory `LruCache`), on the same queue, so they are not written to disk either. Icons are kept in memory only, the strict reading of the same rule. Not tested yet: that `ImageLoader` works on the `NoCache` queue and how fast memory-only icons are; this is checked when `CoinImageLoader` is written. If icon loading turns out too slow, this choice is revisited.
+- **Coin icons** (contract C8, D20): `CoinImageLoader` in `core/image` wraps Volley's `ImageLoader` with an in-memory `LruCache` as its image cache, on the same `NoCache` queue, so icons are not written to disk either. The layouts show an icon with Volley's `NetworkImageView` (`setImageUrl(url, loader)`, with a placeholder and an error image from the shared resources). Checked in the Volley sources (section 18): `NetworkImageView` and `ImageLoader` exist in Volley 1.2.1 (the 1.2.0 release notes add default and error images to `NetworkImageView`; 1.2.1 only separates Cronet); `ImageLoader` uses only the image cache it is given (a first-level in-memory cache, which must not block) and sends an `ImageRequest` to the queue, and it does not read or write the queue's disk cache, so `NoCache` should not matter. Not run yet on our queue; this is seen at once when `CoinImageLoader` is written. Two things to know: (1) `ImageLoader.get` throws if it is called off the main thread (binding rows in an adapter is on the main thread, so this is fine); (2) `ImageLoader` decodes images as `RGB_565`, which has no transparency, so icons with a transparent background may show a dark background: look at it once, and if it looks wrong, subclass `ImageLoader` and override `makeImageRequest` (a `protected` method) to decode with transparency. Whether the CoinGecko icons have a transparent background is not known.
 
 ### 8.2 Freshness (FR-DATA-01)
 `RefreshPolicy` holds the intervals in one place: market list and watchlist 60 s, chart 1H/24H 60 s, 7D 5 min, 1M/1Y 15 min, coin detail 60 s. A repository keeps the last result in memory with its fetch time, keyed by request (endpoint, parameters, currency). If the stored result is younger than its interval, it is returned without calling the data source. Because 1H is cut from the 1-day dataset, 1H and 24H share the same stored response. The repository is the same with the remote and the fake data source, so this rule can be tried on fake data.
@@ -253,6 +256,7 @@ Fake data sources implement the same data source interfaces as the remote ones, 
 - **Strings:** English default in `values/`, Vietnamese in `values-vi/`.
 - **Formatters:** plain Kotlin classes with a fixed locale (rules in `01`, §5.2). Dates use `SimpleDateFormat`/`Date`, which works on API 24 without extra setup.
 - **StateView:** shows loading, empty or error (with Retry) from a `UiState`.
+- **Coin icons:** shown with Volley's `NetworkImageView` and the `CoinImageLoader` that `CryptoApp` provides (contract C8, section 8.1). The placeholder and the error image are drawables in the shared resources (Hải). A layout never loads an image in any other way.
 - **Currency:** the `Currency` type itself (USD, VND) is a domain model in `domain/model`, because the repository interfaces take it (section 3, D18). `CurrencySettings` stores the choice in `SharedPreferences` and exposes it as LiveData. A screen's Fragment observes it and tells its ViewModel to reload when it changes (FR-CUR-04). The selector sits at the right end of the main top bar (both tabs) and, as a Should, in the Detail top bar (FR-CUR-05); both use the same saved value.
 - **Favorites:** `FavoriteStore` saves the coin IDs as one JSON array string in `SharedPreferences`, because a `SharedPreferences` string *set* has no order and FR-WL-03 needs "oldest first". It enforces the limit of 50 and exposes the list as LiveData, so a star tapped on one screen updates the others (FR-CD-08).
 - **Layout rules (NFR-13):** every layout and every PR follows these. Hải owns them and checks them in review.
@@ -281,6 +285,7 @@ Fake data sources implement the same data source interfaces as the remote ones, 
 | C5 | Chart | Duy → Kiên | `PriceChartFragment.newInstance(coinId)`: needs only the coin ID, shows timeframe selector, chart and its own states |
 | C6 | Open Detail | Kiên → An Khánh, Bảo Linh | Explicit `Intent`, string extra `coin_id` |
 | C7 | Currency | Hải → all ViewModels, Kiên | Current currency, change notification, and the selector view (main top bar, Detail top bar) |
+| C8 | Coin icons | Vân Khánh → An Khánh, Kiên | `CoinImageLoader` from `CryptoApp`, used with Volley's `NetworkImageView` in the layout; placeholder and error drawables come from the shared resources (Hải) |
 
 The data source interfaces (section 3) are not a contract: only the repository implementations inside the Data layer use them.
 
@@ -312,7 +317,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 2. Call only repository **interfaces** from the ViewModel; never Volley, JSON or a data source.
 3. Put pure logic (filter, sort, slicing, mapping) in plain Kotlin classes and test them in JVM unit tests.
 4. In the Fragment, observe the LiveData and render with the adapter and `StateView`.
-5. Take every color, size and string from the shared resources and formatters.
+5. Take every color, size and string from the shared resources and formatters; show coin icons with `NetworkImageView` and the `CoinImageLoader` (C8).
 6. Run on fake data (including the error scenarios), then on real data.
 
 ---
@@ -326,7 +331,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 | `ErrorMapper` | JVM unit tests with fake Volley errors (429, 5xx and the observed cases of section 8.3) | Volley on the test classpath |
 | Repositories | JVM unit tests with a fake data source and a fake clock (refresh intervals, pause after a 429) | – |
 | ViewModels | JVM unit tests | A rule that runs LiveData synchronously in tests (a Jetpack test library; confirm at setup) |
-| Screens | Manual checklist on the emulator and the demo device | – |
+| Screens, coin icons | Manual checklist on the emulator and the demo device | – |
 
 ---
 
@@ -341,7 +346,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 | D5 | `JSONObject`/`JSONArray` mappers | No extra library; boxed types for missing values | Gson/Moshi | Decided |
 | D6 | `ExecutorService` + main-thread `Handler`, callbacks on the main thread | Platform classes only, no extra library; `AsyncTask` is deprecated | Kotlin coroutines (extra library, new concept); `AsyncTask`; parsing inside Volley's own thread (possible, but less explicit) | Decided; S2 measured 187–332 ms to parse 100 coins, which confirms parsing must stay off the main thread |
 | D7 | No Volley cache: `RequestQueue(NoCache(), BasicNetwork(HurlStack()))`; in-memory data with refresh intervals | No market data on the device; one place decides freshness; cannot be forgotten per request | Volley disk cache; `setShouldCache(false)` on each request | Decided (updated 19 Oct 2026) |
-| D8 | Icons: Volley `ImageLoader` + in-memory cache on the same `NoCache` queue | One networking library | Glide/Picasso | Decided, revisit if slow. Note 19 Oct 2026: S2 loaded icons (about 17.5 KB each) and no credits were charged, but ImageLoader on the `NoCache` queue is not tested yet |
+| D8 | Icons: Volley `ImageLoader` + in-memory cache on the same `NoCache` queue, shown with `NetworkImageView` | One networking library | Glide/Picasso | Decided, revisit if slow. Checked 21 Oct 2026 in the Volley release notes and the `ImageLoader` source (section 8.1); not yet run on our queue. S2 loaded icons (about 17.5 KB each) and no credits were charged |
 | D9 | Chart behind `PriceChart`; MPAndroidChart v3.1.0 baseline | Saves time on touch interaction | Custom Canvas chart (more work, more risk) | Decided (S3 passed; fallback if a later problem appears: basic line chart) |
 | D10 | `SparklineView` drawn with `Canvas` | 100 rows; a library per row would be too heavy | Chart library per row | Decided |
 | D11 | Favorites and currency in `SharedPreferences` (favorites as one JSON array) | Small data; order must be kept | SQLite | Decided |
@@ -353,6 +358,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 | D17 | Tabs are switched with a pill toggle (`MaterialButtonToggleGroup`) in a shared top bar owned by `MainActivity`; no bottom navigation, no tab row, no swiping | With only two destinations a bottom bar looks empty and stacks with the footer bar; the toggle keeps one top bar for ⓘ, tabs and currency; swiping with ViewPager2 would need extra code and the lecture slides say Fragments beyond the off-screen limit are destroyed | Bottom navigation; TabLayout with ViewPager2; a separate tab row | Decided 20 Oct 2026; pill look and fit at 360 dp not verified yet |
 | D18 | `Currency` (USD, VND) is a domain model in `domain/model`; `CurrencySettings` and the selector stay in `core/currency` | The repository interfaces (Domain) take a currency, and Domain must not depend on `core` | `Currency` inside `core/currency` (Domain would have to import from `core`) | Decided 20 Oct 2026 |
 | D19 | The repositories (in-memory data, refresh intervals, pause after a 429) are the same classes in fake and real mode and sit on top of data source interfaces; the remote and the fake data source are the two implementations. The data source interfaces are in `data/`, used only by the repositories | The refresh rule (FR-DATA-01) and the pause after a 429 (FR-ERR-04) are Must and live in the repository; if the fake replaced the repository, they could only be tried on the real API (day 5 or later) and cost quota. The Android data layer guide makes the repository the only entry point of the data layer and allows an in-memory cache inside it | The fake implements the repository interface directly (one interface less, but the two rules cannot be tried on fake data); data source interfaces in `domain/` (ViewModels could call them, against the guide) | Decided 21 Oct 2026 |
+| D20 | `CoinImageLoader` is a concrete class in `core/image` (not in `data/`, no interface), created in `CryptoApp`; layouts show icons with `NetworkImageView` (contract C8) | Features may use `core` but not `data`, and the icon is needed by the coin row and the Detail header; icons are pictures, not market data; nobody needs a fake of it (icons load from the network in both modes, `fake-data.md` §6); `NetworkImageView` is made for lists and handles views that are reused | `CoinImageLoader` in `data/image` (features may not import it); an interface with a fake (extra work, no user); Glide/Picasso (second networking stack, D4, D8) | Decided 21 Oct 2026 |
 
 ---
 
@@ -363,7 +369,7 @@ Closed by S2 (19 Oct 2026): the thread of Volley's listener and the parse time; 
 | Check | When | Affects |
 |---|---|---|
 | Volley errors for HTTP 429 and 5xx: only predicted (section 8.3); covered by an `ErrorMapper` unit test, not by the real API | Data layer | Section 8.3 |
-| `ImageLoader` on the `NoCache` queue; speed of memory-only icons | When `CoinImageLoader` is written | D8 |
+| `CoinImageLoader` on our `NoCache` queue (expected to work, section 8.1); how the icons look (`RGB_565` has no transparency) and how fast memory-only icons load | When `CoinImageLoader` is written | D8, D20 |
 | A6: icons are free, or only cache hits are free (all measured requests were cache hits) | Data layer or later spot check | `01` A6, D8 |
 | Same HTTPS check on the demo emulator (API 36) | First integration build | `01` A5 |
 | Content under the status bar; ViewModel factory and test libraries | Project setup (S4) | Sections 6, 9 |
@@ -387,3 +393,5 @@ Read on 19 Oct 2026:
 
 Read on 21 Oct 2026:
 - Android Developers, *Data layer* (the repository is the only entry point of the data layer; other layers never use data sources directly; a repository can use an in-memory cache as its source of truth; naming of data sources): https://developer.android.com/jetpack/guide/data-layer
+- Volley releases (1.2.0: default and error images for `NetworkImageView`; 1.2.1: Cronet separated, nothing else): https://github.com/google/volley/releases
+- Volley source, `ImageLoader.java` (first-level in-memory image cache, `ImageRequest` sent to the queue, main-thread check, `RGB_565` decoding, `makeImageRequest` is `protected`): https://android.googlesource.com/platform/frameworks/volley/+/refs/heads/main/src/main/java/com/android/volley/toolbox/ImageLoader.java
