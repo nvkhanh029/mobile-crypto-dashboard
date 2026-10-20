@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Colour roles (docs/02-ui spec.md, section 2.1). Layouts and code use these names only;
+    never a literal hex value. Placeholder values, to be replaced by the real design
+    (approved by the team lead). Changing a value here must not require a layout change.
+
+    Contrast (NFR-08, >= 4.5:1):
+      textPrimary   on background  ~16.7:1
+      textSecondary on background  ~7.2:1
+      onPositive    on positive    ~5.0:1
+      onNegative    on negative    ~6.5:1
+      onNeutral     on neutral     ~9.1:1
+      onAccent      on accent      ~6.5:1
+
+    `onAccent` is not listed in 02 section 2.1, but the selected timeframe chip (CMP-10) and
+    the selected segment of the view switch (CMP-13) are filled with `accent` and need a
+    readable text colour. Reported to the team lead for 02 section 2.1.
+-->
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Surfaces -->
+    <color name="background">#FF121212</color>
+    <color name="surface">#FF1E1E1E</color>
+    <color name="divider">#FF2E2E2E</color>
+
+    <!-- Text -->
+    <color name="textPrimary">#FFF2F2F2</color>
+    <color name="textSecondary">#FFA0A0A0</color>
+
+    <!-- Accent: selected chip, links, progress -->
+    <color name="accent">#FF5B9BFF</color>
+    <color name="onAccent">#FF0B1220</color>
+
+    <!-- Direction colours (02 section 2.2; colour is never the only signal) -->
+    <color name="positive">#FF1B7F4D</color>
+    <color name="onPositive">#FFFFFFFF</color>
+    <color name="negative">#FFB3261E</color>
+    <color name="onNegative">#FFFFFFFF</color>
+    <color name="neutral">#FF3A3A3A</color>
+    <color name="onNeutral">#FFE6E6E6</color>
 </resources>

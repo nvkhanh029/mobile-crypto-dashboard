@@ -1,9 +1,59 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.CryptoDashboard" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!--
+        One dark theme only (FR-UI-01, NFR-08). There is deliberately no values-night/ file:
+        the same theme is used whatever the system setting is, and forceDark must not restyle it.
+        All colours come from the role names in colors.xml; no hex value in a layout.
+
+        Placeholder values, to be replaced by the real design.
+    -->
+    <style name="Base.Theme.CryptoDashboard" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Dark only: never let the platform or the OEM auto-darken the app. -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <!-- Surfaces and text -->
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/textPrimary</item>
+        <item name="colorSurfaceVariant">@color/surface</item>
+        <item name="colorOnSurfaceVariant">@color/textSecondary</item>
+        <item name="colorOutline">@color/divider</item>
+        <item name="colorOutlineVariant">@color/divider</item>
+
+        <!-- Accent: selected chip, links, progress -->
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/onAccent</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/onAccent</item>
+
+        <!-- Errors use the same red role as a negative change -->
+        <item name="colorError">@color/negative</item>
+        <item name="colorOnError">@color/onNegative</item>
+
+        <!-- System bars: the app draws edge to edge, so they are transparent -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Components take their corners from the corner dimens, never from a layout -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.CryptoDashboard.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.CryptoDashboard.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.CryptoDashboard.Large</item>
     </style>
 
     <style name="Theme.CryptoDashboard" parent="Base.Theme.CryptoDashboard" />
+
+    <style name="ShapeAppearance.CryptoDashboard.Small" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_s</item>
+    </style>
+
+    <style name="ShapeAppearance.CryptoDashboard.Medium" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_m</item>
+    </style>
+
+    <style name="ShapeAppearance.CryptoDashboard.Large" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_l</item>
+    </style>
 </resources>
