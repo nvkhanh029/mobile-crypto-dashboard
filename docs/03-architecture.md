@@ -281,7 +281,7 @@ Fake data sources implement the same data source interfaces as the remote ones, 
 | C1 | Models and repository interfaces | Vân Khánh → all | Repositories take a currency and a callback; success carries the data and its fetch time; failure carries an `AppError` |
 | C2 | Formatters, `StateView`, `UiState`, style guide | Hải → all | Static/format classes; one sample coin row as the style reference |
 | C3 | Favorites | Bảo Linh → An Khánh, Kiên | `FavoriteStore` (add, remove, contains, list as LiveData) and `FavoriteButton` |
-| C4 | Coin row and adapter | An Khánh → Bảo Linh | Takes coin data and favorite state; reports row tap and favorite toggle |
+| C4 | Coin row and adapter | An Khánh → Bảo Linh | Takes coin data and favorite state; reports row tap and favorite toggle. The star is part of the row: always on Watchlist rows, on Market rows only if FR-ML-08 is built |
 | C5 | Chart | Duy → Kiên | `PriceChartFragment.newInstance(coinId)`: needs only the coin ID, shows timeframe selector, chart and its own states |
 | C6 | Open Detail | Kiên → An Khánh, Bảo Linh | Explicit `Intent`, string extra `coin_id` |
 | C7 | Currency | Hải → all ViewModels, Kiên | Current currency, change notification, and the selector view (main top bar, Detail top bar) |
