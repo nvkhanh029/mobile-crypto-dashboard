@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sizes in dp, text in sp (docs/03-architecture.md, section 11). Layouts and code use these
+    names only; never a literal value. Placeholder values, to be replaced by the real design.
+
+    Corner sizes are not listed in 02 section 2.1; these names are Hải's proposal for the
+    "corner" file the team lead asked for. Reported to the team lead for 02 section 2.1.
+-->
+<resources>
+    <!-- Spacing scale (02 section 2.1) -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_s">8dp</dimen>
+    <dimen name="space_m">16dp</dimen>
+    <dimen name="space_l">24dp</dimen>
+
+    <!-- Minimum touch target (NFR-08, 02 section 2.1) -->
+    <dimen name="touch_min">48dp</dimen>
+
+    <!-- Corner sizes -->
+    <dimen name="corner_xs">2dp</dimen>
+    <dimen name="corner_s">4dp</dimen>
+    <dimen name="corner_m">8dp</dimen>
+    <dimen name="corner_l">16dp</dimen>
+    <dimen name="corner_pill">100dp</dimen>
+
+    <!-- Lines -->
+    <dimen name="divider_thickness">1dp</dimen>
+
+    <!-- Shared component geometry (CMP-01, CMP-03, SCR-05) -->
+    <!-- CMP-03: one named width so the sparklines align down the list. -->
+    <dimen name="sparkline_width">64dp</dimen>
+    <dimen name="sparkline_height">24dp</dimen>
+    <dimen name="coin_icon_size">32dp</dimen>
+    <!-- SCR-05: the chart has a fixed height from a named dimension. -->
+    <dimen name="chart_height">220dp</dimen>
+</resources>

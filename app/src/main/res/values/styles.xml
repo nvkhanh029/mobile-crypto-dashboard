@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Text styles (docs/02-ui spec.md, section 2.1). Use them as `style="@style/RowTitle"` on a
+    TextView; sizes and colours come from here, never from the layout. Placeholder values, to
+    be replaced by the real design.
+
+    `fontFeatureSettings="tnum"` (tabular digits) keeps prices, percentages and statistics from
+    jumping around when a digit changes width. It is not available below API 21 and minSdk is 24.
+-->
+<resources>
+
+    <!-- Top bar title -->
+    <style name="TitleBar" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Coin row, line 1: name -->
+    <style name="RowTitle" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Coin row, line 2: SYMBOL · MC <market cap> -->
+    <style name="RowSubtitle" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/textSecondary</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Price in a coin row (never truncated, so no ellipsize here) -->
+    <style name="Price" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- Price in the Detail header -->
+    <style name="PriceLarge" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- 24h change label (CMP-02). The fill and the `on…` text colour are set by the view. -->
+    <style name="ChangeLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">@color/onNeutral</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- Paragraphs: explanation dialog, description, messages -->
+    <style name="Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+    <!-- Footer bar text (>= 10 sp, FR-INFO-01) -->
+    <style name="Caption" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textColor">@color/textSecondary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Statistics list, label at the start (may be shortened) -->
+    <style name="StatLabel" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/textSecondary</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Statistics list, value at the end (never truncated) -->
+    <style name="StatValue" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:textAlignment">viewEnd</item>
+        <item name="android:maxLines">1</item>
+    </style>
+</resources>
