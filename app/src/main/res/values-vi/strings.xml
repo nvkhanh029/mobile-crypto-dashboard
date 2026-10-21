@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CryptoDashboard</string>
+
+    <!-- CMP-09 StateView -->
+    <string name="retry">Thử lại</string>
+    <string name="content_desc_loading">Đang tải</string>
+    <string name="error_no_connection">Không có kết nối internet</string>
+    <string name="error_timeout">Yêu cầu đã hết thời gian chờ</string>
+    <string name="error_rate_limited">Quá nhiều yêu cầu, hãy thử lại sau một phút</string>
+    <string name="error_server">Dịch vụ dữ liệu đang gặp sự cố, hãy thử lại sau</string>
+    <string name="error_request_rejected">Không tải được dữ liệu (yêu cầu bị từ chối)</string>
+    <string name="error_invalid_data">Dữ liệu nhận được không hợp lệ</string>
+
+    <!-- CMP-08 footer bar -->
+    <string name="powered_by_coingecko">Cung cấp bởi CoinGecko</string>
+    <string name="content_desc_last_updated">Cập nhật lần cuối</string>
+
+    <!-- CMP-01 coin row -->
+    <string name="content_desc_price_trend">Xu hướng giá 7 ngày</string>
+    <string name="content_desc_add_to_watchlist">Thêm vào danh sách theo dõi</string>
+    <string name="content_desc_remove_from_watchlist">Bỏ khỏi danh sách theo dõi</string>
+    <string name="content_desc_explain_statistic">Giải thích %1$s</string>
+
+    <!-- CMP-12 explanation dialog -->
+    <string name="dialog_got_it">Đã hiểu</string>
+    <string name="dialog_how_to_read_title">Cách đọc danh sách này</string>
+    <string name="content_desc_how_to_read">Cách đọc danh sách này</string>
+    <string name="dialog_how_to_read_body">Thứ hạng — Số bên trái là thứ hạng của coin theo vốn hóa thị trường. 1 là lớn nhất.\nMC — MC là vốn hóa thị trường: tổng giá trị của tất cả coin đang lưu hành (giá × nguồn cung lưu hành).\nNhãn thay đổi — Nhãn màu là mức thay đổi giá trong 24 giờ qua. Màu xanh với dấu + là tăng, màu đỏ với dấu - là giảm.\nĐường xu hướng — Đường nhỏ là xu hướng giá trong 7 ngày qua. Nó có thể đi ngược với mức thay đổi 24 giờ.\nNgôi sao — Nhấn vào ngôi sao để thêm hoặc bỏ coin khỏi Danh sách theo dõi.</string>
+
+    <string name="dialog_statistic_market_cap_title">Vốn hóa thị trường</string>
+    <string name="dialog_statistic_market_cap_text">Tổng giá trị của tất cả coin đang lưu hành: giá × nguồn cung lưu hành.</string>
+    <string name="dialog_statistic_volume_24h_title">Khối lượng giao dịch 24h</string>
+    <string name="dialog_statistic_volume_24h_text">Tổng giá trị của đồng coin này được giao dịch trong 24 giờ qua.</string>
+    <string name="dialog_statistic_circulating_supply_title">Nguồn cung lưu hành</string>
+    <string name="dialog_statistic_circulating_supply_text">Số coin đang có sẵn và được giao dịch trên thị trường hiện tại.</string>
+    <string name="dialog_statistic_total_supply_title">Tổng nguồn cung</string>
+    <string name="dialog_statistic_total_supply_text">Số coin đã được tạo ra, trừ đi số coin đã bị loại bỏ vĩnh viễn khỏi lưu hành.</string>
+    <string name="dialog_statistic_max_supply_title">Nguồn cung tối đa</string>
+    <string name="dialog_statistic_max_supply_text">Số coin tối đa có thể tồn tại.</string>
+    <string name="dialog_statistic_ath_title">Giá cao nhất mọi thời đại</string>
+    <string name="dialog_statistic_ath_text">Giá cao nhất được ghi nhận cho đồng coin này.</string>
+    <string name="dialog_statistic_atl_title">Giá thấp nhất mọi thời đại</string>
+    <string name="dialog_statistic_atl_text">Giá thấp nhất được ghi nhận cho đồng coin này.</string>
+</resources>

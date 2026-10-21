@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CMP-09 StateView: centred loading, empty message (+ optional action) or error + Retry. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ProgressBar
+        android:id="@+id/stateLoadingIndicator"
+        android:layout_width="@dimen/touch_min"
+        android:layout_height="@dimen/touch_min"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/content_desc_loading"
+        android:indeterminateTint="?attr/colorPrimary"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/stateMessageText"
+        style="@style/Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_m"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="4"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/stateRetryButton"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_m"
+        android:minHeight="@dimen/touch_min"
+        android:minWidth="@dimen/touch_min"
+        android:text="@string/retry"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/stateEmptyActionButton"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_m"
+        android:minHeight="@dimen/touch_min"
+        android:minWidth="@dimen/touch_min"
+        android:visibility="gone" />
+
+</merge>

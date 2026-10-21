@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Sizes in dp, text in sp (docs/03-architecture.md, section 11). Layouts and code use these
-    names only; never a literal value. Placeholder values, to be replaced by the real design.
-
-    Corner sizes are not listed in 02 section 2.1; these names are Hải's proposal for the
-    "corner" file the team lead asked for. Reported to the team lead for 02 section 2.1.
+    Sizes in dp, text in sp (docs/02-ui-spec.md, section 2.1). Layouts and code use these names
+    only; never a literal value. Placeholder values, to be replaced by the real design.
 -->
 <resources>
     <!-- Spacing scale (02 section 2.1) -->
@@ -25,6 +22,14 @@
 
     <!-- Lines -->
     <dimen name="divider_thickness">1dp</dimen>
+
+    <!-- Small non-interactive icons (footer clock, inline info) -->
+    <dimen name="icon_size_small">16dp</dimen>
+
+    <!-- Footer caption auto-size range, always >= 10 sp (FR-INFO-01) -->
+    <dimen name="caption_text_size_min">10sp</dimen>
+    <dimen name="caption_text_size_max">12sp</dimen>
+    <dimen name="caption_text_size_step">1sp</dimen>
 
     <!-- Shared component geometry (CMP-01, CMP-03, SCR-05) -->
     <!-- CMP-03: one named width so the sparklines align down the list. -->
