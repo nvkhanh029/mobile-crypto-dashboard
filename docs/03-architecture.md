@@ -254,7 +254,7 @@ Fake data sources implement the same data source interfaces as the remote ones, 
 
 - **Theme:** one dark theme; colors, text styles and spacing defined once in resources by Hải. Layouts and Kotlin code use these names only (no hard-coded colors, sizes, strings).
 - **Strings:** English default in `values/`, Vietnamese in `values-vi/`.
-- **Formatters:** plain Kotlin classes with a fixed locale (rules in `01`, §5.2). Dates use `SimpleDateFormat`/`Date`, which works on API 24 without extra setup.
+- **Formatters:** plain Kotlin classes with a fixed locale (rules in `01`, §5.2). Dates use `SimpleDateFormat`/`Date`, which works on API 24 without extra setup. Always pass `Locale.US` to `String.format` (or the `format` extension): without a locale it uses the device's default locale, so a device whose language uses a comma as decimal separator would break the fixed format. `%f` rounds half up, which is the rule of `01` §5.2. `DecimalFormat` rounds half even by default, so it is not used for these formats unless its rounding mode is set to half up. Both statements come from the Java SE specification (section 18); the Android reference pages could not be read, so the behaviour on Android is not checked in the docs: the unit tests of the formatters (for example `0.005` → `0.01`, `999,996` → `1.00M`) are the check.
 - **StateView:** shows loading, empty or error (with Retry) from a `UiState`.
 - **Coin icons:** shown with Volley's `NetworkImageView` and the `CoinImageLoader` that `CryptoApp` provides (contract C8, section 8.1). The placeholder and the error image are drawables in the shared resources (Hải). A layout never loads an image in any other way.
 - **Currency:** the `Currency` type itself (USD, VND) is a domain model in `domain/model`, because the repository interfaces take it (section 3, D18). `CurrencySettings` stores the choice in `SharedPreferences` and exposes it as LiveData. A screen's Fragment observes it and tells its ViewModel to reload when it changes (FR-CUR-04). The selector sits at the right end of the main top bar (both tabs) and, as a Should, in the Detail top bar (FR-CUR-05); both use the same saved value.
@@ -268,7 +268,7 @@ Fake data sources implement the same data source interfaces as the remote ones, 
   6. A screen that can be taller than the display (Coin Detail) scrolls (`NestedScrollView` or `RecyclerView`). Lists use `RecyclerView`.
   7. Charts, sparklines and images take their size from the parent (constraints) or from `dimens`. Custom Views read their size in `onSizeChanged`/`onMeasure`, never from constants.
   8. Do not use `ScrollView` inside `ScrollView`, and do not design for only one device: run the two checks below before opening a PR.
-  - **Two checks per screen:** emulator 360×640 dp and emulator 411×891 dp, both at the default font size. Also try the longest realistic content: a long coin name, a 7-digit price, and a VND market cap (`32.5T ₫`).
+  - **Two checks per screen:** emulator 360×640 dp and emulator 411×891 dp, both at the default font size. Also try the longest realistic content: a long coin name, a 7-digit price, and a VND market cap (`32.50T ₫`).
 - **Footer bar (`AttributionView`):** the only bottom bar, fixed at the bottom of the screen on Market, Watchlist and Detail, with "Powered by CoinGecko" (link) on the left and, on Market and Watchlist, the last-updated time with a clock icon on the right (FR-INFO-01, FR-DATA-03). The time comes from the `UiState` success value, so it stays correct while old data is kept after an error.
 - **Sparkline:** a small custom `View` drawing a line on a `Canvas`, with no chart library, because 100 rows are drawn at once.
 
@@ -395,3 +395,8 @@ Read on 21 Oct 2026:
 - Android Developers, *Data layer* (the repository is the only entry point of the data layer; other layers never use data sources directly; a repository can use an in-memory cache as its source of truth; naming of data sources): https://developer.android.com/jetpack/guide/data-layer
 - Volley releases (1.2.0: default and error images for `NetworkImageView`; 1.2.1: Cronet separated, nothing else): https://github.com/google/volley/releases
 - Volley source, `ImageLoader.java` (first-level in-memory image cache, `ImageRequest` sent to the queue, main-thread check, `RGB_565` decoding, `makeImageRequest` is `protected`): https://android.googlesource.com/platform/frameworks/volley/+/refs/heads/main/src/main/java/com/android/volley/toolbox/ImageLoader.java
+
+Read on 21 Oct 2026 (number formatting):
+- Oracle, Java SE 17 API, `java.util.Formatter` (the `f` conversion rounds with the round half up algorithm; with no explicit locale the default locale is used): https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Formatter.html
+- Oracle, Java SE 17 API, `java.text.DecimalFormat` (rounding mode is half even by default; a new instance uses the default FORMAT locale): https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/text/DecimalFormat.html
+- Kotlin standard library, `String.format` (uses the default locale unless one is passed; syntax of `java.util.Formatter`): https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/format.html

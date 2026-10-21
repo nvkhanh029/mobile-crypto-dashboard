@@ -220,12 +220,12 @@ Grouping separator `,` and decimal separator `.` for both currencies.
 |---|---|---|
 | USD price | ≥ 1: 2 decimals; 0.01 to < 1: 4 decimals; < 0.01: 8 decimals | `$67,234.50`, `$0.2345`, `$0.00001234` |
 | VND price | ≥ 1,000: 0 decimals; 1 to < 1,000: 2 decimals; < 1: 6 decimals; symbol `₫` after the number | `1,650,000 ₫`, `312.50 ₫` |
-| Compact numbers (market cap, volume, supply) | ≥ 1,000 uses K/M/B/T with 2 decimals; currency symbol as above | `$1.23B`, `340.00M`, `32.5T ₫` |
+| Compact numbers (market cap, volume, supply) | 2 decimals. From 1,000 upward the number is divided and gets the suffix K, M, B or T; below 1,000 there is no suffix; a value of 0 shows `0`. The suffix is chosen after rounding, so 999,996 shows `1.00M`, not `1000.00K`. Currency symbol as above | `$1.23B`, `340.00M`, `32.50T ₫`, `$523.40`, `1.00M` |
 | Percent | Always signed, 2 decimals | `+2.35%`, `-0.40%`, `0.00%` |
 | Missing value | `—` | |
 | Last-updated time | `HH:mm dd/MM` in device time zone | `14:32 13/10` |
 
-The decimal rules are the team's proposal; they may be adjusted after the spike shows real price ranges, but must stay in this table.
+Every rounding in this table is half up: a value exactly halfway rounds away from zero (0.005 becomes 0.01). The decimal rules are the team's proposal; they may be adjusted after the spike shows real price ranges, but must stay in this table.
 
 ---
 

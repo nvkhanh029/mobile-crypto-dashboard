@@ -356,7 +356,7 @@ Owner: Kiên. Opened with the string extra `coin_id` (C6). Uses the currency sav
 │ [1H][24H][7D][1M][1Y]        │  CMP-10   ┐
 │  chart                       │  SCR-05   ┘ PriceChartFragment
 │ Market cap ⓘ        $1.30T   │
-│ 24h trading volume ⓘ $32.5B  │  CMP-11
+│ 24h trading volume ⓘ $32.50B │  CMP-11
 │ ...                          │
 │ About Bitcoin                │
 │ description (4 lines) ...    │
@@ -445,7 +445,7 @@ Use these when checking a layout at 360×640 dp and 411×891 dp (the fake files 
 | Long coin name | a 30–40 character name: the name shortens, price and change label stay whole |
 | Short and long symbols | `BTC`, `USDT`, a 6-character symbol |
 | Very small price | `$0.00001234` (8 decimals) |
-| Large VND values | `1,650,000 ₫` price, `32.5T ₫` market cap |
+| Large VND values | `1,650,000 ₫` price, `32.50T ₫` market cap |
 | Rank | `1` and `100` |
 | Change | positive, negative, zero, missing |
 | Missing fields | use `markets_missing_fields_usd.json` and `detail_missing_fields.json` |
