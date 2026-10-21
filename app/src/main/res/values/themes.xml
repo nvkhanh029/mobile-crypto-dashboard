@@ -30,10 +30,6 @@
         <item name="colorError">@color/negative</item>
         <item name="colorOnError">@color/onNegative</item>
 
-        <!-- System bars: the app draws edge to edge, so they are transparent -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-
         <!-- Components take their corners from the corner dimens, never from a layout -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.CryptoDashboard.Small</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.CryptoDashboard.Medium</item>
