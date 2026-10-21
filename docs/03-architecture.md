@@ -226,7 +226,7 @@ The 429 and 5xx rows are covered by a JVM unit test of `ErrorMapper` that builds
 After a 429, the repository refuses new calls to the data source for 60 s (FR-ERR-04). Because this rule is in the repository, it also applies to the fake `rate_limited` scenario.
 
 ### 8.4 JSON mapping
-Mappers use `JSONObject`/`JSONArray` and return domain models. Fields that may be missing are boxed types (`Double`, not `double`) so "missing" is different from 0 (FR-CD-06, FR-ML-09). Which fields can be null is confirmed from real responses in S1 and recorded in `04-api-contract.md`.
+Mappers use `JSONObject`/`JSONArray` and return domain models. Fields that may be missing are nullable types (for example `Double?`), so "missing" (`null`) is different from 0 (FR-CD-06, FR-ML-09). An absent key and a JSON `null` are treated the same way (`04` §1.1). Which fields can be null is confirmed from real responses in S1 and recorded in `04-api-contract.md`.
 
 ### 8.5 Fake data
 Fake data sources implement the same data source interfaces as the remote ones, read the JSON files in `assets/fake`, and can produce the error scenarios. The repositories above them are identical in both modes (D19). Details in `fake-data.md`.
@@ -307,7 +307,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 - `ChartSandboxActivity` lives in the `debug` source set and has its own launcher entry. It hosts `PriceChartFragment` for a fixed coin ID, running on fake data from `assets/fake`, with the real `ChartRepository` interface, `CurrencySettings`, formatters and `StateView`.
 - Duy tests all five timeframes, the "Not enough data" case (the short chart file), VND formatting and error scenarios here, without waiting for Detail or the network layer.
 - When Kiên's `CoinDetailActivity` exists, it only places `PriceChartFragment` in a container. No chart code is written in Detail.
-- Until C1, C2 and C7 exist (end of day 2), Duy writes against the interfaces with small stubs in his own package and replaces them when the real ones land.
+- Until C1 and C2 exist (end of day 2; C2 no later than day 3) and the repositories run on the fake data sources (day 3), Duy writes against the interfaces with small stubs in his own package and replaces them when the real ones land. Only the reload on a currency change (Should, FR-CUR-05) needs C7 (day 3).
 
 ---
 
@@ -343,7 +343,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 | D2 | ViewModel + LiveData for screen state | Lifecycle safety, survives tab switching, testable | Plain listeners (each Fragment must register/unregister correctly) | Decided |
 | D3 | Manual dependency injection through `CryptoApp` | Few classes, easy to explain | Hilt (extra setup, annotation processing) | Decided |
 | D4 | Volley for HTTP, `StringRequest`, one `RequestQueue` | Simple, asynchronous out of the box; latest stable release 1.2.1 | Retrofit/OkHttp (more concepts to learn) | Decided; works on the API 24 emulator (S2) |
-| D5 | `JSONObject`/`JSONArray` mappers | No extra library; boxed types for missing values | Gson/Moshi | Decided |
+| D5 | `JSONObject`/`JSONArray` mappers | No extra library; nullable types for missing values | Gson/Moshi | Decided |
 | D6 | `ExecutorService` + main-thread `Handler`, callbacks on the main thread | Platform classes only, no extra library; `AsyncTask` is deprecated | Kotlin coroutines (extra library, new concept); `AsyncTask`; parsing inside Volley's own thread (possible, but less explicit) | Decided; S2 measured 187–332 ms to parse 100 coins, which confirms parsing must stay off the main thread |
 | D7 | No Volley cache: `RequestQueue(NoCache(), BasicNetwork(HurlStack()))`; in-memory data with refresh intervals | No market data on the device; one place decides freshness; cannot be forgotten per request | Volley disk cache; `setShouldCache(false)` on each request | Decided (updated 19 Oct 2026) |
 | D8 | Icons: Volley `ImageLoader` + in-memory cache on the same `NoCache` queue, shown with `NetworkImageView` | One networking library | Glide/Picasso | Decided, revisit if slow. Checked 21 Oct 2026 in the Volley release notes and the `ImageLoader` source (section 8.1); not yet run on our queue. S2 loaded icons (about 17.5 KB each) and no credits were charged |
