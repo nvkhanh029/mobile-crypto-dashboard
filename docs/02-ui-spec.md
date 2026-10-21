@@ -55,9 +55,11 @@ One dark theme (FR-UI-01). Hải defines these **roles** once in resources; layo
 
 | Kind | Roles |
 |---|---|
-| Colour | `background`, `surface` (cards, chips, bars), `textPrimary`, `textSecondary`, `divider`, `accent` (selected chip, links, progress), `positive`, `negative`, `neutral`, `onPositive`, `onNegative`, `onNeutral` (text on a coloured label) |
+| Colour | `background`, `surface` (cards, chips, bars), `textPrimary`, `textSecondary`, `divider`, `accent` (selected chip, links, progress), `positive`, `negative`, `neutral`, `onPositive`, `onNegative`, `onNeutral` (text on a coloured label), `onAccent` (text on `accent`: the selected timeframe chip, CMP-10, and the selected segment of the view switch, CMP-13) |
 | Text style | `TitleBar`, `RowTitle`, `RowSubtitle`, `Price`, `PriceLarge`, `ChangeLabel`, `Body`, `Caption` (footer text, size ≥ 10 sp per FR-INFO-01), `StatLabel`, `StatValue` |
-| Spacing | a small named scale (for example `space_xs`, `space_s`, `space_m`, `space_l`) and one `touch_min` = 48 dp |
+| Spacing | `space_xs`, `space_s`, `space_m`, `space_l` (a small named scale) and one `touch_min` = 48 dp |
+| Corner size | `corner_xs`, `corner_s`, `corner_m`, `corner_l`, `corner_pill` |
+| Component size | `divider_thickness`, `sparkline_width` and `sparkline_height` (CMP-03), `coin_icon_size`, `chart_height` (SCR-05) |
 
 All text and icons meet contrast ≥ 4.5:1 against their background (NFR-08).
 
