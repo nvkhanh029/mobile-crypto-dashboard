@@ -40,8 +40,10 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 - Kotlin + XML Views (Activities, Fragments, RecyclerView, Material components).
   **No Jetpack Compose** (not accepted by the instructor).
 - minSdk 24, compileSdk 37, portrait only, dark theme only.
-- ViewModel + LiveData per screen. Manual dependency injection through `CryptoApp` and
-  `ViewModelFactory`. No Hilt.
+- ViewModel + LiveData per screen. Manual dependency injection through `CryptoApp`, which exposes the
+  repositories and the other shared objects as properties. Each feature writes the small ViewModel
+  factory of its own screens (`viewModelFactory { initializer { ... } }`); there is no shared factory.
+  No Hilt.
 - Volley for HTTP and `org.json` for JSON. No Retrofit, OkHttp, Gson or Moshi.
 - Coin icons: Volley `NetworkImageView` with the `CoinImageLoader` from `CryptoApp` (contract C8). No Glide, Picasso or Coil.
 - Threading: one `ExecutorService` + a `Handler` on the main looper. Repository callbacks always
@@ -90,7 +92,7 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 ## 8. Ownership and contracts
 | Area | Owner | Folders and files |
 |---|---|---|
-| Data layer, CryptoApp, ViewModelFactory, coin icon loader, build files | Vân Khánh | `data/`, `domain/`, `core/image`, `app/CryptoApp`, `app/ViewModelFactory`, `res/xml/`, `res/raw/`, Gradle files |
+| Data layer, CryptoApp, coin icon loader, build files | Vân Khánh | `data/`, `domain/`, `core/image`, `app/CryptoApp`, `res/xml/`, `res/raw/`, Gradle files |
 | UI foundation, MainActivity, formatters, StateView, currency, shared resources | Hải | `core/ui`, `core/format`, `core/currency`, `app/MainActivity`, and the shared values in `res/` (theme, colors, dimens, text styles, shared drawables, the common `strings.xml`) |
 | Market list | An Khánh | `features/marketlist`, and the layouts, drawables and strings file of its screens |
 | Coin detail | Kiên | `features/detail`, and the layouts, drawables and strings file of its screen |
@@ -98,6 +100,7 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 | Watchlist, favorites | Bảo Linh | `features/watchlist`, `core/favorite`, and the layouts, drawables and strings file of its screen |
 
 - **Layouts and drawables** of a screen belong to the owner of that screen (the shared coin row layout is An Khánh's, C4).
+- **ViewModel factory:** the factory of a screen's ViewModel is in the feature's own package and belongs to the owner of that feature. It takes the repositories from `CryptoApp`; nobody edits a file of another member to register a ViewModel.
 - **Strings:** put the strings of your screen in a strings file of your own, in `values/` and in `values-vi/`, and start
   each string name with the name of your feature so that names never clash. Words used by several screens go in the common
   `strings.xml`, which is Hải's: ask the member to ask Hải. Hải reviews the Vietnamese text.
