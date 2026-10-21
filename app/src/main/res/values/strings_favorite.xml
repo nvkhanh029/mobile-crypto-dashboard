@@ -3,4 +3,5 @@
 <resources>
     <string name="favorite_add">Add to watchlist</string>
     <string name="favorite_remove">Remove from watchlist</string>
+    <string name="favorite_full">Watchlist is full (50)</string>
 </resources>
