@@ -183,7 +183,7 @@ Known limitation (decided 19 Oct 2026): the network library reports a failed sec
 | ID | Requirement | Pri | Acceptance criteria |
 |---|---|---|---|
 | FR-INFO-01 | Data attribution | M | Market, Watchlist and Detail show the text "Powered by CoinGecko" in a fixed footer bar at the bottom of the screen, in a legible font of size ≥ 10, visible without scrolling past data; tapping opens https://www.coingecko.com. Not hidden or obscured. Nothing in the app suggests CoinGecko endorses it. |
-| FR-INFO-02 | Disclaimer | M | Detail (or an About dialog reachable from the Market tab) shows "For information only. Not financial advice." |
+| FR-INFO-02 | Disclaimer | M | Detail shows "For information only. Not financial advice." as the last block of the screen, below the description. It is part of the Detail content: it is shown whenever Detail shows its content (also when an inline error is shown over data that is already on screen, FR-ERR-03), and it is not shown while Detail is in the full-screen loading or error state, where there is no data to explain (`02` SCR-04). |
 | FR-INFO-03 | How to read the list | S | The main top bar, shared by the Market and the Watchlist tab, has an ⓘ icon at its left end (touch target ≥ 48 dp, content description "How to read this list"). Tapping it opens a dialog that explains, in one short sentence each: rank, market cap (MC), the 24h change label (sign and colour), the 7-day trend line (and that it can point a different way than the 24h change) and the star. The dialog is the same on both tabs; "Got it" closes it. The text comes from string resources, English and Vietnamese (FR-UI-02). The dialog needs no network and no data. |
 
 ### 4.9 Appearance and language
