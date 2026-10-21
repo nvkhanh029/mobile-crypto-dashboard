@@ -4,7 +4,7 @@
 **Version:** 1.0 | **Team:** 6 | **Duration:** ~10 working days <br>
 **Scope of this file:** *what* the app must do and how we verify it. What each screen contains and how it behaves is in `02-ui-spec.md`. *How* it is built is in `03-architecture.md`, API facts are in `04-api-contract.md`, interfaces in `05-interfaces.md`, tasks in `06-task-plan.md`, tests in `07-test-plan.md`.
 
-Priority legend: **M** = Must (demo cannot fail without it), **S** = Should (do after all M are merged), **C** = Could (only if everything else is done).
+Priority legend: **M** = Must (demo cannot fail without it), **S** = Should (do after all M are merged), **C** = Could (only if all Must and Should items are done).
 
 ---
 
@@ -56,7 +56,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 | A1 | `days=365` (1Y) works on Demo; Demo history is limited to the past 365 days (documented). | FR-CD-03 | Confirmed (S1): `days=365` returns 366 points about 1 day apart. |
 | A2 | `days=1` returns about 5-minute points, enough for 1H (about 12 points). | FR-CD-03 | Confirmed (S1): 289 points about 5 minutes apart; 13 points in the last 60 minutes. |
 | A3 | `vs_currency=vnd` works on the markets, detail and chart endpoints. | FR-CUR | Confirmed (S1). |
-| A4 | Which fields can be null (`max_supply`, `ath_date`, description, `sparkline_in_7d`, `price_change_percentage_24h`, …). | FR-ML-09, FR-CD-06 | Partly confirmed (S1): `max_supply` is null for 46 of 100 coins in the list and for ethereum and solana in detail; `roi` is null for 91 of 100; the other fields checked were not null in the sample. The list is in `04`; the edge-case files cover the rest. |
+| A4 | Which fields can be null (`max_supply`, `ath_date`, description, `sparkline_in_7d`, `price_change_percentage_24h`, …). | FR-ML-09, FR-CD-06 | Partly confirmed (S1): `max_supply` is null for 46 of 100 coins in the USD list and for ethereum and solana in detail; `roi` is null for 91 of 100; the other fields checked were not null in the sample. The list is in `04`; the edge-case files cover the rest. |
 | A5 | HTTPS to the API and the image host works on an API 24 emulator and on the demo emulator. | All | Confirmed with a fix (S2): on API 24 it first failed (the device does not trust the certificate chain). It works with a network security configuration (`03` §8.1); both hosts returned 200. Not yet tried on the API 36 demo emulator. |
 | A6 | Image requests (coin icons) do not count against the API call quota. | FR-ML-01 | Partly confirmed (S2): no credits were charged for icon requests, but every measured request was a cache hit, so "icons are free" cannot be told apart from "cache hits are free". |
 
@@ -64,7 +64,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 | Item | Value |
 |---|---|
 | Rate limit | Demo account: **100 calls/minute** (account dashboard, 13 Oct 2026). Monthly allowance: 10,000 credits. |
-| API key (D-KEY) | One shared team key, held by the Tech Lead, used for integration and demo builds. Daily development uses fake data (see `fake-data.md`). The key stays in `local.properties` and is never committed. |
+| API key (D-KEY) | One shared team key, held by the team lead, used for integration and demo builds. Daily development uses fake data (see `fake-data.md`). The key stays in `local.properties` and is never committed. |
 | Attribution | "Powered by CoinGecko", legible font, size ≥ 10, linking to https://www.coingecko.com (ToS clause 4.3). |
 | Data storage | No market data is stored on the device. |
 | Caching and copying (ToS) | Clause 6.1: CoinGecko does not encourage caching or storage of Data; if Data is cached it must be refreshed at least every 24 hours and protected with strong encryption. Clause 6.2: Data may not be copied or reproduced "except as expressly permitted" by the Terms. Clause 6 has no exception for development or testing; clause 3.1 licenses use of the API to develop, test and support applications. Clause 2.6 defines Data as content made available by CoinGecko (coin information, market data, statistics); it does not name images or logos. |
@@ -158,7 +158,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 | FR-DATA-01 | Minimum refresh intervals | M | The app does not call the network for the same data again within: market list and watchlist 60 s; chart 1H/24H 60 s; 7D 5 min; 1M/1Y 15 min; coin detail stats 60 s. A user action inside the interval (pull, reopening Detail) uses the data already held. |
 | FR-DATA-02 | No stored market data | M | Market, chart and detail data are held in memory only while the app runs and are never written to device storage. Only favorite coin IDs and the currency choice are stored. |
 | FR-DATA-03 | Last updated | M | Market and Watchlist show the time the data on screen was fetched (format in §5.2) at the right of the footer bar, next to a clock icon whose content description is "Last updated". The time stays visible when old data is kept after an error (FR-ERR-03). |
-| FR-DATA-04 | Launch without network | M | No data and no network → full-screen error state with Retry (no empty list). |
+| FR-DATA-04 | Launch without network | M | No data and no network → an error state that fills the content area of the screen, with Retry (no empty list). |
 
 ### 4.7 States and errors (FR-ERR)
 | ID | Requirement | Pri | Acceptance criteria |

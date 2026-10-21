@@ -2,7 +2,7 @@
 
 **Purpose:** let all six members build and test features without calling the real CoinGecko API, so we do not spend the 10,000-credit monthly allowance, and so tests are repeatable. <br>
 **Related:** `01-requirements.md` (NFR-12, D-KEY), `04-api-contract.md` (the real responses these files come from), `05-interfaces.md` (the data-source interfaces). <br>
-**Owner:** Tech Lead creates the files and the fake classes; feature owners may request extra scenarios.
+**Owner:** the team lead creates the files and the fake classes; feature owners may request extra scenarios.
 
 ---
 
@@ -117,7 +117,7 @@ Captured files are read from `fake/`, edge-case files from `fake/edge/`. The ans
 | `fail_then_ok` | First request fails with `server_error`, the next succeeds (tests Retry and "keep old data") |
 
 ### 5.3 Unit tests
-Unit tests build the fake data source directly with a scenario, for example `FakeMarketDataSource(Scenario.EMPTY)` (the class names are examples; the exact names are in `05-interfaces.md`), without reading `local.properties`. A repository test passes that fake data source and a fake clock to the repository. JVM tests read the same JSON files as the app, so there is **one copy** of each file. The Tech Lead configures the test source set to include `src/main/assets` and adds the `org.json` library for tests, because plain JVM tests do not contain a working `JSONObject`. (Setup details are to be confirmed when the project is created.)
+Unit tests build the fake data source directly with a scenario, for example `FakeMarketDataSource(Scenario.EMPTY)` (the class names are examples; the exact names are in `05-interfaces.md`), without reading `local.properties`. A repository test passes that fake data source and a fake clock to the repository. JVM tests read the same JSON files as the app, so there is **one copy** of each file. The team lead configures the test source set to include `src/main/assets` and adds the `org.json` library for tests, because plain JVM tests do not contain a working `JSONObject`. (Setup details are to be confirmed when the project is created.)
 
 Watchlist storage has its own in-memory fake for unit tests; no JSON is involved.
 

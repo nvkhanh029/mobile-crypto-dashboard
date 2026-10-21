@@ -85,7 +85,7 @@ A minimal `CryptoApp` and `ViewModelFactory` come with C1 (end of day 2), so tha
 | 4 | Screens on fakes | Market, Detail and Watchlist screens. Vân Khánh: remote data source for Market (the real network path) with the `ErrorMapper` class; `CoinImageLoader` (C8). |
 | 5 | Real data begins | **Market List runs on real data by the end of day 5.** Remote data sources for Detail, chart and data by ID. Kiên attaches the chart to Detail. Owners write their tests and edge cases. |
 | 6–7 | Integration | Real chart data, favorites synchronised across screens, VND, error and rate-limit cases, full flow works end to end. Vân Khánh: the `ErrorMapper` unit test (including 429 and 5xx), the manual checklist written (day 6), run at the end of day 7. |
-| 8 | Quality | Hải: UI polish pass. Vietnamese strings. Error and edge cases. Could items only if every Must is done and merged. |
+| 8 | Quality | Hải: UI polish pass. Vietnamese strings. Error and edge cases. Could items only if every Must and Should is done and merged. |
 | 9 | QA | Vân Khánh runs the full checklist; fix bugs; CI green; README. |
 | 10 | Presentation | Demo script, rehearsal, recorded demo as backup, tag the release on `main`. |
 
@@ -128,7 +128,7 @@ Everyone must also know how to use the shared parts: repository interfaces (C1),
 | Risk | Likelihood | Impact | Mitigation | Owner |
 |---|---|---|---|---|
 | Vân Khánh is the critical path on days 2–3 (`05`, models, interfaces, fake data sources, minimal `CryptoApp`, then the repositories) | High | High | Fixed order (`05` first, then C1 with the models and interfaces, then the repositories); others work on layouts with temporary data and stubs meanwhile | Vân Khánh |
-| Chart takes longer than planned | Medium | High | The library is chosen (S3 passed); the chart sandbox lets Duy work alone; fall back to a basic line chart without touch if the library later does not fit | Duy |
+| Chart takes longer than planned | Medium | High | The library is chosen (S3 passed); the chart sandbox lets Duy work alone; fall back to a basic line chart that still has the touch marker (FR-CD-04, a Must) if the library later does not fit | Duy |
 | Inconsistent UI between screens | Medium | Medium | Hải's style names on day 1 (placeholder values), then the style guide and sample row by day 2–3; review pairs check style use; polish pass on day 8 | Hải |
 | A member is slow or unavailable | Medium | Medium | Watchlist is the lightest area; check progress on day 3; reassign Could items first | Vân Khánh |
 | API quota or rate limit during development | Medium | Medium | Fake data by default; one shared key; real mode only when integrating | Vân Khánh |
