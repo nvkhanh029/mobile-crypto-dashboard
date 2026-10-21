@@ -35,7 +35,7 @@ The scripted demo runs end to end on an emulator with a recent stable Android im
 Market List, Coin Detail, Watchlist, USD/VND currency selection, loading/empty/error states, data attribution, disclaimer.
 
 ### 2.2 Out of scope
-iOS and other platforms, offline use and any persistent storage of market data (only favorite coin IDs and the currency choice are stored), accounts/login, cloud sync, portfolio, trading, price alerts, push notifications, tablet layouts, landscape orientation, global search beyond the top 100 (Could), in-app language switch, a custom backend, several or named watchlists (the app has exactly one watchlist), a horizontal ticker strip of coins, sharing or copying a link to a coin.
+iOS and other platforms, offline use and any persistent storage of market data (only favorite coin IDs and the currency choice are stored), accounts/login, cloud sync, portfolio, trading, price alerts, push notifications, tablet layouts, landscape orientation, search beyond the loaded top 100, in-app language switch, a custom backend, several or named watchlists (the app has exactly one watchlist), a horizontal ticker strip of coins, sharing or copying a link to a coin.
 
 ### 2.3 Constraints
 - Native Android, Kotlin with XML Views (Activities/Fragments, RecyclerView, Material components; no Jetpack Compose), Android Studio. minSdk 24 (Android 7.0). Portrait orientation only.
@@ -233,7 +233,7 @@ Every rounding in this table is half up: a value exactly halfway rounds away fro
 
 - **Must:** FR-NAV-01…03, FR-ML-01…07 and 09, FR-CD-01…04, 06…08, FR-WL-01…05, 08…10, FR-CUR-01…04, FR-DATA-01…04, FR-ERR-01…04, FR-INFO-01…02, FR-UI-01, NFR-01, 03…07, 09…12.
 - **Should:** FR-ML-08, FR-CD-05, FR-CD-10, FR-CD-11, FR-CD-13, FR-CUR-05, FR-INFO-03, FR-UI-02, NFR-02, NFR-08, NFR-13.
-- **Could:** FR-ML-10, FR-CD-09, FR-CD-12, FR-WL-06, FR-WL-07, global search.
+- **Could:** FR-ML-10, FR-CD-09, FR-CD-12, FR-WL-06, FR-WL-07.
 
 If time runs short, cut in this order: Could → FR-CUR-05 → FR-CD-11 → FR-CD-13 → FR-UI-02 → FR-CD-05 → FR-ML-08 → FR-INFO-03 → FR-CD-10. The two explanation items are cut last because the target users are beginners (§1.2).
 
