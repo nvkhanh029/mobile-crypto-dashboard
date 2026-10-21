@@ -227,3 +227,54 @@ val viewModel = ViewModelProvider(this, marketViewModelFactory(app)).get(MarketV
 A ViewModel that needs an ID (Detail, chart) takes it as a constructor parameter of its factory function, for example `detailViewModelFactory(app, coinId)`; the `coin_id` comes from the Intent (C6) or from `PriceChartFragment.newInstance(coinId)` (C5).
 
 - Not yet compiled in the project: the `viewModelFactory { initializer { … } }` form comes from the Android documentation (`03` §18); the lifecycle libraries are not in `libs.versions.toml` yet (`03` §17). The imports are added by Android Studio.
+
+---
+
+## 7. Fake data sources (`data/fake`)
+
+The four fake data sources of section 4 implement the same interfaces as the remote ones. They are plain Kotlin classes: they use no `Context` and no `Handler`, so the same classes run in the app and in JVM unit tests (`fake-data.md` §5.3). They get everything they need through their constructor:
+
+```kotlin
+enum class Scenario {
+    NORMAL, MISSING_FIELDS, SHORT_LIST, EMPTY, INVALID_JSON, HTML_DESCRIPTION,
+    SHORT_CHART, NO_CONNECTION, TIMEOUT, RATE_LIMITED, SERVER_ERROR, REJECTED,
+    FAIL_THEN_OK;
+
+    companion object {
+        fun fromName(name: String): Scenario   // "rate_limited" -> RATE_LIMITED
+    }
+}
+
+fun interface FakeFileReader {
+    fun read(path: String): String             // path inside assets, e.g. "fake/markets_usd.json"
+}
+
+fun interface MainThreadPoster {
+    fun post(delayMs: Long, action: Runnable)
+}
+
+class MarketListFakeDataSource(
+    reader: FakeFileReader,
+    scenario: Scenario,
+    delayMs: Long,
+    executor: java.util.concurrent.Executor,
+    mainThread: MainThreadPoster,
+) : MarketListDataSource
+```
+
+`CoinsByIdsFakeDataSource`, `CoinDetailFakeDataSource` and `ChartFakeDataSource` have the same five constructor parameters.
+
+| Parameter | In the app (`CryptoApp`) | In a JVM unit test |
+|---|---|---|
+| `reader` | reads from `assets` through the `AssetManager` | reads `src/main/assets` from the disk |
+| `delayMs` | `BuildConfig.FAKE_DELAY_MS` | 0 |
+| `executor` | the shared background `ExecutorService` | any `Executor`, for example one that runs the task at once |
+| `mainThread` | posts to the main looper with `Handler.postDelayed` | runs the action at once and ignores the delay |
+
+Rules:
+- **Threading:** the file is read and parsed on `executor`; `onSuccess` and `onError` are delivered with `mainThread.post(delayMs, …)`, so they arrive on the main thread after the delay (`03` §5).
+- **Scenario value:** `Scenario.fromName` turns the text of `FAKE_SCENARIO` into the constant of the same name in upper case (`Locale.US`). A text that matches no constant throws `IllegalArgumentException("Unknown FAKE_SCENARIO: …")`, so the app stops at startup instead of quietly running `normal`.
+- **What a scenario changes:** only what `fake-data.md` §5.2 lists; every other request is answered as in `NORMAL`. The five error scenarios (`NO_CONNECTION`, `TIMEOUT`, `RATE_LIMITED`, `SERVER_ERROR`, `REJECTED`) make all four data sources answer with the matching `AppError` (`fake-data.md` §4).
+- **`FAIL_THEN_OK`:** each data source counts its own requests. Its first request fails with `AppError.ServerError` and every later request succeeds as in `NORMAL`. The count is per data source, not per coin and not for the whole app, so every screen can be tried on its own.
+- **Files:** `fake/` for captured files and `fake/edge/` for edge-case files (`fake-data.md` §2, §3). A missing file is a programming error, not an `AppError`: the reader throws and the test or the app fails at once.
+- **Test helpers:** the disk reader and the immediate poster of the table are written by Vân Khánh in the test source set; their names are not part of this contract. The working directory of the Gradle test task is the project directory (`app/`) by default (Gradle documentation, read 22 Oct 2026); that the Android Gradle Plugin keeps it is not verified. If it does not, one line in the build file fixes it and nothing in this section changes.
