@@ -1,7 +1,7 @@
 # 02 – UI Specification
  
-**Project:** Crypto Dashboard (Android, native Kotlin, XML Views)<br>
-**Related:** `01-requirements.md` (requirement IDs), `03-architecture.md` (how it is built, layout rules in §11), `06-task-plan.md` (owners), `fake-data.md` (test data).<br>
+**Project:** Crypto Dashboard (Android, native Kotlin, XML Views) <br>
+**Related:** `01-requirements.md` (requirement IDs), `03-architecture.md` (how it is built, layout rules in §11), `06-task-plan.md` (owners), `fake-data.md` (test data). <br>
 **Owners of this file:** Hải (UI foundation) keeps it in line with the styles; each feature owner follows the part for their screen.
  
 ---
@@ -17,6 +17,7 @@ Rules for everyone, including AI coding assistants:
 3. **Text shown to the user comes from string resources.** The English wording in this document is the intended meaning; the exact strings live in `strings.xml` (`values/` for English, `values-vi/` for Vietnamese).
 4. **No hard-coded colours, sizes or strings**, and follow the layout rules in `03-architecture.md` §11 (dp/sp, flexible widths, ellipsis, 48 dp touch targets, check at 360×640 dp and 411×891 dp).
 5. **Layout reference.** The look is that of a clean, dark, list-first market app: a compact row per item with a trend line and a coloured change label, a chart with timeframe chips, and a plain statistics list. The components are Android Material components. No assets, icons or wording are copied from any other app.
+
 Conventions: screens are `SCR-nn`, shared components are `CMP-nn`. "Tap" means a single tap. "Row" means a coin row (CMP-01).
  
 ---
@@ -26,7 +27,7 @@ Conventions: screens are `SCR-nn`, shared components are `CMP-nn`. "Tap" means a
 ```
                       ┌────────────────────────────────────────────┐
                       │ MainActivity (SCR-01)                      │
-                      │  top bar · content · footer bar             │
+                      │  top bar · tab content                     │
                       │   ┌───────────────┐   ┌─────────────────┐  │
                       │   │ Market tab    │   │ Watchlist tab   │  │
                       │   │ SCR-02        │   │ SCR-03          │  │
@@ -44,6 +45,7 @@ Conventions: screens are `SCR-nn`, shared components are `CMP-nn`. "Tap" means a
 - The app opens on **Market**.
 - Detail is a separate screen opened with the coin ID (contract C6). Back returns to the same tab with search text, sort and scroll position unchanged (FR-NAV-03).
 - There is no other screen: no settings, no about, no sign-in.
+
 ---
  
 ## 2. Global rules
@@ -53,19 +55,23 @@ One dark theme (FR-UI-01). Hải defines these **roles** once in resources; layo
  
 | Kind | Roles |
 |---|---|
-| Colour | `background`, `surface` (cards, chips, bars), `textPrimary`, `textSecondary`, `divider`, `accent` (selected chip, links, progress), `positive`, `negative`, `neutral`, `onPositive`, `onNegative`, `onNeutral` (text on a coloured label) |
+| Colour | `background`, `surface` (cards, chips, bars), `textPrimary`, `textSecondary`, `divider`, `accent` (selected chip, links, progress), `positive`, `negative`, `neutral`, `onPositive`, `onNegative`, `onNeutral` (text on a coloured label), `onAccent` (text on `accent`: the selected timeframe chip, CMP-10, and the selected segment of the view switch, CMP-13) |
 | Text style | `TitleBar`, `RowTitle`, `RowSubtitle`, `Price`, `PriceLarge`, `ChangeLabel`, `Body`, `Caption` (footer text, size ≥ 10 sp per FR-INFO-01), `StatLabel`, `StatValue` |
-| Spacing | a small named scale (for example `space_xs`, `space_s`, `space_m`, `space_l`) and one `touch_min` = 48 dp |
+| Spacing | `space_xs`, `space_s`, `space_m`, `space_l` (a small named scale) and one `touch_min` = 48 dp |
+| Corner size | `corner_xs`, `corner_s`, `corner_m`, `corner_l`, `corner_pill` |
+| Component size | `divider_thickness`, `sparkline_width` and `sparkline_height` (CMP-03), `coin_icon_size`, `chart_height` (SCR-05) |
  
 All text and icons meet contrast ≥ 4.5:1 against their background (NFR-08).
  
 ### 2.2 Direction colours
 - `positive` = value went up, `negative` = went down, `neutral` = unchanged or unknown.
 - **Colour is never the only signal:** every change value carries a sign (`+` or `-`) and the text itself (FR-ML-02, NFR-08).
+
 ### 2.3 Text and numbers
 - All numbers use the fixed formats of `01` §5.2 (same on every screen and in both languages).
 - A missing value is always `—`. The words "null", "NaN" and "0" (for missing) never appear (FR-ML-09, FR-CD-06).
 - A coin symbol is shown in upper case.
+
 ### 2.4 The four states (FR-ERR-01)
 Every screen that loads data has these states. Components for them are in CMP-09.
  
@@ -88,7 +94,7 @@ Portrait only (NFR-11). Layouts work from 360 dp width upward (NFR-13).
  
 ## 3. Shared components
  
-### CMP-01 Coin row  *(FR-ML-01, FR-ML-02, FR-ML-09, FR-WL-03, FR-WL-09)*
+### CMP-01 Coin row  *(FR-ML-01, FR-ML-02, FR-ML-09, FR-WL-01, FR-WL-03, FR-WL-09)*
 Used by Market and Watchlist. One layout, one adapter (contract C4).
  
 ```
@@ -108,28 +114,32 @@ Used by Market and Watchlist. One layout, one adapter (contract C4).
 | Sparkline | CMP-03. |
 | Price | `Price` style, current currency, format of §5.2. **Never truncated.** Missing → `—`. |
 | Change label | CMP-02 under the price. **Never truncated.** |
-| Star | CMP-04. Shown only if FR-ML-08 is built; it is the first element removed if the row is too crowded at 360 dp. |
+| Star | CMP-04. Always shown on Watchlist rows, where it removes the coin (FR-WL-01). Shown on Market rows only if FR-ML-08 is built. It is never dropped to save space: if the row is crowded at 360 dp, the name shrinks first. |
  
 Behaviour:
 - Tapping the row (not the star) opens Detail with the coin ID (FR-NAV-02).
 - Dividers separate rows. Minimum row height 48 dp.
 - **Missing data:** each missing field shows `—`; a missing sparkline leaves an empty placeholder of the same size; the row never crashes or shows "null".
 - **Variant "Data unavailable"** (Watchlist only, FR-WL-09): the row shows the coin ID (or the name if known) in the title position, the text "Data unavailable" in the second line, and a filled star that removes the coin. No sparkline, price or change label. Other rows are unaffected.
+
 ### CMP-02 Change label  *(FR-ML-01, FR-CD-01)*
 - Rounded rectangle filled with `positive`, `negative` or `neutral`, text in the matching `on…` role, style `ChangeLabel`.
 - Text: 24h change, signed, 2 decimals (`+2.35%`, `-0.40%`, `0.00%`).
 - `0.00%` and missing (`—`) use `neutral`.
 - Percent values do not change with the currency (FR-CUR-03).
+
 ### CMP-03 Sparkline  *(FR-ML-02)*
 - Line only, no axes, no labels, no touch. Drawn on a Canvas (`03` §11).
 - Colour: `positive` if the last value is higher than the first, `negative` if lower, `neutral` if equal or fewer than 2 points. (This is the 7-day trend; the change label is the 24h change, so the two can differ.)
 - The same width on every row (one named dimension) so lines align down the list.
+
 ### CMP-04 Favorite star  *(FR-ML-08, FR-CD-08, FR-WL-01, FR-WL-08)*
 - Filled star = in the watchlist; outline star = not.
 - Touch target at least 48×48 dp. Content description "Add to watchlist" / "Remove from watchlist".
 - Tapping toggles the coin in `FavoriteStore`; every screen showing that coin updates immediately.
 - Adding when 50 coins are already saved does not add and shows the Snackbar "Watchlist is full (50)".
 - On the Watchlist screen, tapping the filled star removes the coin and its row disappears (no undo in the base scope).
+
 ### CMP-05 Sort chips  *(FR-ML-04, FR-ML-05, FR-ML-09)*
 One row of three chips under the search field: **Market cap**, **Price**, **24h %**.
  
@@ -144,11 +154,13 @@ One row of three chips under the search field: **Market cap**, **Price**, **24h 
 - Rank numbers on the rows are not changed by sorting (FR-ML-01).
 - The sort is kept when the user switches tabs or returns from Detail; it is not saved across app restarts.
 - The three chips fit on one row at 360 dp without scrolling.
+
 ### CMP-06 Search field  *(FR-ML-03)*
 - Single-line field with a search icon at the start, hint "Search coins", and a clear (×) button at the end that appears only when there is text.
 - Filters by name or symbol, case-insensitive, "contains", leading/trailing spaces ignored, applied 300 ms after the user stops typing.
 - No match → the list area shows the empty state "No coins found". The field and chips stay visible. Clearing the text restores the full list.
 - The keyboard's action key hides the keyboard. The text is kept when the user switches tabs or returns from Detail.
+
 ### CMP-07 Currency selector  *(FR-CUR-01…05)*
 - A button at the end (right side) of the top bar showing the current code with a drop-down arrow: `USD ▾` or `VND ▾`. It is part of the main top bar, so it is on both the Market and the Watchlist tab, and (Should, FR-CUR-05) in the top bar of Detail.
 - Tapping opens a small menu with two items, USD and VND, the current one checked.
@@ -156,8 +168,9 @@ One row of three chips under the search field: **Market cap**, **Price**, **24h 
 - On Detail the screen shows its loading state as at first open, then the price, statistics and chart in the new currency (the chart reloads in the chart area); the description and the favorite state do not change. If Detail has no selector (FR-CUR-05 not built), it follows the saved choice.
 - Returning to a list after the currency was changed on Detail reloads that list in the new currency; search text and sort are kept, the scroll position is not guaranteed.
 - Prices carry their currency symbol (`$`, `₫`), so the currency is always visible.
+
 ### CMP-08 Footer bar  *(FR-INFO-01, FR-DATA-03)*
-A fixed, single-line bar at the bottom of the screen on Market, Watchlist and Detail. List and scroll content end above it; it never covers data.
+A fixed, single-line bar at the bottom of the screen on Market, Watchlist and Detail. List and scroll content end above it; it never covers data. Each of these three screens puts its own footer bar (`AttributionView`) in its own layout; the main screen shell (SCR-01) does not draw one.
  
 ```
 Powered by CoinGecko                         🕒 14:32 13/10
@@ -166,6 +179,7 @@ Powered by CoinGecko                         🕒 14:32 13/10
 - **Left:** "Powered by CoinGecko", style `Caption`, size ≥ 10 sp, never truncated. The whole left area (at least 48 dp high) opens https://www.coingecko.com in the browser. Nothing else on the screen suggests endorsement.
 - **Right (Market and Watchlist only):** a clock icon (content description "Last updated") and the fetch time of the data on screen, format `HH:mm dd/MM` in the device time zone. Hidden until data has loaded. It keeps showing the time of the old data when a refresh fails.
 - **Detail:** only the left part.
+
 ### CMP-09 State components  *(FR-ERR-01…04)*
 **StateView** fills the content area of its screen (or only the chart area for SCR-05):
  
@@ -184,6 +198,7 @@ Powered by CoinGecko                         🕒 14:32 13/10
 ### CMP-10 Timeframe chips  *(FR-CD-03)*
 - One row of five equal-width chips: **1H, 24H, 7D, 1M, 1Y**. Exactly one selected, default **24H**. The selected chip is filled with `accent`.
 - Tapping a chip selects it and loads that timeframe in the chart area only. The chips stay usable while loading.
+
 ### CMP-11 Statistics list  *(FR-CD-06, FR-CD-10)*
 One column of rows, label at the start (`StatLabel`) and value at the end (`StatValue`), a divider between rows. The value is never truncated; the label may be shortened.
  
@@ -215,7 +230,8 @@ Behaviour:
 - All text comes from string resources, English and Vietnamese (FR-UI-02). The English wording below is the intended meaning.
 - The wording only explains. It never says that a value is good or bad, or what to buy or sell.
 - Only one dialog is shown at a time.
-"How to read this list" (one line per item; the Star line is left out when the star is not built, FR-ML-08):
+
+"How to read this list" (one line per item; the Star line is always included, because Watchlist rows and Detail always have a star):
  
 | Item | Text |
 |---|---|
@@ -233,7 +249,7 @@ Statistic explanations:
 | 24h trading volume | The total value of this coin that was traded in the last 24 hours. |
 | Circulating supply | The number of coins that are available and trading in the market now. |
 | Total supply | The number of coins created so far, minus any coins permanently removed from circulation. |
-| Max supply | The maximum number of coins that can ever exist. If this row is missing, the coin may have no fixed limit. |
+| Max supply | The maximum number of coins that can ever exist. |
 | All-time high | The highest price recorded for this coin. |
 | All-time low | The lowest price recorded for this coin. |
  
@@ -245,6 +261,7 @@ A small pill-shaped toggle with two segments, **Market** and **Watchlist**, in t
 - Each tab keeps its state when the user switches (search text, sort, scroll position, FR-NAV-01).
 - Each segment is at least 48 dp high. The two labels are one short word each, so that the top bar fits the ⓘ icon, the switch and the currency selector at 360 dp (NFR-13), in English and in Vietnamese.
 - The tabs are switched only by tapping the segments; swiping between the tabs is not supported.
+
 ---
  
 ## 4. Screens
@@ -258,17 +275,18 @@ Owner: Hải. Owns the top bar and hosts the two tab screens.
 ├──────────────────────────────┤
 │                              │
 │  tab content (SCR-02/03)     │
+│  with its own footer bar     │
 │                              │
-├──────────────────────────────┤
-│ footer bar (CMP-08)          │
 └──────────────────────────────┘
 ```
  
 - **Top bar**, shared by both tabs: the ⓘ icon at the start (CMP-12, FR-INFO-03), the view switch **Market | Watchlist** in the middle (CMP-13) and the currency selector at the end (CMP-07). The top bar has no title text: the selected segment of the switch names the tab.
 - There is no bottom navigation and no separate tab row.
+- The shell has no footer bar. Each tab screen has its own footer bar (CMP-08), because the time it shows is the fetch time of that tab.
 - Switching tabs keeps each tab's state: search text, sort, scroll position (FR-NAV-01).
 - The system Back button on a tab leaves the app (default behaviour).
 - Content does not draw under the status bar (check at project setup).
+
 ### SCR-02 Market tab  *(FR-ML-01…09, FR-DATA-01…04)*
 Owner: An Khánh.
  
@@ -293,6 +311,7 @@ Behaviour:
 - Search, sort and refresh as in CMP-06, CMP-05, CMP-09. Scroll position is preserved on refresh, search clearing, tab switch and return from Detail.
 - Changing the currency: CMP-07.
 - Data held in memory is reused inside the intervals of FR-DATA-01; the screen never calls the network just because it became visible again within the interval.
+
 States:
  
 | State | Search + chips | List area | Footer time |
@@ -304,7 +323,7 @@ States:
 | Error, no data | visible | StateView Error + Retry (FR-DATA-04) | hidden |
 | Error, data on screen | visible | rows stay; Snackbar + Retry | old time |
  
-### SCR-03 Watchlist tab  *(FR-WL-01…05, 08…10, FR-ML-08)*
+### SCR-03 Watchlist tab  *(FR-WL-01…05, 08…10)*
 Owner: Bảo Linh.
  
 Top to bottom: the main top bar (SCR-01; the Watchlist segment is selected), the list (pull-to-refresh), footer bar. **No search field and no sort chips.** The currency selector in the top bar works as on Market (CMP-07).
@@ -316,6 +335,7 @@ Behaviour:
 - A coin added on another screen is fetched the next time the Watchlist is shown (a new set of coins is a new request).
 - Pull-to-refresh follows the 60 s rule (FR-WL-10).
 - The favorites survive closing the app (FR-WL-02).
+
 States:
  
 | State | Content |
@@ -338,7 +358,7 @@ Owner: Kiên. Opened with the string extra `coin_id` (C6). Uses the currency sav
 │ [1H][24H][7D][1M][1Y]        │  CMP-10   ┐
 │  chart                       │  SCR-05   ┘ PriceChartFragment
 │ Market cap ⓘ        $1.30T   │
-│ 24h trading volume ⓘ $32.5B  │  CMP-11
+│ 24h trading volume ⓘ $32.50B │  CMP-11
 │ ...                          │
 │ About Bitcoin                │
 │ description (4 lines) ...    │
@@ -357,12 +377,14 @@ Content scrolls; the footer bar is fixed. Top to bottom of the scrolling area:
 3. **Statistics:** CMP-11.
 4. **Description** (FR-CD-07): plain text (markup removed, links not clickable), collapsed to about 4 lines with **Read more** / **Show less**; the control appears only if the text is longer than 4 lines. No description → "No description available." Always English.
 5. **Disclaimer** (FR-INFO-02): "For information only. Not financial advice."
+
 Top bar: back arrow, the coin name as title, the currency selector (CMP-07, Should, FR-CUR-05) and the favorite star (CMP-04, FR-CD-08).
  
 Behaviour:
 - Back returns to the previous tab exactly as it was (FR-NAV-03).
 - No pull-to-refresh on this screen; data is refreshed when the screen is opened, within the 60 s rule (FR-DATA-01). Changing the currency here: CMP-07.
 - The chart loads and fails independently of the rest of the screen.
+
 States:
  
 | State | Content |
@@ -385,6 +407,7 @@ Chart:
 - **Reference line** (C, FR-CD-12): dashed horizontal line at the first price of the period.
 - **Axis labels** (S, FR-CD-13): 3–4 price labels along the right edge (price format of §5.2); time labels along the bottom with the time format below.
 - **Touch** (FR-CD-04): touching or dragging shows a vertical marker and a dot at the nearest data point and a label with its price (same format as the header) and its time. The label stays inside the chart bounds. Lifting the finger hides everything. While the marker is active the page does not scroll.
+
 | Timeframe | Time format (axis labels and marker) |
 |---|---|
 | 1H, 24H | `HH:mm` |
@@ -424,7 +447,7 @@ Use these when checking a layout at 360×640 dp and 411×891 dp (the fake files 
 | Long coin name | a 30–40 character name: the name shortens, price and change label stay whole |
 | Short and long symbols | `BTC`, `USDT`, a 6-character symbol |
 | Very small price | `$0.00001234` (8 decimals) |
-| Large VND values | `1,650,000 ₫` price, `32.5T ₫` market cap |
+| Large VND values | `1,650,000 ₫` price, `32.50T ₫` market cap |
 | Rank | `1` and `100` |
 | Change | positive, negative, zero, missing |
 | Missing fields | use `markets_missing_fields_usd.json` and `detail_missing_fields.json` |
@@ -448,6 +471,7 @@ Use these when checking a layout at 360×640 dp and 411×891 dp (the fake files 
 - News, portfolio, price alerts, notifications, trading.
 - Pull-to-refresh on Detail; automatic retry (FR-ERR-04).
 - A bottom navigation bar, a separate tab row under the top bar, swiping between the two tabs.
+
 ---
  
 ## 8. Requirement coverage
@@ -483,10 +507,10 @@ These are not stated in `01`; they hold for this document.
 1. A coin row has two lines: name; then `SYMBOL · MC <market cap>`. Price and change label are on the right.
 2. Search field and sort chips stay visible in every state of the Market tab; the StateView fills the list area. That area is the "full-screen error state" of FR-DATA-04.
 3. The currency selector is part of the main top bar (both tabs) and, as a Should, of the Detail top bar.
-4. The footer bar belongs to each screen (on the tabs it shows that tab's fetch time) and sits at the bottom of the screen.
+4. The footer bar belongs to each screen (on the tabs it shows that tab's fetch time) and sits at the bottom of the screen; the shell does not draw one.
 5. Inline errors use a Snackbar with a Retry action.
 6. The statistics are a single-column list (long VND values do not fit in two columns at 360 dp).
-7. The star on a row is dropped first if the row is too crowded.
+7. The star on a Watchlist row is never dropped; on a Market row it exists only if FR-ML-08 is built. If a row is too crowded at 360 dp, the coin name shrinks first (CMP-01).
 8. Back on a tab leaves the app; no custom back handling.
 9. Detail has no pull-to-refresh. Its currency selector is a Should (FR-CUR-05).
 10. Sort and search text are kept while the app is running and are not saved across restarts.
