@@ -149,7 +149,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 | FR-CUR-01 | Supported currencies | M | USD and VND. Default on first launch: USD. |
 | FR-CUR-02 | Selection | M | A selector at the right end of the top bar, on both the Market and the Watchlist tab (and on Detail, FR-CUR-05). The choice is saved and restored after restart. |
 | FR-CUR-03 | Consistency | M | After a change, every price, market cap, volume, ATH, ATL and chart value on Market, Watchlist and Detail uses the new currency. Values come from the provider in that currency (no conversion inside the app). Percentages are unchanged. |
-| FR-CUR-04 | Switching behaviour | M | Switching shows a loading state, then new data. Search text and sort are kept. Data of the other currency is never shown as the current one. |
+| FR-CUR-04 | Switching behaviour | M | Switching shows a loading state, then new data. Search text and sort are kept. Data of the other currency is never shown as the current one. If the request fails, FR-ERR-03 applies: the error state with Retry replaces the old data, and the new currency stays selected. |
 | FR-CUR-05 | Selector on Detail | S | The top bar of Detail has the same selector as FR-CUR-02, showing the saved currency. Choosing the other currency saves it, as in FR-CUR-02, and Detail shows its loading state, then the price, statistics and chart in the new currency; the description and the favorite state do not change. Data of the other currency is never shown as the current one. If this requirement is not built, Detail has no selector and uses the saved currency. |
 
 ### 4.6 Data freshness (FR-DATA)
@@ -165,7 +165,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 |---|---|---|---|
 | FR-ERR-01 | Four states | M | Every data screen (Market, Watchlist, Detail, chart area) implements loading, success, empty and error states. |
 | FR-ERR-02 | Error categories | M | Each category has its own user-facing message (see table below) and a Retry action. |
-| FR-ERR-03 | Keep old data | M | If an error happens while data is on screen, the data stays and the error is shown as a message (banner/Snackbar). Only when there is no data is the full-screen error shown. |
+| FR-ERR-03 | Keep old data | M | If a refresh of the same request fails (same currency, coin and timeframe: pull-to-refresh, or Retry while data is on screen), the data stays and the error is shown as a message (banner/Snackbar). A change of currency or timeframe is a new request: the data of the old request is removed when the change is made, and if the new request fails, the error state that fills the content area is shown with Retry, even though data was on screen before. The new currency stays selected. When there is no data, the error state that fills the content area is shown. |
 | FR-ERR-04 | No retry storm | M | No automatic retry. After HTTP 429, no new network request for at least 60 s. The app never crashes on any category. |
 
 | Category | Trigger | Message intent |

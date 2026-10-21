@@ -172,6 +172,8 @@ Each screen has one `ViewModel` (an Android Jetpack class) that exposes `LiveDat
 
 `UiState<T>` has four cases that match FR-ERR-01: **Loading, Success (data + "updated at" time), Empty, Error (AppError, optionally with old data to keep showing, FR-ERR-03)**. Every screen reads the same shape, so `StateView` (Hải) works everywhere.
 
+**Old data in `Error`:** `Error` carries old data only when a refresh of the same request failed (same currency, coin and timeframe: pull-to-refresh, or Retry with data on screen). After a change of currency or timeframe the ViewModel emits `Error` without old data, because the old data belongs to another request (FR-ERR-03, FR-CUR-04). The ViewModel decides this, not the screen.
+
 **Why ViewModel + LiveData:**
 - LiveData only notifies observers whose screen is visible, and removes them when the screen is destroyed, so a response that arrives after the user left the screen cannot crash the app. This is the most common bug for beginners.
 - A ViewModel lives as long as its screen, so search text, sort and timeframe are kept without extra code (FR-NAV-01/03).

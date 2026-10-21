@@ -82,6 +82,8 @@ Every screen that loads data has these states. Components for them are in CMP-09
 | Empty | The request worked but there is nothing to show | Message (and an action where stated) |
 | Error | The request failed | If **no data** is on screen: message + **Retry** filling the content area. If data **is** on screen: the data stays and a **Snackbar** shows the message with **Retry** (FR-ERR-03). |
 
+The data stays under a Snackbar only when a **refresh of the same request** fails (same currency, coin and timeframe). A change of currency or timeframe is a new request: the data of the old request is removed when the change is made, so if the new request fails there is no data on screen and the error fills the content area with Retry (FR-ERR-03, CMP-07).
+
 Error messages by category are in `01` §4.7 (no connection, timeout, rate limited, server error, request rejected, invalid data).
 
 ### 2.5 Data source
@@ -165,6 +167,7 @@ One row of three chips under the search field: **Market cap**, **Price**, **24h 
 - A button at the end (right side) of the top bar showing the current code with a drop-down arrow: `USD ▾` or `VND ▾`. It is part of the main top bar, so it is on both the Market and the Watchlist tab, and (Should, FR-CUR-05) in the top bar of Detail.
 - Tapping opens a small menu with two items, USD and VND, the current one checked.
 - Choosing an item saves it and applies it to Market, Watchlist and Detail at once. The list area shows the loading state, then data in the new currency. Search text and sort are kept. Data of the other currency is never shown as the current one.
+- If the request for the new currency fails, the old data is not kept (it is in the other currency): the area shows the error state with Retry (CMP-09, FR-ERR-03), on Detail too. The new currency stays selected, and Retry requests it.
 - On Detail the screen shows its loading state as at first open, then the price, statistics and chart in the new currency (the chart reloads in the chart area); the description and the favorite state do not change. If Detail has no selector (FR-CUR-05 not built), it follows the saved choice.
 - Returning to a list after the currency was changed on Detail reloads that list in the new currency; search text and sort are kept, the scroll position is not guaranteed.
 - Prices carry their currency symbol (`$`, `₫`), so the currency is always visible.
@@ -316,7 +319,7 @@ States:
 
 | State | Search + chips | List area | Footer time |
 |---|---|---|---|
-| First load / currency change | visible | StateView Loading | hidden / old time until new data |
+| First load / currency change | visible | StateView Loading | hidden |
 | Success | visible | rows | fetch time |
 | Search has no match | visible | Empty "No coins found" | fetch time |
 | Provider returned an empty list | visible | Empty "No coins to show" + Retry | hidden |
@@ -424,6 +427,8 @@ States (shown **in the chart area only**; chips and the rest of the screen stay 
 | Error | message for the category and **Retry**, inside the chart area |
 
 If the user switches timeframe quickly, only the response for the currently selected timeframe is displayed (FR-CD-03).
+
+If the request for a new timeframe fails, the chart area shows the Error state with Retry; the chart of the previous timeframe is not kept (FR-ERR-03).
 
 ---
 

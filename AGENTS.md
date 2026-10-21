@@ -60,6 +60,7 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 - Filtering, sorting, slicing and mapping are plain Kotlin (no Android types) so JVM unit tests can run them.
 - Every screen exposes `LiveData<UiState<T>>` with Loading, Success, Empty and Error.
 - Ignore stale responses (request counter) when the user changes timeframe or currency.
+- After a change of currency or timeframe, drop the old data and show Loading; if the new request fails, emit `Error` without old data. Keep old data in `Error` only when a refresh of the same request fails (`01` FR-ERR-03, `03` section 6).
 - Fake and real data sources implement the same interfaces; `CryptoApp` chooses once at startup.
   No other class checks the fake/real flag.
 
@@ -137,4 +138,5 @@ Out-of-scope items are listed in `02` section 7.
 
 ## 12. Documents
 Do not edit files in `docs/`. If a document seems wrong or incomplete, tell the member to report it to
-the team lead (Vân Khánh).
+the team lead (Vân Khánh), who decides on changes to the documents. The one exception is a missing style
+name (a color, text style, spacing, corner size or component size role): the member asks Hải (section 6).
