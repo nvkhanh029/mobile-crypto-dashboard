@@ -1,10 +1,10 @@
 package vn.edu.usth.cryptodashboard.features.detail
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 
-class CoinDetailActivity : Activity() {
+class CoinDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_COIN_ID = "coin_id"
