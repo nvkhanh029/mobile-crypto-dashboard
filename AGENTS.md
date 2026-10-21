@@ -65,8 +65,8 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 
 ## 6. UI rules (details: 03 section 11, 02)
 - **No hard-coded colors, sizes or strings**, in layouts or in Kotlin. Use the shared style names
-  (themes, colors, dimens, text styles; role names in `02` section 2.1) and `strings.xml`
-  (`values/` and `values-vi/`).
+  (themes, colors, dimens, text styles; role names in `02` section 2.1) and string resources
+  (`values/` and `values-vi/`; see section 8 for which strings file is yours).
   If a style name you need does not exist, do not hard-code a value: ask the member to ask Hải.
 - Show prices, compact numbers, percentages and dates only through the shared formatters.
 - Sizes in `dp`, text in `sp`. Use `ConstraintLayout`. No fixed width on containers, no fixed height on
@@ -87,14 +87,21 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 - Do not call the real API in loops, tests or CI (quota).
 
 ## 8. Ownership and contracts
-| Area | Owner | Folder |
+| Area | Owner | Folders and files |
 |---|---|---|
-| Data layer, CryptoApp, ViewModelFactory, coin icon loader | Vân Khánh | `data/`, `domain/`, `app/`, `core/image` |
-| UI foundation, MainActivity, formatters, StateView, currency, shared resources | Hải | `core/ui`, `core/format`, `core/currency`, `res/` |
-| Market list | An Khánh | `features/marketlist` |
-| Coin detail | Kiên | `features/detail` |
-| Price chart | Duy | `features/chart` |
-| Watchlist, favorites | Bảo Linh | `features/watchlist`, `core/favorite` |
+| Data layer, CryptoApp, ViewModelFactory, coin icon loader, build files | Vân Khánh | `data/`, `domain/`, `core/image`, `app/CryptoApp`, `app/ViewModelFactory`, `res/xml/`, `res/raw/`, Gradle files |
+| UI foundation, MainActivity, formatters, StateView, currency, shared resources | Hải | `core/ui`, `core/format`, `core/currency`, `app/MainActivity`, and the shared values in `res/` (theme, colors, dimens, text styles, shared drawables, the common `strings.xml`) |
+| Market list | An Khánh | `features/marketlist`, and the layouts, drawables and strings file of its screens |
+| Coin detail | Kiên | `features/detail`, and the layouts, drawables and strings file of its screen |
+| Price chart | Duy | `features/chart`, and the layouts, drawables and strings file of its screen |
+| Watchlist, favorites | Bảo Linh | `features/watchlist`, `core/favorite`, and the layouts, drawables and strings file of its screen |
+
+- **Layouts and drawables** of a screen belong to the owner of that screen (the shared coin row layout is An Khánh's, C4).
+- **Strings:** put the strings of your screen in a strings file of your own, in `values/` and in `values-vi/`, and start
+  each string name with the name of your feature so that names never clash. Words used by several screens go in the common
+  `strings.xml`, which is Hải's: ask the member to ask Hải. Hải reviews the Vietnamese text.
+- **`AndroidManifest.xml`:** declare your own Activity there. Every other change to it (permissions, the network
+  security configuration, the application element) goes through Vân Khánh.
 
 Contracts C1–C8 are defined in `06` section 3 and `03` section 12. Do not edit files in another
 member's area. Tell the member what you need so they can ask the owner. A change to a contract needs

@@ -86,7 +86,9 @@ features/
   chart/             PriceChartFragment, ViewModel, chart view,
                      timeframe slicing                                      Duy
   watchlist/         WatchlistFragment, ViewModel                           Bảo Linh
-res/                 layouts, themes, colors, dimens, strings, strings-vi   Hải owns the shared values
+res/                 shared values: theme, colours, dimens, text styles,
+                     shared drawables, common strings (EN and VI)           Hải
+                     layouts, drawables and strings file of one screen      owner of that screen
 res/xml/             network_security_config.xml (section 8.1)              Vân Khánh
 res/raw/             the two certificate files used by that config          Vân Khánh
 ```
@@ -98,6 +100,8 @@ Rules:
 - `data` depends only on `domain`. Inside `data`, data sources are used only by the repository implementations.
 - Formatters, filter/sort, timeframe slicing and mappers are plain Kotlin (no Android types) so they run in JVM unit tests.
 - Package by feature (not by type) so each owner works in their own folder and merge conflicts stay rare.
+- **Resources follow the same rule.** The layouts and drawables of a screen belong to its owner (the shared coin row layout is An Khánh's, C4). The strings of a screen go in a strings file of the owner's own, in `values/` and in `values-vi/`; Android takes the file name as arbitrary and uses the `name` of each `<string>` (checked 21 Oct 2026, section 18), so several strings files work together. Hải owns the common `strings.xml` (words used by several screens, for example Retry, and the shared error messages) and reviews the Vietnamese text. A string name must be unique across all files (general Android knowledge, not checked in the docs), so each owner starts the names of their strings with the name of the feature.
+- **`AndroidManifest.xml`:** each owner declares their own Activity; every other change (permissions, the network security configuration, the application element) goes through Vân Khánh.
 
 ---
 
@@ -397,6 +401,10 @@ Read on 21 Oct 2026:
 - Android Developers, *Data layer* (the repository is the only entry point of the data layer; other layers never use data sources directly; a repository can use an in-memory cache as its source of truth; naming of data sources): https://developer.android.com/jetpack/guide/data-layer
 - Volley releases (1.2.0: default and error images for `NetworkImageView`; 1.2.1: Cronet separated, nothing else): https://github.com/google/volley/releases
 - Volley source, `ImageLoader.java` (first-level in-memory image cache, `ImageRequest` sent to the queue, main-thread check, `RGB_565` decoding, `makeImageRequest` is `protected`): https://android.googlesource.com/platform/frameworks/volley/+/refs/heads/main/src/main/java/com/android/volley/toolbox/ImageLoader.java
+
+Read on 21 Oct 2026 (resources):
+- Android Developers, *Providing resources* ("you can name the file whatever you want and place different resource types in one file"): https://developer.android.com/guide/topics/resources/providing-resources
+- Android Developers, *String resources* ("The filename is arbitrary. The `<string>` element's `name` is used as the resource ID."): https://developer.android.com/guide/topics/resources/string-resource
 
 Read on 21 Oct 2026 (number formatting):
 - Oracle, Java SE 17 API, `java.util.Formatter` (the `f` conversion rounds with the round half up algorithm; with no explicit locale the default locale is used): https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Formatter.html
