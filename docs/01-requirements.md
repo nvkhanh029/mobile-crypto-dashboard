@@ -102,7 +102,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 | ID | Requirement | Pri | Acceptance criteria |
 |---|---|---|---|
 | FR-ML-01 | Show top 100 coins | M | "Top 100" = the first 100 coins returned by the data provider ordered by market cap rank at fetch time (may include stablecoins). Each row: rank, icon, name, symbol, price, 24h % change, market cap, sparkline. Rank is the provider's rank and does not change when the user sorts. If fewer than 100 coins are returned, show what was returned without error. |
-| FR-ML-02 | 7-day sparkline per row | M | Line chart without axes. Green if last value > first value, red if lower, neutral if equal or fewer than 2 points. The 24h % is always shown with a sign next to it, so colour is never the only indicator. |
+| FR-ML-02 | 7-day sparkline per row | M | Line chart without axes. Green if last value > first value, red if lower, neutral if equal or fewer than 2 points. A 24h % that is not zero is always shown with a sign next to it (a value that rounds to `0.00%` has no sign, §5.2), so colour is never the only indicator. |
 | FR-ML-03 | Search | M | Filters the loaded list by name or symbol, case-insensitive, "contains" match, leading/trailing spaces ignored, applied after 300 ms of no typing. No match → empty state "No coins found". Clearing the text restores the full list. |
 | FR-ML-04 | Sort | M | By price, 24h % change, or market cap. Default: market cap descending. Tapping the active criterion toggles ascending/descending; tapping another criterion starts descending. Active criterion and direction are visible. Ties are ordered by rank ascending. |
 | FR-ML-05 | Search and sort compose | M | Sorting applies only to the filtered result; changing the search text keeps the current sort. |
@@ -220,8 +220,8 @@ Grouping separator `,` and decimal separator `.` for both currencies.
 |---|---|---|
 | USD price | ≥ 1: 2 decimals; 0.01 to < 1: 4 decimals; < 0.01: 8 decimals | `$67,234.50`, `$0.2345`, `$0.00001234` |
 | VND price | ≥ 1,000: 0 decimals; 1 to < 1,000: 2 decimals; < 1: 6 decimals; symbol `₫` after the number | `1,650,000 ₫`, `312.50 ₫` |
-| Compact numbers (market cap, volume, supply) | 2 decimals. From 1,000 upward the number is divided and gets the suffix K, M, B or T; below 1,000 there is no suffix; a value of 0 shows `0`. The suffix is chosen after rounding, so 999,996 shows `1.00M`, not `1000.00K`. Currency symbol as above | `$1.23B`, `340.00M`, `32.50T ₫`, `$523.40`, `1.00M` |
-| Percent | Always signed, 2 decimals | `+2.35%`, `-0.40%`, `0.00%` |
+| Compact numbers (market cap, volume, supply) | 2 decimals. From 1,000 upward the number is divided and gets the suffix K, M, B or T; below 1,000 there is no suffix; a value of 0 shows `0`. The suffix is chosen after rounding, so 999,996 shows `1.00M`, not `1000.00K`. Market cap and volume carry the currency symbol as above; supply is a count of coins and has no currency symbol | `$1.23B`, `340.00M`, `32.50T ₫`, `$523.40`, `1.00M` |
+| Percent | Signed, 2 decimals. Round first, then choose the sign: a value that rounds to zero is shown as `0.00%` with no sign (never `+0.00%` or `-0.00%`) | `+2.35%`, `-0.40%`, `0.00%` |
 | Missing value | `—` | |
 | Last-updated time | `HH:mm dd/MM` in device time zone | `14:32 13/10` |
 

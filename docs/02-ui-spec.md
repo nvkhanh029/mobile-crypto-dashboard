@@ -65,7 +65,7 @@ All text and icons meet contrast ≥ 4.5:1 against their background (NFR-08).
 
 ### 2.2 Direction colours
 - `positive` = value went up, `negative` = went down, `neutral` = unchanged or unknown.
-- **Colour is never the only signal:** every change value carries a sign (`+` or `-`) and the text itself (FR-ML-02, NFR-08).
+- **Colour is never the only signal:** every change value that is not `0.00%` carries a sign (`+` or `-`) and the text itself (FR-ML-02, NFR-08).
 
 ### 2.3 Text and numbers
 - All numbers use the fixed formats of `01` §5.2 (same on every screen and in both languages).
@@ -127,6 +127,7 @@ Behaviour:
 ### CMP-02 Change label  *(FR-ML-01, FR-CD-01)*
 - Rounded rectangle filled with `positive`, `negative` or `neutral`, text in the matching `on…` role, style `ChangeLabel`.
 - Text: 24h change, signed, 2 decimals (`+2.35%`, `-0.40%`, `0.00%`).
+- The sign is chosen after rounding: a value that rounds to zero (for example -0.004) shows `0.00%` without a sign, never `-0.00%` or `+0.00%`.
 - `0.00%` and missing (`—`) use `neutral`.
 - Percent values do not change with the currency (FR-CUR-03).
 
@@ -210,8 +211,8 @@ One column of rows, label at the start (`StatLabel`) and value at the end (`Stat
 | Market cap | compact, current currency |
 | 24h trading volume | compact, current currency |
 | Circulating supply | compact number, no currency symbol |
-| Total supply | compact number; **row shown only when the provider returns a value** |
-| Max supply | compact number; **row shown only when the provider returns a value** |
+| Total supply | compact number, no currency symbol; **row shown only when the provider returns a value** |
+| Max supply | compact number, no currency symbol; **row shown only when the provider returns a value** |
 | All-time high | price format, current currency |
 | All-time low | price format, current currency |
 
