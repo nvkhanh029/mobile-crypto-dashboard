@@ -247,7 +247,7 @@ Statistic explanations:
 | 24h trading volume | The total value of this coin that was traded in the last 24 hours. |
 | Circulating supply | The number of coins that are available and trading in the market now. |
 | Total supply | The number of coins created so far, minus any coins permanently removed from circulation. |
-| Max supply | The maximum number of coins that can ever exist. If this row is missing, the coin may have no fixed limit. |
+| Max supply | The maximum number of coins that can ever exist. |
 | All-time high | The highest price recorded for this coin. |
 | All-time low | The lowest price recorded for this coin. |
 
