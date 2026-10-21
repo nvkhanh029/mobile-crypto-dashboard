@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import org.json.JSONArray
 import org.json.JSONException
 
-class SharedPrefsFavoriteStore(
+class SharedPreferences(
     private val prefs: SharedPreferences
 ) : FavoriteStore {
 
