@@ -58,7 +58,7 @@ Dependencies point down only: UI → ViewModel → Domain ← Data
 Root package: `vn.edu.usth.cryptodashboard`
 
 ```
-app/                 CryptoApp, ViewModelFactory                           Vân Khánh
+app/                 CryptoApp                                             Vân Khánh
                      MainActivity (two tabs, shared top bar)               Hải
 core/
   ui/                StateView, PriceChangeLabel, AttributionView, UiState,
@@ -80,12 +80,13 @@ data/
   fake/              fake data sources (read JSON from assets/fake)         Vân Khánh
   repository/        repository implementations, RefreshPolicy              Vân Khánh
 features/
-  marketlist/        fragment, ViewModel, coin row + adapter, sparkline,
-                     filter and sort logic                                  An Khánh
-  detail/            CoinDetailActivity, ViewModel, stats, description      Kiên
-  chart/             PriceChartFragment, ViewModel, chart view,
-                     timeframe slicing                                      Duy
-  watchlist/         WatchlistFragment, ViewModel                           Bảo Linh
+  marketlist/        fragment, ViewModel and its factory, coin row +
+                     adapter, sparkline, filter and sort logic              An Khánh
+  detail/            CoinDetailActivity, ViewModel and its factory,
+                     stats, description                                     Kiên
+  chart/             PriceChartFragment, ViewModel and its factory,
+                     chart view, timeframe slicing                          Duy
+  watchlist/         WatchlistFragment, ViewModel and its factory           Bảo Linh
 res/                 shared values: theme, colours, dimens, text styles,
                      shared drawables, common strings (EN and VI)           Hải
                      layouts, drawables and strings file of one screen      owner of that screen
@@ -172,6 +173,8 @@ Each screen has one `ViewModel` (an Android Jetpack class) that exposes `LiveDat
 
 `UiState<T>` has four cases that match FR-ERR-01: **Loading, Success (data + "updated at" time), Empty, Error (AppError, optionally with old data to keep showing, FR-ERR-03)**. Every screen reads the same shape, so `StateView` (Hải) works everywhere.
 
+**Old data in `Error`:** `Error` carries old data only when a refresh of the same request failed (same currency, coin and timeframe: pull-to-refresh, or Retry with data on screen). After a change of currency or timeframe the ViewModel emits `Error` without old data, because the old data belongs to another request (FR-ERR-03, FR-CUR-04). The ViewModel decides this, not the screen.
+
 **Why ViewModel + LiveData:**
 - LiveData only notifies observers whose screen is visible, and removes them when the screen is destroyed, so a response that arrives after the user left the screen cannot crash the app. This is the most common bug for beginners.
 - A ViewModel lives as long as its screen, so search text, sort and timeframe are kept without extra code (FR-NAV-01/03).
@@ -179,7 +182,7 @@ Each screen has one `ViewModel` (an Android Jetpack class) that exposes `LiveDat
 
 **Boundaries:** LiveData is used in the UI layer only (ViewModels and what observes them). Repositories use plain callbacks, because the Android documentation advises against LiveData in the data layer.
 
-**Creating ViewModels:** repositories are passed to ViewModels through a small `ViewModelFactory` in `app/` (needed because ViewModels with constructor arguments cannot be created by default). The factory takes the repositories from `CryptoApp`.
+**Creating ViewModels:** a ViewModel that receives repositories (or a `coin_id`) in its constructor cannot be created by the default factory, so each owner writes a small factory for their own ViewModel in their feature package, with `viewModelFactory { initializer { … } }` (an Android `ViewModelProvider.Factory`, section 18). The factory takes the repositories from `CryptoApp`, which only exposes them as properties (`05-interfaces.md`). There is no shared factory, so nobody edits a file of another member to register a ViewModel (D22).
 
 **Stale responses:** each ViewModel keeps a request counter and ignores a response that is not from the latest request (FR-CD-03: quick timeframe switching; currency change while loading). This is needed in practice: S2 showed that responses can arrive in a different order from the requests.
 
@@ -205,7 +208,7 @@ Other classes receive what they need from `CryptoApp` (manual dependency injecti
 - **Timeout and no retry:** the request uses `DefaultRetryPolicy(timeoutMs, 0, 1f)` with a 15-second timeout, 0 retries and backoff multiplier 1, so Volley never retries by itself (FR-ERR-04).
 - **Nothing is cached by Volley:** the shared queue is created as `RequestQueue(NoCache(), BasicNetwork(HurlStack()))`. `NoCache` stores nothing, so no response of any request is written to the device's disk (FR-DATA-02). This is used for the whole queue, not per request with `setShouldCache(false)`, so no one can forget it on a new request. The app's own in-memory data and refresh intervals decide freshness (section 8.2). Used in the S2 scratch project for API requests; the combination with `ImageLoader` is covered in the next point.
 - **HTTPS on Android 7.0 (API 24):** Android 7.0 does not trust the certificate root that the CoinGecko hosts need (ISRG Root X1 is trusted from Android 7.1.1, ISRG Root X2 from Android 14). In S2 the first request on the API 24 emulator failed for this reason. The fix is a Network Security Configuration (`res/xml/network_security_config.xml`, referenced from the manifest): a `domain-config` for `coingecko.com` (including subdomains, so both `api.coingecko.com` and `coin-images.coingecko.com` are covered) whose trust anchors are the two root certificates stored as PEM files in `res/raw`, plus the system certificates. Verified in S2: after this, both hosts returned 200 on API 24. The app never disables certificate checks and never trusts all certificates. The two PEM files are copied from the official Let's Encrypt page (section 18). The Android documentation says a config like this is the supported way to add trusted certificates on older versions.
-- **Coin icons** (contract C8, D20): `CoinImageLoader` in `core/image` wraps Volley's `ImageLoader` with an in-memory `LruCache` as its image cache, on the same `NoCache` queue, so icons are not written to disk either. The layouts show an icon with Volley's `NetworkImageView` (`setImageUrl(url, loader)`, with a placeholder and an error image from the shared resources). Checked in the Volley sources (section 18): `NetworkImageView` and `ImageLoader` exist in Volley 1.2.1 (the 1.2.0 release notes add default and error images to `NetworkImageView`; 1.2.1 only separates Cronet); `ImageLoader` uses only the image cache it is given (a first-level in-memory cache, which must not block) and sends an `ImageRequest` to the queue, and it does not read or write the queue's disk cache, so `NoCache` should not matter. Not run yet on our queue; this is seen at once when `CoinImageLoader` is written. Two things to know: (1) `ImageLoader.get` throws if it is called off the main thread (binding rows in an adapter is on the main thread, so this is fine); (2) `ImageLoader` decodes images as `RGB_565`, which has no transparency, so icons with a transparent background may show a dark background: look at it once, and if it looks wrong, subclass `ImageLoader` and override `makeImageRequest` (a `protected` method) to decode with transparency. Whether the CoinGecko icons have a transparent background is not known.
+- **Coin icons** (contract C8, D20): `CoinImageLoader` in `core/image` extends Volley's `ImageLoader` with an in-memory `LruCache` as its image cache, on the same `NoCache` queue, so icons are not written to disk either (`05-interfaces.md`, section 5). The layouts show an icon with Volley's `NetworkImageView` (`setImageUrl(url, loader)`, with a placeholder and an error image from the shared resources). Checked in the Volley sources (section 18): `NetworkImageView` and `ImageLoader` exist in Volley 1.2.1 (the 1.2.0 release notes add default and error images to `NetworkImageView`; 1.2.1 only separates Cronet); `ImageLoader` uses only the image cache it is given (a first-level in-memory cache, which must not block) and sends an `ImageRequest` to the queue, and it does not read or write the queue's disk cache, so `NoCache` should not matter. Not run yet on our queue; this is seen at once when `CoinImageLoader` is written. Two things to know: (1) `ImageLoader.get` throws if it is called off the main thread (binding rows in an adapter is on the main thread, so this is fine); (2) `ImageLoader` decodes images as `RGB_565`, which has no transparency, so icons with a transparent background may show a dark background: look at it once, and if it looks wrong, override `makeImageRequest` (a `protected` method of `ImageLoader`) in `CoinImageLoader` to decode with transparency. Whether the CoinGecko icons have a transparent background is not known.
 
 ### 8.2 Freshness (FR-DATA-01)
 `RefreshPolicy` holds the intervals in one place: market list and watchlist 60 s, chart 1H/24H 60 s, 7D 5 min, 1M/1Y 15 min, coin detail 60 s. A repository keeps the last result in memory with its fetch time, keyed by request (endpoint, parameters, currency). If the stored result is younger than its interval, it is returned without calling the data source. Because 1H is cut from the 1-day dataset, 1H and 24H share the same stored response. The repository is the same with the remote and the fake data source, so this rule can be tried on fake data.
@@ -285,7 +288,7 @@ Fake data sources implement the same data source interfaces as the remote ones, 
 |---|---|---|---|
 | C1 | Models and repository interfaces | Vân Khánh → all | Repositories take a currency and a callback; success carries the data and its fetch time; failure carries an `AppError` |
 | C2 | Formatters, `StateView`, `UiState`, `AttributionView` (footer bar), explanation dialog (CMP-12), style guide | Hải → all | Plain Kotlin formatters (no Android types); `UiState` with its four cases; `StateView` shows a `UiState`; `AttributionView` shows the footer bar (CMP-08) and takes the fetch time, or none (Detail), and each screen includes it in its own layout; the explanation dialog takes a title and a text (`02` CMP-12); one sample coin row as the style reference |
-| C3 | Favorites | Bảo Linh → An Khánh, Kiên | `FavoriteStore` (add, remove, contains, list as LiveData) and `FavoriteButton` |
+| C3 | Favorites | Bảo Linh → An Khánh, Kiên | `FavoriteStore` (check whether a coin is a favorite, add, remove, toggle, the list of IDs as LiveData; the exact members are in the code, `05` §1) and `FavoriteButton` |
 | C4 | Coin row and adapter | An Khánh → Bảo Linh | Takes coin data and favorite state; reports row tap and favorite toggle. The star is part of the row: always on Watchlist rows, on Market rows only if FR-ML-08 is built |
 | C5 | Chart | Duy → Kiên | `PriceChartFragment.newInstance(coinId)`: needs only the coin ID, shows timeframe selector, chart and its own states |
 | C6 | Open Detail | Kiên → An Khánh, Bảo Linh | Explicit `Intent`, string extra `coin_id` |
@@ -318,7 +321,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 
 ## 14. How to build a feature (recipe for every owner)
 
-1. Write the screen's `UiState` and `ViewModel` first; expose `LiveData<UiState<…>>`.
+1. Write the screen's `UiState`, `ViewModel` and its small factory first; expose `LiveData<UiState<…>>`.
 2. Call only repository **interfaces** from the ViewModel; never Volley, JSON or a data source.
 3. Put pure logic (filter, sort, slicing, mapping) in plain Kotlin classes and test them in JVM unit tests.
 4. In the Fragment, observe the LiveData and render with the adapter and `StateView`; put the footer bar (`AttributionView`) in the screen's own layout.
@@ -365,6 +368,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 | D19 | The repositories (in-memory data, refresh intervals, pause after a 429) are the same classes in fake and real mode and sit on top of data source interfaces; the remote and the fake data source are the two implementations. The data source interfaces are in `data/`, used only by the repositories | The refresh rule (FR-DATA-01) and the pause after a 429 (FR-ERR-04) are Must and live in the repository; if the fake replaced the repository, they could only be tried on the real API (day 5 or later) and cost quota. The Android data layer guide makes the repository the only entry point of the data layer and allows an in-memory cache inside it | The fake implements the repository interface directly (one interface less, but the two rules cannot be tried on fake data); data source interfaces in `domain/` (ViewModels could call them, against the guide) | Decided 21 Oct 2026 |
 | D20 | `CoinImageLoader` is a concrete class in `core/image` (not in `data/`, no interface), created in `CryptoApp`; layouts show icons with `NetworkImageView` (contract C8) | Features may use `core` but not `data`, and the icon is needed by the coin row and the Detail header; icons are pictures, not market data; nobody needs a fake of it (icons load from the network in both modes, `fake-data.md` §6); `NetworkImageView` is made for lists and handles views that are reused | `CoinImageLoader` in `data/image` (features may not import it); an interface with a fake (extra work, no user); Glide/Picasso (second networking stack, D4, D8) | Decided 21 Oct 2026 |
 | D21 | The footer bar (`AttributionView`) belongs to each screen: Market, Watchlist and Detail each include it in their own layout; `MainActivity` does not draw one | The two tabs show different fetch times; with one footer in the shell, `MainActivity` would have to read the ViewModel of the visible tab, a coupling no contract covers. One view used in three layouts costs nothing extra | One footer in the shell for the two tabs (needs a channel from both ViewModels to `MainActivity`) | Decided 21 Oct 2026 |
+| D22 | Each feature owner writes the ViewModel factory of their own screens, in their own package; `CryptoApp` only exposes the repositories and the other shared objects as properties | A shared factory in `app/` would have to know every ViewModel, so four owners would edit one file of the team lead (merge conflicts that break the build for everyone) and the team lead would wait for every ViewModel constructor. Per-feature factories keep the rule of one owner per folder (section 3); `viewModelFactory { initializer { … } }` keeps each one to a few lines | One `ViewModelFactory` in `app/` with a `when` over every ViewModel class | Decided 22 Oct 2026; the factory API is checked in the Android documentation (section 18), not yet compiled in the project |
 
 ---
 
@@ -378,7 +382,7 @@ Closed by S2 (19 Oct 2026): the thread of Volley's listener and the parse time; 
 | `CoinImageLoader` on our `NoCache` queue (expected to work, section 8.1); how the icons look (`RGB_565` has no transparency) and how fast memory-only icons load | When `CoinImageLoader` is written | D8, D20 |
 | A6: icons are free, or only cache hits are free (all measured requests were cache hits) | Data layer or later spot check | `01` A6, D8 |
 | Same HTTPS check on the demo emulator (API 36) | First integration build | `01` A5 |
-| Content under the status bar; ViewModel factory and test libraries | Project setup (S4) | Sections 6, 9 |
+| Content under the status bar; the ViewModel and LiveData libraries (`lifecycle-viewmodel`, `lifecycle-livedata`; not in `libs.versions.toml` on 22 Oct 2026, so the version must be added and checked with `:app:dependencies`); whether `viewModelFactory { initializer { … } }` compiles with that version; the test libraries | First step of the data layer work (`06`, section 4, day 2) | Sections 6, 9, D22 |
 | Pill look of the toggle (button shape in Material components) and the top bar fit at 360 dp with English and Vietnamese labels | First build of the top bar (Hải) | Section 9, D17 |
 
 ---
@@ -410,3 +414,8 @@ Read on 21 Oct 2026 (number formatting):
 - Oracle, Java SE 17 API, `java.util.Formatter` (the `f` conversion rounds with the round half up algorithm; with no explicit locale the default locale is used): https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Formatter.html
 - Oracle, Java SE 17 API, `java.text.DecimalFormat` (rounding mode is half even by default; a new instance uses the default FORMAT locale): https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/text/DecimalFormat.html
 - Kotlin standard library, `String.format` (uses the default locale unless one is passed; syntax of `java.util.Formatter`): https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/format.html
+
+Read on 22 Oct 2026 (ViewModel factories):
+- Android Developers, *ViewModel factories* (a ViewModel with constructor dependencies needs a factory that implements `ViewModelProvider.Factory`; the `viewModelFactory { initializer { … } }` form; `CreationExtras`): https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-factories
+- Android Developers, *Lifecycle releases* (artifacts `lifecycle-viewmodel` and `lifecycle-livedata`): https://developer.android.com/jetpack/androidx/releases/lifecycle
+- Android Developers, *Activity releases* (a release note says the `lifecycle-runtime` dependency was updated to 2.10.0; which `activity` version it belongs to is not confirmed): https://developer.android.com/jetpack/androidx/releases/activity

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="favorite_add">Thêm vào danh sách theo dõi</string>
+    <string name="favorite_remove">Xóa khỏi danh sách theo dõi</string>
+    <string name="favorite_full">Danh sách theo dõi đã đầy (50)</string>
+</resources>
