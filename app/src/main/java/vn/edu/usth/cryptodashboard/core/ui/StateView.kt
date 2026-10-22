@@ -133,6 +133,6 @@ class StateView @JvmOverloads constructor(
         AppError.RateLimited -> R.string.error_rate_limited
         AppError.ServerError -> R.string.error_server
         AppError.RequestRejected -> R.string.error_request_rejected
-        is AppError.InvalidData -> R.string.error_invalid_data
+        AppError.InvalidData -> R.string.error_invalid_data
     }
 }

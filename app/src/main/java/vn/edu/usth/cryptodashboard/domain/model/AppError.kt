@@ -18,5 +18,5 @@ sealed interface AppError {
 
     object RequestRejected : AppError
 
-    data class InvalidData(val cause: Throwable? = null) : AppError
+    object InvalidData : AppError
 }
