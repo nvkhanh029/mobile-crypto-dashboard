@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:focusable="true" android:focusableInTouchMode="true"
+>
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/marketSearchBox"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_s" android:layout_marginEnd="@dimen/space_s"
+        android:hint="@string/market_search_hint"
+        app:startIconDrawable="@drawable/ic_market_search" app:endIconMode="clear_text"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/marketSearch"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="@dimen/touch_min" android:maxLines="1" android:ellipsize="end"
+            android:inputType="text" android:imeOptions="actionSearch"
+            android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <LinearLayout android:id="@+id/marketSortBar"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingStart="@dimen/space_s" android:paddingEnd="@dimen/space_s"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/marketSearchBox">
+        <com.google.android.material.chip.Chip android:id="@+id/marketSortCap"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minHeight="@dimen/touch_min" android:maxLines="1"
+            android:text="@string/market_sort_cap" android:checkable="true"
+            app:checkedIconVisible="false" app:chipMinHeight="@dimen/touch_min"
+            app:chipStartPadding="@dimen/space_xs" app:chipEndPadding="@dimen/space_xs"
+            app:textStartPadding="@dimen/space_xs" app:textEndPadding="@dimen/space_xs"
+            app:ensureMinTouchTargetSize="true" />
+        <com.google.android.material.chip.Chip android:id="@+id/marketSortPrice"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_xs"
+            android:minHeight="@dimen/touch_min" android:maxLines="1"
+            android:text="@string/market_sort_price" android:checkable="true"
+            app:checkedIconVisible="false" app:chipMinHeight="@dimen/touch_min"
+            app:chipStartPadding="@dimen/space_xs" app:chipEndPadding="@dimen/space_xs"
+            app:textStartPadding="@dimen/space_xs" app:textEndPadding="@dimen/space_xs"
+            app:ensureMinTouchTargetSize="true" />
+        <com.google.android.material.chip.Chip android:id="@+id/marketSortChange"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="@dimen/space_xs"
+            android:minHeight="@dimen/touch_min" android:maxLines="1"
+            android:text="@string/market_sort_change" android:checkable="true"
+            app:checkedIconVisible="false" app:chipMinHeight="@dimen/touch_min"
+            app:chipStartPadding="@dimen/space_xs" app:chipEndPadding="@dimen/space_xs"
+            app:textStartPadding="@dimen/space_xs" app:textEndPadding="@dimen/space_xs"
+            app:ensureMinTouchTargetSize="true" />
+    </LinearLayout>
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:id="@+id/marketRefresh"
+        android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/marketSortBar"
+        app:layout_constraintBottom_toTopOf="@id/marketFooter"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+    android:focusable="true" android:focusableInTouchMode="true">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/marketList"
+                android:layout_width="0dp" android:layout_height="0dp"
+                android:clipToPadding="false"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+            <vn.edu.usth.cryptodashboard.core.ui.StateView android:id="@+id/marketState"
+                android:layout_width="0dp" android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <vn.edu.usth.cryptodashboard.core.ui.AttributionView android:id="@+id/marketFooter"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
