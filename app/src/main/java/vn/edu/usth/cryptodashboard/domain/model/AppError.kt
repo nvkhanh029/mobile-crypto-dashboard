@@ -7,6 +7,7 @@ package vn.edu.usth.cryptodashboard.domain.model
  * show it. Keeping the categories free of Android types lets C1 and its unit tests live in the
  * domain/data layers.
  */
+
 sealed interface AppError {
     object NoConnection : AppError
 
