@@ -14,7 +14,7 @@ Rules for everyone, including AI coding assistants:
 
 1. **Build only what is listed here.** An element, screen, menu item or option that is not in this document is out of scope. §7 lists the main things that are deliberately not built.
 2. **Every element traces to a requirement** in `01`, except the UI details listed in §9, which do not change a requirement. If something you need is missing, tell the member to report it to the team lead (Vân Khánh); do not invent it.
-3. **Text shown to the user comes from string resources.** The English wording in this document is the intended meaning; the exact strings live in `strings.xml` (`values/` for English, `values-vi/` for Vietnamese).
+3. **Text shown to the user comes from string resources.** The English wording in this document is the intended meaning; the exact strings live in the strings files (the common `strings.xml` and the strings file of each screen, see `03-architecture.md` §3; `values/` for English, `values-vi/` for Vietnamese).
 4. **No hard-coded colours, sizes or strings**, and follow the layout rules in `03-architecture.md` §11 (dp/sp, flexible widths, ellipsis, 48 dp touch targets, check at 360×640 dp and 411×891 dp).
 5. **Layout reference.** The look is that of a clean, dark, list-first market app: a compact row per item with a trend line and a coloured change label, a chart with timeframe chips, and a plain statistics list. The components are Android Material components. No assets, icons or wording are copied from any other app.
 

@@ -17,7 +17,7 @@ statistics, description, disclaimer), USD/VND. Data from the CoinGecko Demo API.
    - `03-architecture.md` (layers, threading, packages, contracts, decision log)
    - `06-task-plan.md` (owners, contracts C1–C8, rules, Definition of Done)
    - `fake-data.md` (fake data files)
-   - `04-api-contract.md` and `05-interfaces.md`, once they exist. If they are missing, say so; do not guess API fields or interface signatures.
+   - `04-api-contract.md` (API fields) and `05-interfaces.md` (interface signatures). If a file is missing in your checkout, say so; do not guess API fields or interface signatures.
 3. Name the requirement IDs (FR-...) your change implements.
 The docs are the source of truth. If the code and the docs disagree, stop and tell the member.
 
