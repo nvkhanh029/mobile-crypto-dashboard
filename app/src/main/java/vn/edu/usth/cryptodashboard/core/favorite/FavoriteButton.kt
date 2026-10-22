@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import vn.edu.usth.cryptodashboard.R
 
-class FavoriteStarButton @JvmOverloads constructor(
+class FavoriteButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : AppCompatImageButton(context, attrs) {
