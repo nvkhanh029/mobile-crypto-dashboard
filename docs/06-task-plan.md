@@ -28,7 +28,7 @@ Principles:
 - **An Khánh:** Market List screen, coin row layout and adapter (the coin icon is a `NetworkImageView`, C8), sparkline view, search, sort, pull-to-refresh, states. The coin row includes the star: Bảo Linh's Watchlist needs it to remove a coin (FR-WL-01), so it is always in the row layout; on Market rows it is shown only if FR-ML-08 is built. Reuses Hải's components and Bảo Linh's favorite button.
 - **Kiên:** Coin Detail screen (header with the coin icon as a `NetworkImageView` (C8), statistics with the ⓘ explanations of FR-CD-10, description, favorite, disclaimer), hosting Duy's chart. As a Should (FR-CUR-05): the currency selector in the Detail top bar and the reload of the Detail data when the currency changes.
 - **Duy:** price chart: the `PriceChart` interface over MPAndroidChart (`03` D9), `PriceChartFragment`, five timeframes, 1H rule, touch marker, area fill, reference line and axis labels (S/C, dropped if the library cannot do them), loading/empty state of the chart area, chart colours, reload of the chart when the currency changes (Should, FR-CUR-05), and the debug-only chart sandbox screen (see `03-architecture.md`, section 13) used to test the chart alone.
-- **Bảo Linh:** favorite storage and listener, favorite button, Watchlist screen (data by ID, empty state, limit, coin without data).
+- **Bảo Linh:** favorite storage (the list of IDs as LiveData), favorite button, Watchlist screen (data by ID, empty state, limit, coin without data).
 
 **Tests:** every member writes the unit tests for their own area. Vân Khánh keeps the manual checklist and runs it at integration; nobody writes another person's unit tests.
 
@@ -51,7 +51,7 @@ Principles:
 | Author | Reviewer | Why |
 |---|---|---|
 | An Khánh | Bảo Linh | Watchlist reuses the coin row and adapter |
-| Bảo Linh | An Khánh | Market List uses the favorite button and listener |
+| Bảo Linh | An Khánh | Market List uses the favorite button and the favorite store |
 | Kiên | Duy | Detail hosts the chart |
 | Duy | Kiên | Same contract, other side |
 | Hải | Vân Khánh | Foundation and data layer are used by everyone |
@@ -65,8 +65,8 @@ Principles:
 |---|---|---|---|---|---|
 | C1 | Domain models and repository interfaces, including the error type and the rule "callbacks run on the main thread" | Vân Khánh | Everyone | `04-api-contract.md`, then `05-interfaces.md` | End of day 2 |
 | C2 | Formatters, `UiState`, StateView, footer bar (`AttributionView`), explanation dialog (CMP-12), style guide (one sample row) | Hải | Everyone | The style-names files (Hải, day 1) | First version end of day 2; no later than day 3 |
-| C3 | Favorite store, listener and favorite button | Bảo Linh | An Khánh, Kiên | – | Day 2 (interface and working version) |
-| C4 | Coin row layout and adapter: takes coin data and favorite state, reports row tap and favorite toggle; the star is part of the row | An Khánh | Bảo Linh | C1, C2, C3 | Day 3 |
+| C3 | Favorite store (the list of IDs as LiveData) and favorite button | Bảo Linh | An Khánh, Kiên | – | Day 2 (interface and working version) |
+| C4 | Coin row layout and adapter: takes coin data and reports the row tap; the star is a `FavoriteButton` (C3) that toggles `FavoriteStore` itself, and a screen that removes rows observes `favoriteIds`; the star is part of the row | An Khánh | Bảo Linh | C1, C2, C3 | Day 3 |
 | C5 | `PriceChartFragment.newInstance(coinId)`: Detail only needs the coin ID; the chart brings its own timeframe selector and states | Duy | Kiên | C1, C2 (C7 only for the reload on a currency change) | Day 3 |
 | C6 | Opening Detail: extra key `coin_id` | Kiên | An Khánh, Bảo Linh | – | Day 1 |
 | C7 | Currency settings and listener: current currency and change notification, and the selector view | Hải | All state holders, Kiên | – | Day 3 |
