@@ -125,7 +125,7 @@ Rules:
 
 ## 4. Data sources (`data/source`)
 
-The data source interfaces are internal to the Data layer: only the repository implementations use them, and they are not a contract between members (`03` §2, §12). Each interface has a remote implementation in `data/remote` and a fake implementation in `data/fake`. The names follow *type of data + type of source + DataSource* (`03` §3).
+The data source interfaces are internal to the Data layer: only the repository implementations use them, and they are not a contract between members (`03` §2, §12). `DataSourceCallback` and the four interfaces are in `data/source`. Each interface has a remote implementation in `data/remote` and a fake implementation in `data/fake`; both turn JSON into models with the mappers of `data/mapper` (below). The names follow *type of data + type of source + DataSource* (`03` §3).
 
 ```kotlin
 interface DataSourceCallback<T> {
@@ -164,6 +164,30 @@ Rules:
 - `getChart` takes `days` (the value of `Timeframe.days`), not a `Timeframe`: the request has no 1H, and the repository gives `H1` and `H24` the same stored answer.
 - `getCoinsByIds` follows the same rule as the repository: an ID without data is missing from the list, without an error.
 - What the fake implementations answer for each request and each scenario is in `fake-data.md` §2 and §5.2.
+
+### JSON mappers (`data/mapper`)
+
+The remote and the fake implementations turn the JSON text into models with three plain Kotlin objects. They use no Android types and read the JSON with `org.json` (`03` §8.4, D23).
+
+```kotlin
+object CoinMapper {
+    fun parseList(json: String): List<Coin>
+}
+
+object CoinDetailMapper {
+    fun parse(json: String, currency: Currency): CoinDetail
+}
+
+object ChartMapper {
+    fun parse(json: String): List<ChartPoint>
+}
+```
+
+Rules:
+- **Input:** the whole response text. `CoinMapper.parseList` reads a `/coins/markets` array (the market list and coins by ID); `CoinDetailMapper.parse` reads a `/coins/{id}` object, and `currency` selects the key of the fields that are keyed by currency (`04` §4); `ChartMapper.parse` reads a `/market_chart` object and uses only `prices` (`04` §5).
+- **Failure:** a mapper throws `org.json.JSONException` when the text is not valid JSON, or when a value the model requires is missing or has the wrong type (the required fields are in section 1). The data source catches it on the background thread and reports `AppError.InvalidData`; nobody shows the message of the exception (`03` §8.3).
+- **Missing values** become `null` as in section 1. `CoinDetailMapper` removes the markup of the description (section 2).
+- A mapper runs on the background thread of the data source, never on the main thread (`03` §5).
 
 ---
 
@@ -232,7 +256,7 @@ A ViewModel that needs an ID (Detail, chart) takes it as a constructor parameter
 
 ## 7. Fake data sources (`data/fake`)
 
-The four fake data sources of section 4 implement the same interfaces as the remote ones. They are plain Kotlin classes: they use no `Context` and no `Handler`, so the same classes run in the app and in JVM unit tests (`fake-data.md` §5.3). They get everything they need through their constructor:
+The four fake data sources of section 4 implement the same interfaces as the remote ones. `Scenario`, `FakeFileReader`, `MainThreadPoster` and the four fake data sources are in `data/fake`. They are plain Kotlin classes: they use no `Context` and no `Handler`, so the same classes run in the app and in JVM unit tests (`fake-data.md` §5.3). They get everything they need through their constructor:
 
 ```kotlin
 enum class Scenario {
@@ -272,7 +296,7 @@ class MarketListFakeDataSource(
 | `mainThread` | posts to the main looper with `Handler.postDelayed` | runs the action at once and ignores the delay |
 
 Rules:
-- **Threading:** the file is read and parsed on `executor`; `onSuccess` and `onError` are delivered with `mainThread.post(delayMs, …)`, so they arrive on the main thread after the delay (`03` §5).
+- **Threading:** the file is read and parsed (with the mappers of section 4) on `executor`; `onSuccess` and `onError` are delivered with `mainThread.post(delayMs, …)`, so they arrive on the main thread after the delay (`03` §5).
 - **Scenario value:** `Scenario.fromName` turns the text of `FAKE_SCENARIO` into the constant of the same name in upper case (`Locale.US`). A text that matches no constant throws `IllegalArgumentException("Unknown FAKE_SCENARIO: …")`, so the app stops at startup instead of quietly running `normal`.
 - **What a scenario changes:** only what `fake-data.md` §5.2 lists; every other request is answered as in `NORMAL`. The five error scenarios (`NO_CONNECTION`, `TIMEOUT`, `RATE_LIMITED`, `SERVER_ERROR`, `REJECTED`) make all four data sources answer with the matching `AppError` (`fake-data.md` §4).
 - **`FAIL_THEN_OK`:** each data source counts its own requests. Its first request fails with `AppError.ServerError` and every later request succeeds as in `NORMAL`. The count is per data source, not per coin and not for the whole app, so every screen can be tried on its own.

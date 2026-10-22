@@ -75,8 +75,9 @@ domain/
 data/
   source/            data source interfaces, one per kind of data
                      (market list, coins by ID, coin detail, chart)         Vân Khánh
-  remote/            remote data sources, CoinGeckoRequest, ErrorMapper,
-                     JSON mappers                                           Vân Khánh
+  mapper/            JSON mappers (CoinMapper, CoinDetailMapper,
+                     ChartMapper), used by remote and fake                  Vân Khánh
+  remote/            remote data sources, CoinGeckoRequest, ErrorMapper     Vân Khánh
   fake/              fake data sources (read JSON from assets/fake)         Vân Khánh
   repository/        repository implementations, RefreshPolicy              Vân Khánh
 features/
@@ -98,7 +99,7 @@ The names of the data source classes and interfaces follow the pattern *type of 
 
 Rules:
 - `features/*` depend on `domain` and `core`, never on `data`. They never import each other, except through the contracts in section 12 (Watchlist uses the coin row from `marketlist`; Detail hosts the chart fragment).
-- `data` depends only on `domain`. Inside `data`, data sources are used only by the repository implementations.
+- `data` depends only on `domain`. Inside `data`, data sources are used only by the repository implementations. `remote` and `fake` both use `mapper` and never import each other (D23).
 - Formatters, filter/sort, timeframe slicing and mappers are plain Kotlin (no Android types) so they run in JVM unit tests.
 - Package by feature (not by type) so each owner works in their own folder and merge conflicts stay rare.
 - **Resources follow the same rule.** The layouts and drawables of a screen belong to its owner (the shared coin row layout is An Khánh's, C4). The strings of a screen go in a strings file of the owner's own, in `values/` and in `values-vi/`; Android takes the file name as arbitrary and uses the `name` of each `<string>` (checked 21 Oct 2026, section 18), so several strings files work together. Hải owns the common `strings.xml` (words used by several screens, for example Retry, and the shared error messages) and reviews the Vietnamese text. A string name must be unique across all files (general Android knowledge, not checked in the docs), so each owner starts the names of their strings with the name of the feature.
@@ -147,7 +148,7 @@ MarketViewModel                         – updates LiveData<UiState<…>>
 Fragment observes the LiveData → adapter shows rows / StateView shows error
 ```
 
-With fake data only the data source changes: the fake data source reads a JSON file from `assets/fake`, waits `FAKE_DELAY_MS`, and calls the same callback. The repository and everything above it are the same classes in both modes, so the refresh intervals and the pause after a 429 also work on fake data (D19).
+With fake data only the data source changes: the fake data source reads a JSON file from `assets/fake`, turns it into models with the same mapper as the remote data source, waits `FAKE_DELAY_MS`, and calls the same callback. The repository and everything above it are the same classes in both modes, so the refresh intervals and the pause after a 429 also work on fake data (D19).
 
 **What S2 confirmed about threads (API 24 emulator, scratch project):** Volley's `parseNetworkResponse` of a `Request` runs on a Volley worker thread, and the response listener (and the error listener) is delivered on the main thread. Requests can finish in a different order from the one they were sent in. Parsing the top-100 response (about 395 KB) into a `JSONArray` took 187 to 332 ms on the emulator, so parsing on the main thread would drop frames (NFR-03). That is why the listener only hands the raw string to the executor.
 
@@ -236,8 +237,10 @@ After a 429, the repository refuses new calls to the data source for 60 s (FR-ER
 ### 8.4 JSON mapping
 Mappers use `JSONObject`/`JSONArray` and return domain models. Fields that may be missing are nullable types (for example `Double?`), so "missing" (`null`) is different from 0 (FR-CD-06, FR-ML-09). An absent key and a JSON `null` are treated the same way (`04` §1.1). Which fields can be null is confirmed from real responses in S1 and recorded in `04-api-contract.md`.
 
+The mappers are three plain Kotlin objects in `data/mapper`: `CoinMapper` (market list and coins by ID), `CoinDetailMapper` and `ChartMapper`. The remote and the fake data sources both call them, so a JSON text is read in the same way in both modes (D23; signatures in `05-interfaces.md`).
+
 ### 8.5 Fake data
-Fake data sources implement the same data source interfaces as the remote ones, read the JSON files in `assets/fake`, and can produce the error scenarios. The repositories above them are identical in both modes (D19). Details in `fake-data.md`.
+Fake data sources implement the same data source interfaces as the remote ones, read the JSON files in `assets/fake`, parse them with the same mappers as the remote ones (section 8.4), and can produce the error scenarios. The repositories above them are identical in both modes (D19). Details in `fake-data.md`.
 
 ---
 
@@ -369,6 +372,7 @@ The chart is the riskiest part, so it is built to be developed and tested **alon
 | D20 | `CoinImageLoader` is a concrete class in `core/image` (not in `data/`, no interface), created in `CryptoApp`; layouts show icons with `NetworkImageView` (contract C8) | Features may use `core` but not `data`, and the icon is needed by the coin row and the Detail header; icons are pictures, not market data; nobody needs a fake of it (icons load from the network in both modes, `fake-data.md` §6); `NetworkImageView` is made for lists and handles views that are reused | `CoinImageLoader` in `data/image` (features may not import it); an interface with a fake (extra work, no user); Glide/Picasso (second networking stack, D4, D8) | Decided 21 Oct 2026 |
 | D21 | The footer bar (`AttributionView`) belongs to each screen: Market, Watchlist and Detail each include it in their own layout; `MainActivity` does not draw one | The two tabs show different fetch times; with one footer in the shell, `MainActivity` would have to read the ViewModel of the visible tab, a coupling no contract covers. One view used in three layouts costs nothing extra | One footer in the shell for the two tabs (needs a channel from both ViewModels to `MainActivity`) | Decided 21 Oct 2026 |
 | D22 | Each feature owner writes the ViewModel factory of their own screens, in their own package; `CryptoApp` only exposes the repositories and the other shared objects as properties | A shared factory in `app/` would have to know every ViewModel, so four owners would edit one file of the team lead (merge conflicts that break the build for everyone) and the team lead would wait for every ViewModel constructor. Per-feature factories keep the rule of one owner per folder (section 3); `viewModelFactory { initializer { … } }` keeps each one to a few lines | One `ViewModelFactory` in `app/` with a `when` over every ViewModel class | Decided 22 Oct 2026; the factory API is checked in the Android documentation (section 18), not yet compiled in the project |
+| D23 | The three JSON mappers (`CoinMapper`, `CoinDetailMapper`, `ChartMapper`) are plain Kotlin objects in their own package `data/mapper`, used by both the remote and the fake data sources | Both kinds of data source must read JSON in the same way: the scenarios `invalid_json` and `html_description` (`fake-data.md` §5.2) work through files, so they test the real mapping code only if the fake data sources use the same mappers. A package of its own keeps the dependencies clear: `remote` → `mapper` and `fake` → `mapper`, and `fake` does not import the network code | Mappers inside `data/remote` (the fake data sources would import from the package of the network code); parsing inside each data source (two copies that can differ) | Decided 23 Oct 2026. The Android data layer guide recommends separate model classes for external data (section 18) but gives no rule for the package of the mapping code, so the package choice is the team's own |
 
 ---
 
@@ -419,3 +423,6 @@ Read on 22 Oct 2026 (ViewModel factories):
 - Android Developers, *ViewModel factories* (a ViewModel with constructor dependencies needs a factory that implements `ViewModelProvider.Factory`; the `viewModelFactory { initializer { … } }` form; `CreationExtras`): https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-factories
 - Android Developers, *Lifecycle releases* (artifacts `lifecycle-viewmodel` and `lifecycle-livedata`): https://developer.android.com/jetpack/androidx/releases/lifecycle
 - Android Developers, *Activity releases* (a release note says the `lifecycle-runtime` dependency was updated to 2.10.0; which `activity` version it belongs to is not confirmed): https://developer.android.com/jetpack/androidx/releases/activity
+
+Read on 23 Oct 2026 (mappers):
+- Android Developers, *Data layer* (current address of the page above; it recommends separate model classes for data from outside the app, at least where a data source's data does not match what the rest of the app expects, and data sources behind interfaces so that fakes can be used in tests; it gives no rule for the package of the mapping code): https://developer.android.com/topic/architecture/data-layer
