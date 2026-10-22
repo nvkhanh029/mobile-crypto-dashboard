@@ -17,7 +17,7 @@ statistics, description, disclaimer), USD/VND. Data from the CoinGecko Demo API.
    - `03-architecture.md` (layers, threading, packages, contracts, decision log)
    - `06-task-plan.md` (owners, contracts C1–C8, rules, Definition of Done)
    - `fake-data.md` (fake data files)
-   - `04-api-contract.md` and `05-interfaces.md`, once they exist. If they are missing, say so; do not guess API fields or interface signatures.
+   - `04-api-contract.md` (API fields) and `05-interfaces.md` (interface signatures). If a file is missing in your checkout, say so; do not guess API fields or interface signatures.
 3. Name the requirement IDs (FR-...) your change implements.
 The docs are the source of truth. If the code and the docs disagree, stop and tell the member.
 
@@ -40,8 +40,10 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 - Kotlin + XML Views (Activities, Fragments, RecyclerView, Material components).
   **No Jetpack Compose** (not accepted by the instructor).
 - minSdk 24, compileSdk 37, portrait only, dark theme only.
-- ViewModel + LiveData per screen. Manual dependency injection through `CryptoApp` and
-  `ViewModelFactory`. No Hilt.
+- ViewModel + LiveData per screen. Manual dependency injection through `CryptoApp`, which exposes the
+  repositories and the other shared objects as properties. Each feature writes the small ViewModel
+  factory of its own screens (`viewModelFactory { initializer { ... } }`); there is no shared factory.
+  No Hilt.
 - Volley for HTTP and `org.json` for JSON. No Retrofit, OkHttp, Gson or Moshi.
 - Coin icons: Volley `NetworkImageView` with the `CoinImageLoader` from `CryptoApp` (contract C8). No Glide, Picasso or Coil.
 - Threading: one `ExecutorService` + a `Handler` on the main looper. Repository callbacks always
@@ -60,6 +62,7 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 - Filtering, sorting, slicing and mapping are plain Kotlin (no Android types) so JVM unit tests can run them.
 - Every screen exposes `LiveData<UiState<T>>` with Loading, Success, Empty and Error.
 - Ignore stale responses (request counter) when the user changes timeframe or currency.
+- After a change of currency or timeframe, drop the old data and show Loading; if the new request fails, emit `Error` without old data. Keep old data in `Error` only when a refresh of the same request fails (`01` FR-ERR-03, `03` section 6).
 - Fake and real data sources implement the same interfaces; `CryptoApp` chooses once at startup.
   No other class checks the fake/real flag.
 
@@ -89,7 +92,7 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 ## 8. Ownership and contracts
 | Area | Owner | Folders and files |
 |---|---|---|
-| Data layer, CryptoApp, ViewModelFactory, coin icon loader, build files | Vân Khánh | `data/`, `domain/`, `core/image`, `app/CryptoApp`, `app/ViewModelFactory`, `res/xml/`, `res/raw/`, Gradle files |
+| Data layer, CryptoApp, coin icon loader, build files | Vân Khánh | `data/`, `domain/`, `core/image`, `app/CryptoApp`, `res/xml/`, `res/raw/`, Gradle files |
 | UI foundation, MainActivity, formatters, StateView, currency, shared resources | Hải | `core/ui`, `core/format`, `core/currency`, `app/MainActivity`, and the shared values in `res/` (theme, colors, dimens, text styles, shared drawables, the common `strings.xml`) |
 | Market list | An Khánh | `features/marketlist`, and the layouts, drawables and strings file of its screens |
 | Coin detail | Kiên | `features/detail`, and the layouts, drawables and strings file of its screen |
@@ -97,6 +100,7 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 | Watchlist, favorites | Bảo Linh | `features/watchlist`, `core/favorite`, and the layouts, drawables and strings file of its screen |
 
 - **Layouts and drawables** of a screen belong to the owner of that screen (the shared coin row layout is An Khánh's, C4).
+- **ViewModel factory:** the factory of a screen's ViewModel is in the feature's own package and belongs to the owner of that feature. It takes the repositories from `CryptoApp`; nobody edits a file of another member to register a ViewModel.
 - **Strings:** put the strings of your screen in a strings file of your own, in `values/` and in `values-vi/`, and start
   each string name with the name of your feature so that names never clash. Words used by several screens go in the common
   `strings.xml`, which is Hải's: ask the member to ask Hải. Hải reviews the Vietnamese text.
@@ -137,4 +141,5 @@ Out-of-scope items are listed in `02` section 7.
 
 ## 12. Documents
 Do not edit files in `docs/`. If a document seems wrong or incomplete, tell the member to report it to
-the team lead (Vân Khánh).
+the team lead (Vân Khánh), who decides on changes to the documents. The one exception is a missing style
+name (a color, text style, spacing, corner size or component size role): the member asks Hải (section 6).
