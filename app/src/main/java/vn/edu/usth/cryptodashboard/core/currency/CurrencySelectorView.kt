@@ -16,7 +16,7 @@ import vn.edu.usth.cryptodashboard.domain.model.Currency
 class CurrencySelectorView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
+    defStyleAttr: Int = com.google.android.material.R.attr.materialButtonStyle,
 ) : MaterialButton(context, attrs, defStyleAttr) {
 
     private var selectedCurrency = Currency.USD

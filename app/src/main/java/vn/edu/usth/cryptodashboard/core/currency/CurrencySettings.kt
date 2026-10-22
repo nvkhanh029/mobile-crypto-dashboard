@@ -29,7 +29,11 @@ class CurrencySettings private constructor(context: Context) {
 
     private fun readSavedCurrency(): Currency {
         val savedValue = preferences.getString(KEY_CURRENCY, null) ?: return Currency.USD
-        return runCatching { Currency.valueOf(savedValue) }.getOrDefault(Currency.USD)
+        return try {
+            Currency.valueOf(savedValue)
+        } catch (_: IllegalArgumentException) {
+            Currency.USD
+        }
     }
 
     companion object {
