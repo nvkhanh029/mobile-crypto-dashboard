@@ -1,0 +1,181 @@
+package vn.edu.usth.cryptodashboard.features.chart
+
+import android.graphics.Color
+import androidx.core.content.ContextCompat
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
+import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.core.format.PriceFormatter
+import vn.edu.usth.cryptodashboard.domain.model.ChartPoint
+import vn.edu.usth.cryptodashboard.domain.model.Currency
+import vn.edu.usth.cryptodashboard.domain.model.Timeframe
+
+/**
+ * [PriceChart] implementation over MPAndroidChart v3.1.0 (docs/03-architecture.md D9).
+ *
+ * The library is used only here. X values are point indices, not millisecond timestamps, because
+ * the library's x values are floats (section 13). Time labels use [ChartTimeLabelFormatter].
+ */
+class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
+
+    private val context = chart.context
+    private val density = context.resources.displayMetrics.density
+    private val marker = ChartMarkerView(context)
+
+    init {
+        chart.marker = marker
+        chart.setDrawMarkers(true)
+        chart.description.isEnabled = false
+        chart.legend.isEnabled = false
+        chart.setTouchEnabled(true)
+        chart.isDragEnabled = true
+        chart.setScaleEnabled(false)
+        chart.setPinchZoom(false)
+        chart.isDoubleTapToZoomEnabled = false
+        chart.setHighlightPerDragEnabled(true)
+        chart.setHighlightPerTapEnabled(true)
+        chart.setDrawGridBackground(false)
+        chart.setDrawBorders(false)
+        chart.axisRight.setDrawLimitLinesBehindData(true)
+        chart.setNoDataText(context.getString(R.string.chart_not_enough_data))
+        chart.setBackgroundColor(Color.TRANSPARENT)
+        chart.extraRightOffset = context.resources.getDimension(R.dimen.chart_axis_right_offset)
+        chart.extraBottomOffset = context.resources.getDimension(R.dimen.chart_axis_bottom_offset)
+
+        val axisTextSize = dp(R.dimen.chart_axis_text_size)
+        val dividerColor = ContextCompat.getColor(context, R.color.divider)
+        val secondaryTextColor = ContextCompat.getColor(context, R.color.textSecondary)
+
+        chart.xAxis.apply {
+            position = XAxis.XAxisPosition.BOTTOM
+            setDrawGridLines(false)
+            setDrawAxisLine(true)
+            axisLineColor = dividerColor
+            textColor = secondaryTextColor
+            textSize = axisTextSize
+            granularity = 1f
+            isGranularityEnabled = true
+            setAvoidFirstLastClipping(true)
+        }
+
+        chart.axisRight.apply {
+            isEnabled = true
+            setDrawGridLines(false)
+            setDrawAxisLine(false)
+            textColor = secondaryTextColor
+            textSize = axisTextSize
+            setLabelCount(Y_AXIS_LABEL_COUNT, true)
+        }
+        chart.axisLeft.isEnabled = false
+    }
+
+    override fun show(
+        points: List<ChartPoint>,
+        currency: Currency,
+        timeframe: Timeframe,
+        animate: Boolean,
+    ) {
+        if (points.size < 2) {
+            clear()
+            return
+        }
+
+        marker.points = points
+        marker.currency = currency
+        marker.timeframe = timeframe
+
+        val firstPrice = points.first().price
+        val lastPrice = points.last().price
+        val directionColor = ContextCompat.getColor(
+            context,
+            if (lastPrice >= firstPrice) R.color.positive else R.color.negative,
+        )
+        chart.highlightDotColor = directionColor
+
+        val entries = points.mapIndexed { index, point ->
+            Entry(index.toFloat(), point.price.toFloat())
+        }
+
+        val dataSet = LineDataSet(entries, "").apply {
+            color = directionColor
+            lineWidth = dp(R.dimen.chart_line_width)
+            mode = LineDataSet.Mode.LINEAR
+            setDrawCircles(false)
+            setDrawValues(false)
+            setDrawFilled(true)
+            fillColor = directionColor
+            fillAlpha = context.resources.getInteger(R.integer.chart_area_fill_alpha)
+            isHighlightEnabled = true
+            highLightColor = ContextCompat.getColor(context, R.color.textSecondary)
+            highlightLineWidth = dp(R.dimen.chart_highlight_line_width)
+            setDrawHorizontalHighlightIndicator(false)
+        }
+
+        chart.xAxis.valueFormatter = IndexAxisValueFormatter(
+            points.map { ChartTimeLabelFormatter.format(it.timestampMillis, timeframe) },
+        )
+        chart.xAxis.setLabelCount(xAxisLabelCount(timeframe), true)
+        chart.axisRight.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String =
+                PriceFormatter.format(value.toDouble(), currency)
+        }
+        chart.axisRight.removeAllLimitLines()
+        chart.axisRight.addLimitLine(referenceLine(firstPrice))
+
+        chart.highlightValue(null)
+        chart.data = LineData(dataSet)
+        chart.notifyDataSetChanged()
+        chart.setVisibleXRangeMaximum(entries.size.toFloat())
+        chart.moveViewToX(0f)
+
+        if (animate) {
+            chart.animateX(ANIMATION_DURATION_MILLIS)
+        } else {
+            chart.invalidate()
+        }
+    }
+
+    override fun clear() {
+        chart.highlightValue(null)
+        chart.clear()
+        chart.invalidate()
+    }
+
+    /** FR-CD-13: long date labels need fewer ticks so they never overlap at 360 dp. */
+    private fun xAxisLabelCount(timeframe: Timeframe): Int = when (timeframe) {
+        Timeframe.H1, Timeframe.H24 -> X_AXIS_LABEL_COUNT_SHORT
+        Timeframe.D7 -> X_AXIS_LABEL_COUNT_MEDIUM
+        Timeframe.M1, Timeframe.Y1 -> X_AXIS_LABEL_COUNT_LONG
+    }
+
+    /** FR-CD-12 (Could): dashed line at the first price of the selected period. */
+    private fun referenceLine(firstPrice: Double): LimitLine = LimitLine(firstPrice.toFloat(), "").apply {
+        lineColor = ContextCompat.getColor(context, R.color.divider)
+        lineWidth = dp(R.dimen.chart_reference_line_width)
+        enableDashedLine(
+            context.resources.getDimension(R.dimen.chart_reference_dash_length),
+            context.resources.getDimension(R.dimen.chart_reference_dash_space),
+            0f,
+        )
+    }
+
+    /**
+     * MPAndroidChart takes dp for line widths and text sizes, and pixels for dash lengths.
+     * [dp] converts a dimension resource to the dp value the library expects.
+     */
+    private fun dp(dimensionResource: Int): Float =
+        context.resources.getDimension(dimensionResource) / density
+
+    private companion object {
+        const val X_AXIS_LABEL_COUNT_SHORT = 4
+        const val X_AXIS_LABEL_COUNT_MEDIUM = 3
+        const val X_AXIS_LABEL_COUNT_LONG = 4
+        const val Y_AXIS_LABEL_COUNT = 4
+        const val ANIMATION_DURATION_MILLIS = 300
+    }
+}

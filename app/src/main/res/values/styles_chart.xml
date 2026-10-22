@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Timeframe chip of the price chart (CMP-10). Owner: Duy. -->
+<resources>
+    <style name="ChartTimeframeChip" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="android:textColor">@color/chart_chip_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:minWidth">@dimen/chart_chip_min_width</item>
+        <item name="android:insetTop">@dimen/chart_chip_inset</item>
+        <item name="android:insetBottom">@dimen/chart_chip_inset</item>
+        <item name="android:paddingStart">@dimen/space_xs</item>
+        <item name="android:paddingEnd">@dimen/space_xs</item>
+        <item name="backgroundTint">@color/chart_chip_background</item>
+        <item name="strokeColor">@color/chart_chip_stroke</item>
+        <item name="strokeWidth">@dimen/divider_thickness</item>
+        <item name="cornerRadius">@dimen/corner_l</item>
+    </style>
+</resources>

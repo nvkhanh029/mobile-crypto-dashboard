@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug-only chart sandbox strings. The sandbox is a developer tool, not a user screen, so these
+    stay in English and are marked not translatable (docs/03-architecture.md section 13).
+-->
+<resources>
+    <string name="chart_sandbox_title" translatable="false">Chart sandbox: %1$s</string>
+    <string name="chart_sandbox_activity_label" translatable="false">Chart sandbox</string>
+    <string name="chart_sandbox_normal" translatable="false">Normal</string>
+    <string name="chart_sandbox_short" translatable="false">Short chart</string>
+    <string name="chart_sandbox_error" translatable="false">Error</string>
+</resources>

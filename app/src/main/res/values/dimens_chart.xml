@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Chart-only sizes (SCR-05). The shared spacing, corner and component roles are in dimens.xml
+    (Hải). These are named so no layout or Kotlin file contains a literal value.
+-->
+<resources>
+    <dimen name="chart_line_width">2dp</dimen>
+    <dimen name="chart_highlight_line_width">1dp</dimen>
+    <dimen name="chart_highlight_dot_radius">3dp</dimen>
+    <dimen name="chart_highlight_dot_stroke_width">1dp</dimen>
+    <dimen name="chart_reference_line_width">1dp</dimen>
+    <dimen name="chart_reference_dash_length">4dp</dimen>
+    <dimen name="chart_reference_dash_space">4dp</dimen>
+    <dimen name="chart_axis_text_size">10sp</dimen>
+    <dimen name="chart_axis_right_offset">4dp</dimen>
+    <dimen name="chart_axis_bottom_offset">4dp</dimen>
+    <dimen name="chart_marker_max_width">240dp</dimen>
+
+    <!-- Chips (CMP-10): 5 equal-width buttons must fit at 360 dp. -->
+    <dimen name="chart_chip_min_width">0dp</dimen>
+    <dimen name="chart_chip_inset">0dp</dimen>
+</resources>

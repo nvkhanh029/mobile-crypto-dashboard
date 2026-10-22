@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug-only chart sandbox (docs/03-architecture.md section 13). -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chartSandboxRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/chartSandboxTitle"
+        style="@style/TitleBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_m"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/chartSandboxNormal"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/touch_min"
+        android:layout_marginTop="@dimen/space_s"
+        android:layout_marginEnd="@dimen/space_xs"
+        android:paddingStart="@dimen/space_s"
+        android:paddingEnd="@dimen/space_s"
+        android:text="@string/chart_sandbox_normal"
+        app:layout_constraintEnd_toStartOf="@id/chartSandboxShort"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxTitle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/chartSandboxShort"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/touch_min"
+        android:layout_marginStart="@dimen/space_xs"
+        android:layout_marginEnd="@dimen/space_xs"
+        android:paddingStart="@dimen/space_s"
+        android:paddingEnd="@dimen/space_s"
+        android:text="@string/chart_sandbox_short"
+        app:layout_constraintEnd_toStartOf="@id/chartSandboxError"
+        app:layout_constraintStart_toEndOf="@id/chartSandboxNormal"
+        app:layout_constraintTop_toTopOf="@id/chartSandboxNormal" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/chartSandboxError"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/touch_min"
+        android:layout_marginStart="@dimen/space_xs"
+        android:paddingStart="@dimen/space_s"
+        android:paddingEnd="@dimen/space_s"
+        android:text="@string/chart_sandbox_error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chartSandboxShort"
+        app:layout_constraintTop_toTopOf="@id/chartSandboxNormal" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/chartSandboxContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/space_m"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxNormal" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

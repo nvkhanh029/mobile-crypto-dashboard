@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Area fill opacity of the price chart (FR-CD-11), 0..255. -->
+<resources>
+    <integer name="chart_area_fill_alpha">40</integer>
+</resources>
