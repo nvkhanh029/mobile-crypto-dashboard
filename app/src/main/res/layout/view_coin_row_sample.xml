@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CMP-01 style reference (C2). An Khánh's C4 adapter uses these dimensions, styles and
+    constraints; this layout is deliberately not wired to a data adapter. Replace the sparkline
+    placeholder with SparklineView in the real item layout.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:minHeight="@dimen/touch_min"
+    android:paddingStart="@dimen/space_m"
+    android:paddingTop="@dimen/space_s"
+    android:paddingEnd="@dimen/space_s"
+    android:paddingBottom="@dimen/space_s">
+
+    <TextView
+        android:id="@+id/rowRank"
+        style="@style/RowSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="@dimen/space_l"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="1" />
+
+    <ImageView
+        android:id="@+id/rowCoinIcon"
+        android:layout_width="@dimen/coin_icon_size"
+        android:layout_height="@dimen/coin_icon_size"
+        android:layout_marginStart="@dimen/space_s"
+        android:importantForAccessibility="no"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_coin_placeholder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rowRank"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:id="@+id/rowTextColumn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_s"
+        android:layout_marginEnd="@dimen/space_s"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rowSparkline"
+        app:layout_constraintStart_toEndOf="@id/rowCoinIcon"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/rowName"
+            style="@style/RowTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Bitcoin" />
+
+        <TextView
+            android:id="@+id/rowSubtitle"
+            style="@style/RowSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="BTC · MC $1.30T" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/rowSparkline"
+        android:layout_width="@dimen/sparkline_width"
+        android:layout_height="@dimen/sparkline_height"
+        android:layout_marginEnd="@dimen/space_s"
+        android:contentDescription="@string/content_desc_price_trend"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_sparkline_sample"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rowPriceColumn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/rowPriceColumn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_s"
+        android:gravity="end"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rowStar"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/rowPrice"
+            style="@style/Price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            tools:text="$67,234.50" />
+
+        <vn.edu.usth.cryptodashboard.core.ui.PriceChangeLabel
+            android:id="@+id/rowPriceChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/space_xs"
+            tools:text="+2.35%" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/rowStar"
+        android:layout_width="@dimen/touch_min"
+        android:layout_height="@dimen/touch_min"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/content_desc_add_to_watchlist"
+        android:scaleType="center"
+        android:src="@drawable/ic_star_outline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Colour roles (docs/02-ui spec.md, section 2.1). Layouts and code use these names only;
+    Colour roles (docs/02-ui-spec.md, section 2.1). Layouts and code use these names only;
     never a literal hex value. Placeholder values, to be replaced by the real design
     (approved by the team lead). Changing a value here must not require a layout change.
 
@@ -12,9 +12,8 @@
       onNeutral     on neutral     ~9.1:1
       onAccent      on accent      ~6.5:1
 
-    `onAccent` is not listed in 02 section 2.1, but the selected timeframe chip (CMP-10) and
-    the selected segment of the view switch (CMP-13) are filled with `accent` and need a
-    readable text colour. Reported to the team lead for 02 section 2.1.
+    `onAccent` is the text colour on `accent`, used by the selected timeframe chip (CMP-10) and
+    the selected segment of the view switch (CMP-13).
 -->
 <resources>
     <!-- Surfaces -->
