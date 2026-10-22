@@ -12,9 +12,5 @@
     <string name="market_no_coins">Chưa có đồng tiền để hiển thị</string>
     <string name="market_row_subtitle">%1$s · MC %2$s</string>
     <string name="market_data_unavailable">Không có dữ liệu</string>
-    <string name="market_limit_reached">Danh sách theo dõi đã đầy (50)</string>
-    <string name="market_preview_name">Xem thử Market</string>
-    <string name="market_preview_title">Thị trường</string>
-    <string name="market_currency_button">%1$s ▾</string>
 </resources>
 

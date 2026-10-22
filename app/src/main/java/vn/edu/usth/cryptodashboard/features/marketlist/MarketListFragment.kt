@@ -62,7 +62,7 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
             },
             onFavoriteLimitReached = {
                 snackbar?.dismiss()
-                snackbar = Snackbar.make(view, R.string.market_limit_reached, Snackbar.LENGTH_LONG).also { it.show() }
+                snackbar = Snackbar.make(view, R.string.favorite_full, Snackbar.LENGTH_LONG).also { it.show() }
             },
         )
         list.layoutManager = LinearLayoutManager(requireContext())

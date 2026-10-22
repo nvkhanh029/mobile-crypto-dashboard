@@ -10,7 +10,7 @@
     android:foreground="?attr/selectableItemBackground">
     <TextView android:id="@+id/marketRowRank" style="@style/RowSubtitle"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:maxLines="1" android:ellipsize="end" android:minWidth="@dimen/space_m"
+        android:maxLines="1" android:ellipsize="end" android:minWidth="@dimen/space_l"
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/marketRowDivider"
@@ -63,7 +63,7 @@
     <vn.edu.usth.cryptodashboard.core.favorite.FavoriteButton android:id="@+id/marketRowStar"
         android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="center" android:tint="@color/accent"
+        android:scaleType="center" app:tint="@color/accent"
         android:contentDescription="@string/favorite_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/marketRowDivider" />

@@ -41,6 +41,7 @@ class MarketScreenTest {
 
     @Before fun configureLocale() {
         val context = instrumentation.targetContext
+        context.getSharedPreferences("market_preview", 0).edit().putString("currency", "USD").commit()
         val locale = InstrumentationRegistry.getArguments().getString("market_locale") ?: "en"
         instrumentation.runOnMainSync {
             if (Build.VERSION.SDK_INT >= 33) context.getSystemService(LocaleManager::class.java).applicationLocales = LocaleList.forLanguageTags(locale)
@@ -181,6 +182,65 @@ class MarketScreenTest {
         screenshot("market-missing-fields")
     }
 
+    @Test fun test05MixedAvailableAndUnavailableRowsKeepColumnsAligned() {
+        launch("normal")
+        await { adapter(it).itemCount == 100 }
+        onView(withId(R.id.marketPreviewCurrency)).perform(click())
+        onView(withText("VND")).perform(click())
+        await { adapter(it).currentList.firstOrNull()?.currency == Currency.VND }
+        val submitted = CountDownLatch(1)
+        screen!!.onActivity { activity ->
+            val first = adapter(activity).currentList.first().coin!!
+            activity.marketDependencies.favoriteStore.add("unavailable-coin")
+            adapter(activity).submitList(listOf(
+                CoinRow(first.id, first.copy(marketCapRank = 1), Currency.VND),
+                CoinRow("unavailable-coin", null, Currency.VND),
+                CoinRow("rank-100", first.copy(
+                    id = "rank-100", name = "A cryptocurrency with a very long name",
+                    marketCapRank = 100, currentPrice = 1_650_000.0,
+                    marketCap = 32_500_000_000_000.0,
+                ), Currency.VND),
+            )) { submitted.countDown() }
+            activity.findViewById<RecyclerView>(R.id.marketList).scrollToPosition(0)
+        }
+        assertTrue(submitted.await(5, TimeUnit.SECONDS))
+        instrumentation.waitForIdleSync()
+        screen!!.onActivity { activity ->
+            val list = activity.findViewById<RecyclerView>(R.id.marketList)
+            val rows = (0..2).map { list.findViewHolderForAdapterPosition(it)!!.itemView }
+            assertEquals(View.INVISIBLE, rows[1].findViewById<View>(R.id.marketRowRank).visibility)
+            assertEquals(textFrom(activity, R.string.market_data_unavailable),
+                rows[1].findViewById<TextView>(R.id.marketRowSubtitle).text.toString())
+            for (id in listOf(R.id.marketRowIcon, R.id.marketRowName, R.id.marketRowSubtitle)) {
+                assertEquals("Columns must align across available and unavailable rows", 1,
+                    rows.map { it.findViewById<View>(id).left }.distinct().size)
+            }
+            val rank = rows[2].findViewById<TextView>(R.id.marketRowRank)
+            assertEquals("100", rank.text.toString())
+            assertEquals("Rank 100 must fit", 0, rank.layout.getEllipsisCount(0))
+            assertTrue(rank.paint.measureText(rank.text.toString()) <=
+                rank.width - rank.totalPaddingLeft - rank.totalPaddingRight)
+            val name = rows[2].findViewById<TextView>(R.id.marketRowName)
+            val price = rows[2].findViewById<TextView>(R.id.marketRowPrice)
+            assertTrue("Long name retains space", name.width > 0)
+            assertTrue("Long name ellipsizes", name.layout.getEllipsisCount(0) > 0)
+            assertTrue("Seven-digit VND price fits", price.paint.measureText(price.text.toString()) <=
+                price.width - price.totalPaddingLeft - price.totalPaddingRight + 1)
+            for (id in listOf(R.id.marketRowPrice, R.id.marketRowChange, R.id.marketRowSparkline)) {
+                assertEquals(View.GONE, rows[1].findViewById<View>(id).visibility)
+            }
+        }
+        screenshot("market-mixed-rows")
+        screen!!.onActivity { activity ->
+            val missing = activity.findViewById<RecyclerView>(R.id.marketList)
+                .findViewHolderForAdapterPosition(1)!!.itemView
+            missing.findViewById<View>(R.id.marketRowStar).performClick()
+            assertFalse(activity.marketDependencies.favoriteStore.isFavorite("unavailable-coin"))
+        }
+    }
+
+    private fun textFrom(activity: MarketPreviewActivity, id: Int) = activity.getString(id)
+
     private fun launch(scenario: String) {
         screen?.close()
         val context = instrumentation.targetContext
@@ -222,6 +282,10 @@ class MarketScreenTest {
 
 
     private fun screenshot(label: String) {
+        await { activity ->
+            val list = activity.findViewById<RecyclerView>(R.id.marketList)
+            !list.isComputingLayout && list.itemAnimator?.isRunning != true
+        }
         instrumentation.waitForIdleSync()
         SystemClock.sleep(200L)
         instrumentation.waitForIdleSync()
@@ -232,9 +296,31 @@ class MarketScreenTest {
         screen!!.onActivity {
             directory = File(it.getExternalFilesDir(null), "market-verification").apply { mkdirs() }
             val metrics = it.resources.displayMetrics
-            suffix = (metrics.widthPixels / metrics.density).toInt().toString() + "x" +
-                (metrics.heightPixels / metrics.density).toInt() + "-" +
+            val widthDp = (metrics.widthPixels / metrics.density).toInt()
+            val heightDp = (metrics.heightPixels / metrics.density).toInt()
+            val arguments = InstrumentationRegistry.getArguments()
+            arguments.getString("market_width_dp")?.toInt()?.let { expected ->
+                assertEquals("Device must have the requested logical width", expected, widthDp)
+                assertEquals("Configuration width must match", expected, it.resources.configuration.screenWidthDp)
+                assertEquals("Screenshot must be captured at native display size", expected,
+                    (bitmap.width / metrics.density).toInt())
+            }
+            arguments.getString("market_height_dp")?.toInt()?.let { expected ->
+                assertEquals("Device must have the requested logical height", expected, heightDp)
+                assertEquals("Screenshot must have the requested native height", expected,
+                    (bitmap.height / metrics.density).toInt())
+            }
+            suffix = widthDp.toString() + "x" + heightDp + "-" +
                 it.resources.configuration.locales[0].language
+            val evidence = org.json.JSONObject()
+                .put("widthDp", widthDp).put("heightDp", heightDp)
+                .put("configurationWidthDp", it.resources.configuration.screenWidthDp)
+                .put("densityDpi", metrics.densityDpi)
+                .put("screenshotWidthPx", bitmap.width).put("screenshotHeightPx", bitmap.height)
+                .put("apiLevel", Build.VERSION.SDK_INT)
+                .put("locale", it.resources.configuration.locales[0].toLanguageTag())
+                .put("capture", "native screenshot without resizing")
+            File(directory, label + "-" + suffix + ".json").writeText(evidence.toString(2))
         }
         File(directory, label + "-" + suffix + ".png").outputStream().use {
             assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))

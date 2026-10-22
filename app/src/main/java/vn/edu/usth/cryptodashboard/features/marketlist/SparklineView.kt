@@ -24,11 +24,10 @@ class SparklineView @JvmOverloads constructor(
 
     fun setPoints(values: List<Double>?) {
         points = values?.takeIf { it.all(Double::isFinite) }?.toList().orEmpty()
-        line.color = ContextCompat.getColor(context, when {
-            points.size < 2 -> R.color.neutral
-            points.last() > points.first() -> R.color.positive
-            points.last() < points.first() -> R.color.negative
-            else -> R.color.neutral
+        line.color = ContextCompat.getColor(context, when (sparklineTrend(points)) {
+            SparklineTrend.POSITIVE -> R.color.positive
+            SparklineTrend.NEGATIVE -> R.color.negative
+            SparklineTrend.NEUTRAL -> R.color.neutral
         })
         rebuildPath()
         invalidate()

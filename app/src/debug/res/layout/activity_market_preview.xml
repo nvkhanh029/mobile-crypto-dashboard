@@ -2,11 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/marketPreviewRoot"
-    android:layout_width="match_parent" android:layout_height="match_parent"
->
+    android:layout_width="match_parent" android:layout_height="match_parent">
     <androidx.appcompat.widget.AppCompatImageButton android:id="@+id/marketPreviewInfo"
         android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min"
-        android:src="@drawable/ic_info" android:tint="@color/textSecondary"
+        android:src="@drawable/ic_info" app:tint="@color/textSecondary"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/content_desc_how_to_read"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />

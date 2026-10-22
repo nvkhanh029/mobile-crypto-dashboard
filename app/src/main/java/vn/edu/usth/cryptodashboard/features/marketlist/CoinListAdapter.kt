@@ -67,7 +67,7 @@ class CoinListAdapter(
         fun bind(row: CoinRow) {
             val coin = row.coin
             val available = coin != null
-            rank.visibility = if (available) View.VISIBLE else View.GONE
+            rank.visibility = if (available) View.VISIBLE else View.INVISIBLE
             rank.text = coin?.marketCapRank?.toString() ?: PriceFormatter.MISSING_VALUE
             name.text = coin?.name ?: row.coinId
             subtitle.text = if (coin == null) itemView.context.getString(R.string.market_data_unavailable)
