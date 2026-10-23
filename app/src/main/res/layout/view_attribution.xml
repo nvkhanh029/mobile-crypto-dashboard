@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- CMP-08 footer bar. Detail hides the right group by passing null to showUpdatedTime. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/attributionText"
+        style="@style/Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="none"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/touch_min"
+        android:maxLines="1"
+        android:text="@string/powered_by_coingecko"
+        app:autoSizeMaxTextSize="@dimen/caption_text_size_max"
+        app:autoSizeMinTextSize="@dimen/caption_text_size_min"
+        app:autoSizeStepGranularity="@dimen/caption_text_size_step"
+        app:autoSizeTextType="uniform" />
+
+    <LinearLayout
+        android:id="@+id/attributionUpdatedTimeGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/attributionClockIcon"
+            android:layout_width="@dimen/icon_size_small"
+            android:layout_height="@dimen/icon_size_small"
+            android:importantForAccessibility="yes"
+            android:src="@drawable/ic_clock" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/attributionUpdatedTime"
+            style="@style/Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:ellipsize="end"
+            android:maxLines="1" />
+    </LinearLayout>
+
+</merge>
