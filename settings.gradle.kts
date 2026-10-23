@@ -19,7 +19,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven("https://jitpack.io") // MPAndroidChart (docs/03 D9)
+        // MPAndroidChart only (docs/03 D9); keep JitPack from serving other groups.
+        exclusiveContent {
+            forRepository { maven("https://jitpack.io") }
+            filter { includeGroup("com.github.PhilJay") }
+        }
     }
 }
 
