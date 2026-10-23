@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -38,10 +39,17 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
     private var shownErrorVersion = -1L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val dependencies = (requireActivity() as? MarketFeatureHost
+        // TEMPORARY until CryptoApp provides the repository: MainActivity already hosts this
+        // Fragment, so without a host the screen stays empty instead of crashing the app.
+        // Use MarketPreviewActivity (debug) to run the Market screen until integration.
+        val host = requireActivity() as? MarketFeatureHost
             ?: requireActivity().application as? MarketFeatureHost
-            ?: error("Supply MarketDependencies from CryptoApp; use MarketPreviewActivity until integration."))
-            .marketDependencies
+        if (host == null) {
+            Log.w(TAG, "No MarketDependencies yet; the Market screen needs CryptoApp.")
+            view.findViewById<View>(R.id.marketList).visibility = View.GONE
+            return
+        }
+        val dependencies = host.marketDependencies
         model = ViewModelProvider(this, marketViewModelFactory(dependencies.marketRepository))
             .get(MarketViewModel::class.java)
         val list = view.findViewById<RecyclerView>(R.id.marketList)
@@ -195,6 +203,7 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
 
     private companion object {
         const val SEARCH_DELAY_MILLIS = 300L
+        const val TAG = "MarketListFragment"
     }
 }
 

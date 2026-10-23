@@ -17,6 +17,8 @@ The app has one data source interface per kind of data (market list, coins by ID
 
 UI code and state holders never know which one is used, and they never see a data source at all: they call a repository. A build setting selects the data source.
 
+The fake data sources read a file and turn it into models with the same mappers as the remote data sources (`03-architecture.md` §8.4, D23). So a file tests the real mapping code: `markets_invalid.json` ends as `AppError.InvalidData` because the mapper throws, and `detail_ethereum_edited.json` loses its markup because the mapper removes it, not because the fake data source does.
+
 **Fake JSON must be real API responses**, captured once on day 1 during the API spike, so that the shape matches exactly. We do not write fake JSON by hand from imagination. (Exception: edge-case files in section 3, which are edited copies of real ones.)
 
 ---

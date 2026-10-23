@@ -13,6 +13,11 @@
     <!-- Minimum touch target (NFR-08, 02 section 2.1) -->
     <dimen name="touch_min">48dp</dimen>
 
+    <!-- Shared main top bar (SCR-01) -->
+    <dimen name="top_bar_height">56dp</dimen>
+    <!-- Half of touch_min: a pill without the self-intersecting shape of corner_pill. -->
+    <dimen name="corner_switch">24dp</dimen>
+
     <!-- Corner sizes -->
     <dimen name="corner_xs">2dp</dimen>
     <dimen name="corner_s">4dp</dimen>
