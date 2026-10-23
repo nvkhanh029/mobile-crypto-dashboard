@@ -112,4 +112,7 @@ enum class ChartSandboxScenario {
 object TemporaryChartConfig {
     @Volatile
     var scenario: ChartSandboxScenario = ChartSandboxScenario.NORMAL
+
+    @Volatile
+    var initialCurrency: Currency = Currency.USD
 }
