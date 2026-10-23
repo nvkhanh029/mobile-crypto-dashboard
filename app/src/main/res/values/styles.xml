@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Text styles (docs/02-ui spec.md, section 2.1). Use them as `style="@style/RowTitle"` on a
+    Text styles (docs/02-ui-spec.md, section 2.1). Use them as `style="@style/RowTitle"` on a
     TextView; sizes and colours come from here, never from the layout. Placeholder values, to
     be replaced by the real design.
 
@@ -45,11 +45,16 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <!-- 24h change label (CMP-02). The fill and the `on…` text colour are set by the view. -->
+    <!-- 24h change label (CMP-02). The fill and the `on…` text colour are set by PriceChangeLabel. -->
     <style name="ChangeLabel" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textColor">@color/onNeutral</item>
         <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:gravity">center</item>
         <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">@dimen/space_s</item>
+        <item name="android:paddingEnd">@dimen/space_s</item>
+        <item name="android:paddingTop">@dimen/space_xs</item>
+        <item name="android:paddingBottom">@dimen/space_xs</item>
     </style>
 
     <!-- Paragraphs: explanation dialog, description, messages -->
@@ -57,11 +62,10 @@
         <item name="android:textColor">@color/textPrimary</item>
     </style>
 
-    <!-- Footer bar text (>= 10 sp, FR-INFO-01) -->
+    <!-- Footer bar text (>= 10 sp, never truncated, FR-INFO-01). -->
     <style name="Caption" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textColor">@color/textSecondary</item>
         <item name="android:maxLines">1</item>
-        <item name="android:ellipsize">end</item>
     </style>
 
     <!-- Statistics list, label at the start (may be shortened) -->
