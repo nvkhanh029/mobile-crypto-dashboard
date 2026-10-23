@@ -8,9 +8,9 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import vn.edu.usth.cryptodashboard.data.fake.DiskFakeFileReader
 import vn.edu.usth.cryptodashboard.domain.model.CoinDetail
 import vn.edu.usth.cryptodashboard.domain.model.Currency
-import java.io.File
 
 /**
  * JVM unit test of [CoinDetailMapper]. The file tests read the same JSON files as the app
@@ -18,6 +18,8 @@ import java.io.File
  * docs/04-api-contract.md section 4 and docs/fake-data.md section 3.
  */
 class CoinDetailMapperTest {
+
+    private val reader = DiskFakeFileReader()
 
     // ---------------------------------------------------------------- captured files
 
@@ -336,20 +338,6 @@ class CoinDetailMapperTest {
     private fun parseFile(name: String, currency: Currency): CoinDetail =
         CoinDetailMapper.parse(readFake(name), currency)
 
-    /**
-     * Reads a file of app/src/main/assets/fake from the disk. [name] is relative to that
-     * folder. The working directory of a unit test is normally the module folder (app/);
-     * the second path covers the case where it is the repository root.
-     */
-    private fun readFake(name: String): String {
-        val candidates = listOf(
-            File("src/main/assets/fake/$name"),
-            File("app/src/main/assets/fake/$name"),
-        )
-        val file = candidates.firstOrNull { it.isFile }
-            ?: throw AssertionError(
-                "Fake file not found: $name. Working directory: ${File(".").absoluteFile}"
-            )
-        return file.readText(Charsets.UTF_8)
-    }
+    /** Reads a file of app/src/main/assets/fake. [name] is relative to that folder. */
+    private fun readFake(name: String): String = reader.read("fake/$name")
 }
