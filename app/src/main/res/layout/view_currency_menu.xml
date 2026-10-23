@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/currencyOptions"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_currency_menu"
+    android:orientation="vertical"
+    android:padding="@dimen/space_s">
+
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/currencyUsdOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/touch_min"
+        android:text="@string/currency_usd"
+        android:textAppearance="@style/Body"
+        android:textColor="@color/textPrimary"
+        app:buttonTint="@color/accent" />
+
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/currencyVndOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/touch_min"
+        android:text="@string/currency_vnd"
+        android:textAppearance="@style/Body"
+        android:textColor="@color/textPrimary"
+        app:buttonTint="@color/accent" />
+</RadioGroup>
