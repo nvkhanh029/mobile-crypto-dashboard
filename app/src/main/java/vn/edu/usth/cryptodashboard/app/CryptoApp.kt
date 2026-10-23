@@ -31,10 +31,11 @@ import vn.edu.usth.cryptodashboard.domain.repository.MarketRepository
 class CryptoApp : Application() {
 
     /**
-     * The single `CurrencySettings`. It still goes through `getInstance` so that callers that
-     * have not moved to `CryptoApp` yet share the same instance; `getInstance` is removed in the
-     * step that moves `MainActivity` to this property.
+     * The single `CurrencySettings`. It still goes through the deprecated `getInstance` so that
+     * callers on open branches that have not moved to `CryptoApp` yet share the same instance;
+     * both go away together once those callers have moved.
      */
+    @Suppress("DEPRECATION")
     val currencySettings: CurrencySettings by lazy { CurrencySettings.getInstance(this) }
 
     /** Created on first use, so the saved favorites are not read during app startup. */
