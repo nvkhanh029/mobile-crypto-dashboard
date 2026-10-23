@@ -22,6 +22,13 @@
     <string name="content_desc_remove_from_watchlist">Remove from watchlist</string>
     <string name="content_desc_explain_statistic">Explain %1$s</string>
 
+    <!-- SCR-01 shared top bar and CMP-07/CMP-13 -->
+    <string name="view_market">Market</string>
+    <string name="view_watchlist">Watchlist</string>
+    <string name="currency_usd" translatable="false">USD</string>
+    <string name="currency_vnd" translatable="false">VND</string>
+    <string name="currency_selector_content_description">Currency: %1$s</string>
+
     <!-- CMP-12 explanation dialog -->
     <string name="dialog_got_it">Got it</string>
     <string name="dialog_how_to_read_title">How to read this list</string>

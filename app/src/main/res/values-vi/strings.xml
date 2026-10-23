@@ -22,6 +22,11 @@
     <string name="content_desc_remove_from_watchlist">Bỏ khỏi danh sách theo dõi</string>
     <string name="content_desc_explain_statistic">Giải thích %1$s</string>
 
+    <!-- SCR-01 shared top bar and CMP-07/CMP-13 -->
+    <string name="view_market">Thị trường</string>
+    <string name="view_watchlist">Theo dõi</string>
+    <string name="currency_selector_content_description">Đơn vị tiền tệ: %1$s</string>
+
     <!-- CMP-12 explanation dialog -->
     <string name="dialog_got_it">Đã hiểu</string>
     <string name="dialog_how_to_read_title">Cách đọc danh sách này</string>
