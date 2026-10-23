@@ -38,13 +38,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.livedata)
-    implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.material)
-    implementation(libs.volley)
-    testImplementation(libs.androidx.arch.core.testing)
+
     testImplementation(libs.junit)
-    testImplementation(libs.org.json)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
