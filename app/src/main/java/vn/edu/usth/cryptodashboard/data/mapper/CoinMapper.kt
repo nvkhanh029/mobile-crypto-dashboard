@@ -12,20 +12,9 @@ import vn.edu.usth.cryptodashboard.domain.model.Coin
  * Plain Kotlin: no Android types, so it runs in JVM unit tests. It must run on the
  * background thread of the data source, never on the main thread (docs/03 section 5).
  *
- * Rules:
- * - `id`, `symbol` and `name` are required. If one is missing, `null` or not a string,
- *   the mapper throws [JSONException].
- * - Every other field is optional. An absent key and a JSON `null` both become `null`.
- *   A real 0 stays 0.
- * - An optional field that is present but has the wrong type (for example a string where a
- *   number is expected) also throws [JSONException]. A number inside quotes ("12") counts
- *   as a string, so it is also an error.
- * - Unknown extra fields are ignored.
- * - The message of a thrown exception never contains data from the response (docs/03 section 8.3).
- *
- * Types are checked by hand (`is String`, `is Number`) instead of `getString` / `getDouble`,
- * because the `org.json` library used in JVM tests and the one inside Android convert
- * values differently. A manual check behaves the same in both.
+ * Which fields are required, what `null` and a wrong type do: see `JsonReading.kt`.
+ * Here: `id`, `symbol` and `name` are required, every other field is optional, and an
+ * unknown extra field is ignored.
  */
 object CoinMapper {
 
@@ -69,45 +58,13 @@ object CoinMapper {
         sparkline7d = obj.optionalSparkline(),
     )
 
-    private fun JSONObject.requiredString(key: String): String {
-        if (isNull(key)) throw JSONException("Required field is missing: $key")
-        return opt(key) as? String
-            ?: throw JSONException("Required field has the wrong type: $key")
-    }
-
-    private fun JSONObject.optionalString(key: String): String? {
-        if (isNull(key)) return null
-        return opt(key) as? String
-            ?: throw JSONException("Field has the wrong type: $key")
-    }
-
-    private fun JSONObject.optionalDouble(key: String): Double? {
-        if (isNull(key)) return null
-        val value = opt(key)
-        if (value is Number) return value.toDouble()
-        throw JSONException("Field has the wrong type: $key")
-    }
-
-    /** The rank is a whole number: a decimal such as 1.5 is the wrong type. */
-    private fun JSONObject.optionalInt(key: String): Int? {
-        if (isNull(key)) return null
-        val value = opt(key)
-        if (value is Int) return value
-        if (value is Long && value in Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()) {
-            return value.toInt()
-        }
-        throw JSONException("Field has the wrong type: $key")
-    }
-
     /**
      * `sparkline_in_7d` is an object with an array `price`. If the object or the array is
      * absent or `null`, the result is `null`. The length is not checked (it varies).
      * Every element must be a number.
      */
     private fun JSONObject.optionalSparkline(): List<Double>? {
-        if (isNull(SPARKLINE)) return null
-        val sparkline = opt(SPARKLINE) as? JSONObject
-            ?: throw JSONException("Field has the wrong type: $SPARKLINE")
+        val sparkline = optionalObject(SPARKLINE) ?: return null
         if (sparkline.isNull(SPARKLINE_PRICE)) return null
         val prices = sparkline.opt(SPARKLINE_PRICE) as? JSONArray
             ?: throw JSONException("Field has the wrong type: $SPARKLINE.$SPARKLINE_PRICE")
