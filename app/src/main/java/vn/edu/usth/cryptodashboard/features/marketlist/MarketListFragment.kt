@@ -18,6 +18,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.core.ui.AttributionView
@@ -111,9 +112,12 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
                     MarketSortField.CHANGE_24H -> R.string.market_sort_change
                 })
                 val selected = model.sort.field == field
-                chip.isChecked = selected
                 chip.text = label
-                // CMP-05 / FR-ML-04: only the active chip shows the direction, with the platform's arrow icons.
+                chip.isSelected = selected
+                // Text-only sort items: the active one is accent, the others textSecondary.
+                chip.setTextColor(ContextCompat.getColor(requireContext(),
+                    if (selected) R.color.accent else R.color.textSecondary))
+                // CMP-05 / FR-ML-04: only the active item shows the direction, with the platform's arrow icons.
                 if (selected) chip.setChipIconResource(
                     if (model.sort.ascending) android.R.drawable.arrow_up_float
                     else android.R.drawable.arrow_down_float,

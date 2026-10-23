@@ -226,6 +226,7 @@ class MarketScreenTest {
             assertTrue("Long name ellipsizes", name.layout.getEllipsisCount(0) > 0)
             assertTrue("Seven-digit VND price fits", price.paint.measureText(price.text.toString()) <=
                 price.width - price.totalPaddingLeft - price.totalPaddingRight + 1)
+            logVisibleName(rows[0], "vnd-bitcoin")
             for (row in listOf(rows[0], rows[2])) {
                 val subtitle = row.findViewById<TextView>(R.id.marketRowSubtitle)
                 assertEquals("Symbol and VND market cap must not be cut (FR-ML-01)",
@@ -242,6 +243,45 @@ class MarketScreenTest {
             missing.findViewById<View>(R.id.marketRowStar).performClick()
             assertFalse(activity.marketDependencies.favoriteStore.isFavorite("unavailable-coin"))
         }
+    }
+
+    @Test fun test06SevenDigitUsdPriceFits() {
+        launch("normal")
+        await { adapter(it).itemCount == 100 }
+        val submitted = CountDownLatch(1)
+        screen!!.onActivity { activity ->
+            val first = adapter(activity).currentList.first().coin!!
+            adapter(activity).submitList(listOf(
+                CoinRow(first.id, first.copy(currentPrice = 1_234_567.89, marketCapRank = 1), Currency.USD),
+                CoinRow("rank-100", first.copy(
+                    id = "rank-100", name = "A cryptocurrency with a very long name",
+                    marketCapRank = 100, currentPrice = 1_234_567.89, marketCap = 32_500_000_000_000.0,
+                ), Currency.USD),
+            )) { submitted.countDown() }
+        }
+        assertTrue(submitted.await(5, TimeUnit.SECONDS))
+        instrumentation.waitForIdleSync()
+        screen!!.onActivity { activity ->
+            val list = activity.findViewById<RecyclerView>(R.id.marketList)
+            for (position in 0..1) {
+                val row = list.findViewHolderForAdapterPosition(position)!!.itemView
+                val price = row.findViewById<TextView>(R.id.marketRowPrice)
+                assertEquals("$1,234,567.89", price.text.toString())
+                assertTrue("Seven-digit USD price fits", price.paint.measureText(price.text.toString()) <=
+                    price.width - price.totalPaddingLeft - price.totalPaddingRight + 1)
+                assertEquals("Market cap line must not be cut", 0,
+                    row.findViewById<TextView>(R.id.marketRowSubtitle).layout.getEllipsisCount(0))
+                logVisibleName(row, "usd-7-digit-row-$position")
+            }
+        }
+        screenshot("market-usd-7-digit")
+    }
+
+    /** Logs how many characters of the coin name are visible, to check the space left for the name. */
+    private fun logVisibleName(row: View, label: String) {
+        val name = row.findViewById<TextView>(R.id.marketRowName)
+        val visible = name.text.length - name.layout.getEllipsisCount(0)
+        android.util.Log.i("MarketScreenTest", "visible-name $label: $visible of ${name.text.length} \"${name.text}\"")
     }
 
     private fun textFrom(activity: MarketPreviewActivity, id: Int) = activity.getString(id)

@@ -8,9 +8,12 @@
     android:paddingTop="@dimen/space_s" android:paddingBottom="@dimen/space_s"
     android:clickable="true" android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
-    <TextView android:id="@+id/marketRowRank" style="@style/RowSubtitle"
+    <!-- Rank: small secondary text (CMP-01), smaller than RowSubtitle to leave room for the name. -->
+    <TextView android:id="@+id/marketRowRank"
+        android:textAppearance="?attr/textAppearanceLabelSmall"
+        android:textColor="@color/textSecondary"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:maxLines="1" android:ellipsize="end" android:minWidth="@dimen/space_l"
+        android:maxLines="1" android:ellipsize="end" android:minWidth="@dimen/market_rank_min_width"
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/marketRowDivider"

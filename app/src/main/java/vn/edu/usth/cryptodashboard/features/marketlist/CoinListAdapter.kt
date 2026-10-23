@@ -33,7 +33,7 @@ class CoinListAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val imageLoader: ImageLoader?,
     private val onCoinClick: (String) -> Unit,
-    private val onFavoriteLimitReached: () -> Unit,
+    private val onFavoriteLimitReached: () -> Unit = {},
     private val showFavorites: Boolean = true,
 ) : ListAdapter<CoinRow, CoinListAdapter.CoinViewHolder>(Difference) {
     init {
