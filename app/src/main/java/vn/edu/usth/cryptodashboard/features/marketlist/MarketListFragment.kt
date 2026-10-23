@@ -62,7 +62,8 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
             },
             onFavoriteLimitReached = {
                 snackbar?.dismiss()
-                snackbar = Snackbar.make(view, R.string.favorite_full, Snackbar.LENGTH_LONG).also { it.show() }
+                snackbar = Snackbar.make(view, R.string.favorite_full, Snackbar.LENGTH_LONG)
+                    .setAnchorView(footer).also { it.show() }
             },
         )
         list.layoutManager = LinearLayoutManager(requireContext())
@@ -103,10 +104,12 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
                 })
                 val selected = model.sort.field == field
                 chip.isChecked = selected
-                chip.text = if (selected) getString(
-                    R.string.market_sort_active, label,
-                    getString(if (model.sort.ascending) R.string.market_arrow_up else R.string.market_arrow_down),
-                ) else label
+                chip.text = label
+                // CMP-05 / FR-ML-04: only the active chip shows the direction, with the platform's arrow icons.
+                if (selected) chip.setChipIconResource(
+                    if (model.sort.ascending) android.R.drawable.arrow_up_float
+                    else android.R.drawable.arrow_down_float,
+                ) else chip.chipIcon = null
                 chip.contentDescription = if (selected) getString(
                     if (model.sort.ascending) R.string.market_sorted_ascending else R.string.market_sorted_descending,
                     label,
@@ -157,8 +160,10 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
                     if (state.previousData != null && shownErrorVersion != model.errorVersion) {
                         shownErrorVersion = model.errorVersion
                         snackbar?.dismiss()
+                        // Anchored above the footer so "Powered by CoinGecko" stays visible (FR-INFO-01, CMP-08).
                         snackbar = Snackbar.make(view, errorMessage(state.error), Snackbar.LENGTH_INDEFINITE)
-                            .setAction(R.string.retry) { model.refresh() }.also { it.show() }
+                            .setAction(R.string.retry) { model.refresh() }
+                            .setAnchorView(footer).also { it.show() }
                     }
                 }
             }

@@ -3,9 +3,6 @@
     <string name="market_sort_cap">Vốn hóa</string>
     <string name="market_sort_price">Giá</string>
     <string name="market_sort_change">24h %</string>
-    <string name="market_sort_active">%1$s %2$s</string>
-    <string name="market_arrow_up">↑</string>
-    <string name="market_arrow_down">↓</string>
     <string name="market_sorted_ascending">%1$s, sắp xếp tăng dần</string>
     <string name="market_sorted_descending">%1$s, sắp xếp giảm dần</string>
     <string name="market_no_matches">Không tìm thấy đồng tiền</string>

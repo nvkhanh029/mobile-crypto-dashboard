@@ -3,7 +3,7 @@
     "360x640": "Physical size: 720x1280\nPhysical density: 320\n1.0",
     "411x891": "Physical size: 822x1782\nPhysical density: 320\n1.0"
   },
-  "fontScale": 1.0,
+  "fontScale": 1,
   "captures": [
     {
       "widthDp": 360,
@@ -16,20 +16,7 @@
       "locale": "en",
       "capture": "native screenshot without resizing",
       "filename": "market-mixed-rows-360x640-en.png",
-      "sha256": "c0523c9ed0c9de3313e1f2e96d65ad748b77bcfb141092b6725eebafc2eb9d60"
-    },
-    {
-      "widthDp": 360,
-      "heightDp": 640,
-      "configurationWidthDp": 360,
-      "densityDpi": 320,
-      "screenshotWidthPx": 720,
-      "screenshotHeightPx": 1280,
-      "apiLevel": 36,
-      "locale": "en",
-      "capture": "native screenshot without resizing",
-      "filename": "market-missing-fields-360x640-en.png",
-      "sha256": "463ec1aa5b799da419bd0bc57a79835b1b4057713565fa4c5785d2ea4eaa1b4d"
+      "sha256": "02debce5a45e508550a5d42d0773873f032f70f6a13f0a57b5f94b8666b4b779"
     },
     {
       "widthDp": 360,
@@ -42,7 +29,20 @@
       "locale": "vi",
       "capture": "native screenshot without resizing",
       "filename": "market-mixed-rows-360x640-vi.png",
-      "sha256": "5da33137f570ab093751694df58dfa5f875cef3b648d12e44ef1a39f2ef2d2b2"
+      "sha256": "8ee6dc1cb70c950c659468187f94a69e9ca9a768251eea822ed8fad4dbeaa327"
+    },
+    {
+      "widthDp": 360,
+      "heightDp": 640,
+      "configurationWidthDp": 360,
+      "densityDpi": 320,
+      "screenshotWidthPx": 720,
+      "screenshotHeightPx": 1280,
+      "apiLevel": 36,
+      "locale": "en",
+      "capture": "native screenshot without resizing",
+      "filename": "market-missing-fields-360x640-en.png",
+      "sha256": "34d87c88df73621b05625a6ca0a459741dc9ff19afcc9c150d3f49ea0e08dee1"
     },
     {
       "widthDp": 360,
@@ -55,7 +55,7 @@
       "locale": "vi",
       "capture": "native screenshot without resizing",
       "filename": "market-missing-fields-360x640-vi.png",
-      "sha256": "ce196e9d9dab672c16fa1371794bf395998dfb5d7f75da17b3d73b1d94239c08"
+      "sha256": "683b7c54264d700710dcb4aca9fe1b649324db529594dda56acbeb449c60ad99"
     },
     {
       "widthDp": 411,
@@ -68,20 +68,7 @@
       "locale": "en",
       "capture": "native screenshot without resizing",
       "filename": "market-mixed-rows-411x891-en.png",
-      "sha256": "d19bc6aab1498dcae1a8094a9e03f6c7108a543c971c7c0b32ecb6a2efac322d"
-    },
-    {
-      "widthDp": 411,
-      "heightDp": 891,
-      "configurationWidthDp": 411,
-      "densityDpi": 320,
-      "screenshotWidthPx": 822,
-      "screenshotHeightPx": 1782,
-      "apiLevel": 36,
-      "locale": "en",
-      "capture": "native screenshot without resizing",
-      "filename": "market-missing-fields-411x891-en.png",
-      "sha256": "e21011fc186e1354a01b6e36490e3ccb74e5f4ac1eae41ed3da21df6ccc18375"
+      "sha256": "88f9625513dece1a3cc551ac8fec08a96d00456dccfc92a0efd3bf75dd9a79c9"
     },
     {
       "widthDp": 411,
@@ -94,7 +81,20 @@
       "locale": "vi",
       "capture": "native screenshot without resizing",
       "filename": "market-mixed-rows-411x891-vi.png",
-      "sha256": "e89ffedf48d33b3b9f1427640bf48e24ed9fbe1f93e72bfdc756a430bb415295"
+      "sha256": "69cee27c2767573e539911adafed74352b4d452610cf87a029882118e5774c17"
+    },
+    {
+      "widthDp": 411,
+      "heightDp": 891,
+      "configurationWidthDp": 411,
+      "densityDpi": 320,
+      "screenshotWidthPx": 822,
+      "screenshotHeightPx": 1782,
+      "apiLevel": 36,
+      "locale": "en",
+      "capture": "native screenshot without resizing",
+      "filename": "market-missing-fields-411x891-en.png",
+      "sha256": "536a4b1c098ab489308a9204844c42b72754e8a3d5d9fe94e35dcb0e3a78c13e"
     },
     {
       "widthDp": 411,
@@ -107,83 +107,25 @@
       "locale": "vi",
       "capture": "native screenshot without resizing",
       "filename": "market-missing-fields-411x891-vi.png",
-      "sha256": "4c33c43e64ef30f4072ba66088ddff6158bbdbd7abd35d38f101eac9ae0b3faa"
+      "sha256": "bc38281f6df6655f16107c12d673bcb42d5a2848fcbde1dff338e99c422cd7e1"
     }
   ],
   "uiTestRuns": [
     {
-      "widthDp": 360,
-      "heightDp": 640,
-      "locale": "en",
-      "tests": 5,
-      "failures": 0
-    },
-    {
-      "widthDp": 360,
-      "heightDp": 640,
-      "locale": "vi",
-      "tests": 5,
-      "failures": 0
-    },
-    {
-      "widthDp": 411,
-      "heightDp": 891,
-      "locale": "en",
-      "tests": 5,
-      "failures": 0
-    },
-    {
-      "widthDp": 411,
-      "heightDp": 891,
-      "locale": "vi",
-      "tests": 5,
-      "failures": 0
+      "date": "2026-10-23",
+      "runner": "adb am instrument",
+      "test": "MarketScreenTest",
+      "results": {
+        "360x640-en": "OK (5 tests)",
+        "360x640-vi": "OK (5 tests)",
+        "411x891-en": "OK (5 tests)",
+        "411x891-vi": "OK (5 tests)"
+      }
     }
   ],
-  "finalCaptureRuns": [
-    {
-      "widthDp": 360,
-      "heightDp": 640,
-      "locale": "en",
-      "tests": 2,
-      "failures": 0
-    },
-    {
-      "widthDp": 360,
-      "heightDp": 640,
-      "locale": "vi",
-      "tests": 2,
-      "failures": 0
-    },
-    {
-      "widthDp": 411,
-      "heightDp": 891,
-      "locale": "en",
-      "tests": 2,
-      "failures": 0
-    },
-    {
-      "widthDp": 411,
-      "heightDp": 891,
-      "locale": "vi",
-      "tests": 2,
-      "failures": 0
-    }
-  ],
-  "jvm": {
-    "tests": 45,
-    "failures": 0,
-    "errors": 0
-  },
-  "lint": {
-    "debug": {
-      "Warning": 40
-    },
-    "release": {
-      "Warning": 42
-    }
-  },
-  "debugApkSha256": "0e871137e27e46d8ef338542650240f6032dbe6646dec5ac21524fc5b56427e1",
+  "jvm": "testDebugUnitTest: 45 tests, 0 failures",
+  "lint": "lintDebug: 0 errors",
+  "debugApkSha256": "cdba9cfe48499003324b8982c5bb2d12107f9197c061b1b387c0346f34831e2a",
   "dataSource": "Approved debug-only fake repository; no CoinGecko requests",
   "notes": "All images are native captures, not resized. Mixed rows include rank 1, an unavailable coin, and rank 100 with a long name and a seven-digit VND price."
 }

@@ -226,6 +226,11 @@ class MarketScreenTest {
             assertTrue("Long name ellipsizes", name.layout.getEllipsisCount(0) > 0)
             assertTrue("Seven-digit VND price fits", price.paint.measureText(price.text.toString()) <=
                 price.width - price.totalPaddingLeft - price.totalPaddingRight + 1)
+            for (row in listOf(rows[0], rows[2])) {
+                val subtitle = row.findViewById<TextView>(R.id.marketRowSubtitle)
+                assertEquals("Symbol and VND market cap must not be cut (FR-ML-01)",
+                    0, subtitle.layout.getEllipsisCount(0))
+            }
             for (id in listOf(R.id.marketRowPrice, R.id.marketRowChange, R.id.marketRowSparkline)) {
                 assertEquals(View.GONE, rows[1].findViewById<View>(id).visibility)
             }
