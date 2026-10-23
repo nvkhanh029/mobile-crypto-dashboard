@@ -1,14 +1,14 @@
 package vn.edu.usth.cryptodashboard.core.currency
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.RadioGroup
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.radiobutton.MaterialRadioButton
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.domain.model.Currency
 
@@ -44,12 +44,21 @@ class CurrencySelectorView @JvmOverloads constructor(
         )
     }
 
+    override fun onDetachedFromWindow() {
+        currencyMenu?.dismiss()
+        currencyMenu = null
+        super.onDetachedFromWindow()
+    }
+
     private fun showCurrencyMenu() {
         currencyMenu?.dismiss()
 
         val menuContent = LayoutInflater.from(context)
             .inflate(R.layout.view_currency_menu, null)
         val options = menuContent.findViewById<RadioGroup>(R.id.currencyOptions)
+        val usdOption = menuContent.findViewById<MaterialRadioButton>(R.id.currencyUsdOption)
+        val vndOption = menuContent.findViewById<MaterialRadioButton>(R.id.currencyVndOption)
+
         options.check(
             if (selectedCurrency == Currency.USD) {
                 R.id.currencyUsdOption
@@ -64,27 +73,24 @@ class CurrencySelectorView @JvmOverloads constructor(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             true,
         ).apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.bg_currency_menu))
             isOutsideTouchable = true
-            elevation = resources.getDimension(R.dimen.popup_elevation)
         }
 
-        options.setOnCheckedChangeListener { _, checkedId ->
-            val currency = when (checkedId) {
-                R.id.currencyUsdOption -> Currency.USD
-                R.id.currencyVndOption -> Currency.VND
-                else -> return@setOnCheckedChangeListener
-            }
-            showCurrency(currency)
-            onCurrencySelected?.invoke(currency)
-            popup.dismiss()
-        }
+        usdOption.setOnClickListener { selectCurrency(Currency.USD, popup) }
+        vndOption.setOnClickListener { selectCurrency(Currency.VND, popup) }
         popup.setOnDismissListener {
             if (currencyMenu === popup) currencyMenu = null
         }
 
         currencyMenu = popup
         popup.showAsDropDown(this, 0, 0)
+    }
+
+    private fun selectCurrency(currency: Currency, popup: PopupWindow) {
+        showCurrency(currency)
+        onCurrencySelected?.invoke(currency)
+        popup.dismiss()
     }
 
     private fun currencyLabel(currency: Currency): String = context.getString(

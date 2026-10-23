@@ -27,14 +27,8 @@ class CurrencySettings private constructor(context: Context) {
         _currency.value = currency
     }
 
-    private fun readSavedCurrency(): Currency {
-        val savedValue = preferences.getString(KEY_CURRENCY, null) ?: return Currency.USD
-        return try {
-            Currency.valueOf(savedValue)
-        } catch (_: IllegalArgumentException) {
-            Currency.USD
-        }
-    }
+    private fun readSavedCurrency(): Currency =
+        CurrencyParser.parse(preferences.getString(KEY_CURRENCY, null))
 
     companion object {
         private const val PREFERENCES_NAME = "currency_settings"

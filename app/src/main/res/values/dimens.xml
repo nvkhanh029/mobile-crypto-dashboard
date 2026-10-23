@@ -18,9 +18,6 @@
     <!-- Half of touch_min: a pill without the self-intersecting shape of corner_pill. -->
     <dimen name="corner_switch">24dp</dimen>
 
-    <!-- Currency menu elevation -->
-    <dimen name="popup_elevation">8dp</dimen>
-
     <!-- Corner sizes -->
     <dimen name="corner_xs">2dp</dimen>
     <dimen name="corner_s">4dp</dimen>
