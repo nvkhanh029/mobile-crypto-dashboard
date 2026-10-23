@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:maxWidth="@dimen/chart_marker_max_width"
     app:cardBackgroundColor="@color/surface"
     app:cardCornerRadius="@dimen/corner_m"
     app:strokeColor="@color/divider"
@@ -23,13 +22,19 @@
             android:id="@+id/chartMarkerPrice"
             style="@style/Price"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxWidth="@dimen/chart_marker_max_width" />
 
         <TextView
             android:id="@+id/chartMarkerTime"
             style="@style/Caption"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxWidth="@dimen/chart_marker_max_width" />
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

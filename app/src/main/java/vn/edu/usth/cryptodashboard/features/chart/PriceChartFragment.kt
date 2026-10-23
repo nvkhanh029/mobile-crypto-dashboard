@@ -20,10 +20,30 @@ import vn.edu.usth.cryptodashboard.domain.model.Timeframe
 class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
 
     private lateinit var viewModel: PriceChartViewModel
-    private lateinit var priceChart: PriceChart
-    private lateinit var chartView: PriceLineChart
-    private lateinit var stateView: StateView
-    private lateinit var timeframeGroup: MaterialButtonToggleGroup
+    private var priceChart: PriceChart? = null
+    private var chartView: PriceLineChart? = null
+    private var stateView: StateView? = null
+    private var timeframeGroup: MaterialButtonToggleGroup? = null
+
+    private val timeframeCheckedListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) viewModel.selectTimeframe(timeframeFor(checkedId))
+        }
+
+    private val chartTouchListener = View.OnTouchListener { view, event ->
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE ->
+                view.parent?.requestDisallowInterceptTouchEvent(true)
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                view.parent?.requestDisallowInterceptTouchEvent(false)
+                // Hide the marker after the library has handled the same UP event.
+                view.post { (view as PriceLineChart).highlightValue(null) }
+                if (event.actionMasked == MotionEvent.ACTION_UP) view.performClick()
+            }
+        }
+        false
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,10 +51,13 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
             "PriceChartFragment needs the coin_id argument; use newInstance(coinId)."
         }
 
-        chartView = view.findViewById(R.id.chartView)
-        stateView = view.findViewById(R.id.chartStateView)
-        timeframeGroup = view.findViewById(R.id.chartTimeframeGroup)
-        priceChart = MpAndroidPriceChart(chartView)
+        val chart = view.findViewById<PriceLineChart>(R.id.chartView)
+        val states = view.findViewById<StateView>(R.id.chartStateView)
+        val chips = view.findViewById<MaterialButtonToggleGroup>(R.id.chartTimeframeGroup)
+        chartView = chart
+        stateView = states
+        timeframeGroup = chips
+        priceChart = MpAndroidPriceChart(chart)
 
         // TODO(chart): replace with (requireActivity().application as CryptoApp).chartRepository
         //  when Vân Khánh's CryptoApp exposes chartRepository. See TemporaryChartRepository.
@@ -42,7 +65,7 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
 
         viewModel = ViewModelProvider(
             this,
-            priceChartViewModelFactory(coinId, repository),
+            priceChartViewModelFactory(coinId, repository, TemporaryChartConfig.initialCurrency),
         )[PriceChartViewModel::class.java]
 
         setUpTimeframeChips()
@@ -51,39 +74,26 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
     }
 
     private fun setUpTimeframeChips() {
-        timeframeGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) viewModel.selectTimeframe(timeframeFor(checkedId))
-        }
+        timeframeGroup?.addOnButtonCheckedListener(timeframeCheckedListener)
         viewModel.timeframe.observe(viewLifecycleOwner) { timeframe ->
             val chipId = chipFor(timeframe)
-            if (timeframeGroup.checkedButtonId != chipId) timeframeGroup.check(chipId)
+            if (timeframeGroup?.checkedButtonId != chipId) timeframeGroup?.check(chipId)
         }
     }
 
     private fun setUpChartTouch() {
-        chartView.setOnTouchListener { _, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE ->
-                    chartView.parent?.requestDisallowInterceptTouchEvent(true)
-
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    chartView.parent?.requestDisallowInterceptTouchEvent(false)
-                    // Hide the marker after the library has handled the same UP event.
-                    chartView.post { chartView.highlightValue(null) }
-                    if (event.actionMasked == MotionEvent.ACTION_UP) chartView.performClick()
-                }
-            }
-            false
-        }
+        chartView?.setOnTouchListener(chartTouchListener)
     }
 
     private fun observeViewModel() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
+            val chart = chartView ?: return@observe
+            val states = stateView ?: return@observe
             when (state) {
                 is UiState.Success -> {
-                    stateView.hide()
-                    chartView.visibility = View.VISIBLE
-                    priceChart.show(
+                    states.hide()
+                    chart.visibility = View.VISIBLE
+                    priceChart?.show(
                         points = state.data,
                         currency = viewModel.currency,
                         timeframe = viewModel.timeframe.value ?: Timeframe.H24,
@@ -91,12 +101,27 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
                 }
 
                 else -> {
-                    chartView.visibility = View.INVISIBLE
-                    priceChart.clear()
-                    stateView.render(state, onRetryClick = viewModel::retry)
+                    chart.visibility = View.INVISIBLE
+                    priceChart?.clear()
+                    states.render(state, onRetryClick = viewModel::retry)
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        timeframeGroup?.removeOnButtonCheckedListener(timeframeCheckedListener)
+        chartView?.let { chart ->
+            // Cast the null so this clears View's listener, not MPAndroidChart's internal
+            // ChartTouchListener overload.
+            chart.setOnTouchListener(null as? View.OnTouchListener)
+            chart.parent?.requestDisallowInterceptTouchEvent(false)
+        }
+        priceChart = null
+        chartView = null
+        stateView = null
+        timeframeGroup = null
+        super.onDestroyView()
     }
 
     private fun timeframeFor(chipId: Int): Timeframe = when (chipId) {
