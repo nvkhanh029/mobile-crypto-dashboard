@@ -58,6 +58,19 @@
         app:layout_constraintStart_toEndOf="@id/chartSandboxShort"
         app:layout_constraintTop_toTopOf="@id/chartSandboxNormal" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/chartSandboxFailOnce"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/touch_min"
+        android:layout_marginTop="@dimen/space_s"
+        android:paddingStart="@dimen/space_s"
+        android:paddingEnd="@dimen/space_s"
+        android:text="@string/chart_sandbox_fail_once"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxNormal" />
+
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/chartSandboxCurrencyGroup"
         android:layout_width="0dp"
@@ -66,7 +79,7 @@
         app:checkedButton="@id/chartSandboxUsd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartSandboxNormal"
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxFailOnce"
         app:selectionRequired="true"
         app:singleSelection="true">
 
@@ -90,7 +103,8 @@
 
     <!--
         Detail hosts the chart in a scrolling screen. This scroll container reproduces that, so the
-        sandbox can check that dragging the marker does not scroll the page (FR-CD-04).
+        sandbox can check that a vertical swipe on the chart still scrolls the page while a
+        horizontal drag shows the marker (FR-CD-04).
     -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/chartSandboxScroll"

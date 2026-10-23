@@ -3,13 +3,16 @@ package vn.edu.usth.cryptodashboard.features.chart
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
 import vn.edu.usth.cryptodashboard.domain.model.Timeframe
+import kotlin.math.abs
 
 /**
  * The price chart area of the Coin Detail screen (contract C5, SCR-05).
@@ -25,6 +28,10 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
     private var stateView: StateView? = null
     private var timeframeGroup: MaterialButtonToggleGroup? = null
 
+    private var touchDownX = 0f
+    private var touchDownY = 0f
+    private var horizontalDrag = false
+
     private val timeframeCheckedListener =
         MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) viewModel.selectTimeframe(timeframeFor(checkedId))
@@ -32,14 +39,32 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
 
     private val chartTouchListener = View.OnTouchListener { view, event ->
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE ->
-                view.parent?.requestDisallowInterceptTouchEvent(true)
+            MotionEvent.ACTION_DOWN -> {
+                // A new gesture must start with the page scroll allowed; only a horizontal drag
+                // takes the gesture away from the scrolling parent.
+                view.parent?.requestDisallowInterceptTouchEvent(false)
+                touchDownX = event.x
+                touchDownY = event.y
+                horizontalDrag = false
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                if (!horizontalDrag) {
+                    val dx = abs(event.x - touchDownX)
+                    val dy = abs(event.y - touchDownY)
+                    val touchSlop = ViewConfiguration.get(view.context).scaledTouchSlop.toFloat()
+                    if (dx > touchSlop && dx > dy) {
+                        horizontalDrag = true
+                        view.parent?.requestDisallowInterceptTouchEvent(true)
+                    }
+                }
+            }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 view.parent?.requestDisallowInterceptTouchEvent(false)
-                // Hide the marker after the library has handled the same UP event.
-                view.post { (view as PriceLineChart).highlightValue(null) }
-                if (event.actionMasked == MotionEvent.ACTION_UP) view.performClick()
+                // Hide the marker after the library has handled the same UP/CANCEL event.
+                view.post { priceChart?.hideMarker() }
+                horizontalDrag = false
             }
         }
         false
@@ -61,15 +86,21 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
 
         // TODO(chart): replace with (requireActivity().application as CryptoApp).chartRepository
         //  when Vân Khánh's CryptoApp exposes chartRepository. See TemporaryChartRepository.
-        val repository = TemporaryChartRepository(requireContext().applicationContext)
+        val repository = TemporaryChartRepositoryProvider.create(
+            requireContext().applicationContext,
+        )
+        // TODO(currency): use CryptoApp.currencySettings instead when it exists. CurrencySettings
+        //  is a shared singleton, so this is the same instance MainActivity uses.
+        val currencySettings = CurrencySettings.getInstance(requireContext())
 
         viewModel = ViewModelProvider(
             this,
-            priceChartViewModelFactory(coinId, repository, TemporaryChartConfig.initialCurrency),
+            priceChartViewModelFactory(coinId, repository, currencySettings.currentCurrency()),
         )[PriceChartViewModel::class.java]
 
         setUpTimeframeChips()
         setUpChartTouch()
+        observeCurrency(currencySettings)
         observeViewModel()
     }
 
@@ -83,6 +114,12 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
 
     private fun setUpChartTouch() {
         chartView?.setOnTouchListener(chartTouchListener)
+    }
+
+    private fun observeCurrency(currencySettings: CurrencySettings) {
+        currencySettings.currency.observe(viewLifecycleOwner) { currency ->
+            viewModel.setCurrency(currency)
+        }
     }
 
     private fun observeViewModel() {
@@ -112,9 +149,7 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
     override fun onDestroyView() {
         timeframeGroup?.removeOnButtonCheckedListener(timeframeCheckedListener)
         chartView?.let { chart ->
-            // Cast the null so this clears View's listener, not MPAndroidChart's internal
-            // ChartTouchListener overload.
-            chart.setOnTouchListener(null as? View.OnTouchListener)
+            chart.setOnTouchListener(null)
             chart.parent?.requestDisallowInterceptTouchEvent(false)
         }
         priceChart = null

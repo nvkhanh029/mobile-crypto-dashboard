@@ -44,10 +44,10 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
         chart.axisRight.setDrawLimitLinesBehindData(true)
         chart.setNoDataText(context.getString(R.string.chart_not_enough_data))
         chart.setBackgroundColor(Color.TRANSPARENT)
-        chart.extraRightOffset = context.resources.getDimension(R.dimen.chart_axis_right_offset)
-        chart.extraBottomOffset = context.resources.getDimension(R.dimen.chart_axis_bottom_offset)
+        chart.extraRightOffset = context.resources.getDimension(R.dimen.space_xs)
+        chart.extraBottomOffset = context.resources.getDimension(R.dimen.space_xs)
 
-        val axisTextSize = dp(R.dimen.chart_axis_text_size)
+        val axisTextSize = dp(R.dimen.caption_text_size_min)
         val dividerColor = ContextCompat.getColor(context, R.color.divider)
         val secondaryTextColor = ContextCompat.getColor(context, R.color.textSecondary)
 
@@ -112,7 +112,7 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
             fillAlpha = context.resources.getInteger(R.integer.chart_area_fill_alpha)
             isHighlightEnabled = true
             highLightColor = ContextCompat.getColor(context, R.color.textSecondary)
-            highlightLineWidth = dp(R.dimen.chart_highlight_line_width)
+            highlightLineWidth = dp(R.dimen.divider_thickness)
             setDrawHorizontalHighlightIndicator(false)
         }
 
@@ -127,7 +127,7 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
         chart.axisRight.removeAllLimitLines()
         chart.axisRight.addLimitLine(referenceLine(firstPrice))
 
-        chart.highlightValue(null)
+        hideMarker()
         chart.data = LineData(dataSet)
         chart.notifyDataSetChanged()
         chart.setVisibleXRangeMaximum(entries.size.toFloat())
@@ -140,8 +140,12 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
         }
     }
 
-    override fun clear() {
+    override fun hideMarker() {
         chart.highlightValue(null)
+    }
+
+    override fun clear() {
+        hideMarker()
         chart.clear()
         chart.invalidate()
     }
@@ -156,10 +160,10 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
     /** FR-CD-12 (Could): dashed line at the first price of the selected period. */
     private fun referenceLine(firstPrice: Double): LimitLine = LimitLine(firstPrice.toFloat(), "").apply {
         lineColor = ContextCompat.getColor(context, R.color.divider)
-        lineWidth = dp(R.dimen.chart_reference_line_width)
+        lineWidth = dp(R.dimen.divider_thickness)
         enableDashedLine(
-            context.resources.getDimension(R.dimen.chart_reference_dash_length),
-            context.resources.getDimension(R.dimen.chart_reference_dash_space),
+            context.resources.getDimension(R.dimen.space_xs),
+            context.resources.getDimension(R.dimen.space_xs),
             0f,
         )
     }

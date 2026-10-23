@@ -36,8 +36,10 @@ class ChartMarkerView(context: Context) : MarkerView(context, R.layout.view_char
 
     override fun refreshContent(e: Entry?, highlight: Highlight?) {
         if (e != null) {
-            priceView.text = PriceFormatter.format(e.y.toDouble(), currency)
             val point = points.getOrNull(e.x.toInt())
+            // Use the exact Double from the data point: MPAndroidChart stores y as Float, which
+            // can lose precision for large VND values.
+            priceView.text = PriceFormatter.format(point?.price ?: e.y.toDouble(), currency)
             timeView.text = point?.let {
                 ChartTimeLabelFormatter.format(it.timestampMillis, timeframe)
             } ?: ""

@@ -23,7 +23,7 @@
             android:id="@+id/chartChip1h"
             style="@style/ChartTimeframeChip"
             android:layout_width="0dp"
-            android:layout_height="@dimen/touch_min"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/chart_timeframe_1h" />
 
@@ -31,7 +31,7 @@
             android:id="@+id/chartChip24h"
             style="@style/ChartTimeframeChip"
             android:layout_width="0dp"
-            android:layout_height="@dimen/touch_min"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_weight="1"
             android:text="@string/chart_timeframe_24h" />
@@ -40,7 +40,7 @@
             android:id="@+id/chartChip7d"
             style="@style/ChartTimeframeChip"
             android:layout_width="0dp"
-            android:layout_height="@dimen/touch_min"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_weight="1"
             android:text="@string/chart_timeframe_7d" />
@@ -49,7 +49,7 @@
             android:id="@+id/chartChip1m"
             style="@style/ChartTimeframeChip"
             android:layout_width="0dp"
-            android:layout_height="@dimen/touch_min"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_weight="1"
             android:text="@string/chart_timeframe_1m" />
@@ -58,7 +58,7 @@
             android:id="@+id/chartChip1y"
             style="@style/ChartTimeframeChip"
             android:layout_width="0dp"
-            android:layout_height="@dimen/touch_min"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_weight="1"
             android:text="@string/chart_timeframe_1y" />

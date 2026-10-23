@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Timeframe chip of the price chart (CMP-10). Owner: Duy. -->
+<!--
+    Timeframe chip of the price chart (CMP-10). Owner: Duy.
+    Colours, line thickness, corners and touch size come from Hải's roles; only the chip style
+    itself is chart-specific.
+-->
 <resources>
     <style name="ChartTimeframeChip" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
         <item name="android:textColor">@color/chart_chip_text</item>
         <item name="android:gravity">center</item>
         <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
         <item name="android:minWidth">@dimen/chart_chip_min_width</item>
+        <item name="android:minHeight">@dimen/touch_min</item>
         <item name="android:insetTop">@dimen/chart_chip_inset</item>
         <item name="android:insetBottom">@dimen/chart_chip_inset</item>
         <item name="android:paddingStart">@dimen/space_xs</item>

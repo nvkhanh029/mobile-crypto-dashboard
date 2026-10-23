@@ -33,86 +33,71 @@ class TemporaryChartRepository(private val context: Context) : ChartRepository {
         currency: Currency,
         callback: RepositoryCallback<List<ChartPoint>>,
     ) {
-        val scenario = TemporaryChartConfig.scenario
-
-        executor.execute {
-            if (scenario == ChartSandboxScenario.ERROR) {
-                mainHandler.postDelayed(
-                    { callback.onError(AppError.NoConnection) },
-                    FAKE_DELAY_MILLIS,
+        TemporaryChartThreads.executor.execute {
+            val points = runCatching {
+                readFakeChart(context, chartFilePath(timeframe, currency))
+            }.getOrElse {
+                TemporaryChartThreads.mainHandler.postDelayed(
+                    { callback.onError(AppError.InvalidData) },
+                    TEMPORARY_CHART_DELAY_MILLIS,
                 )
                 return@execute
             }
 
-            val points = runCatching { readPoints(timeframe, currency, scenario) }
-                .getOrElse {
-                    mainHandler.post { callback.onError(AppError.InvalidData) }
-                    return@execute
-                }
-
-            mainHandler.postDelayed(
+            TemporaryChartThreads.mainHandler.postDelayed(
                 { callback.onSuccess(points, System.currentTimeMillis()) },
-                FAKE_DELAY_MILLIS,
+                TEMPORARY_CHART_DELAY_MILLIS,
             )
         }
     }
-
-    private fun readPoints(
-        timeframe: Timeframe,
-        currency: Currency,
-        scenario: ChartSandboxScenario,
-    ): List<ChartPoint> {
-        val path = if (scenario == ChartSandboxScenario.SHORT_CHART) {
-            SHORT_CHART_FILE
-        } else {
-            chartFile(timeframe, currency)
-        }
-
-        val root = JSONObject(context.assets.open(path).bufferedReader().use { it.readText() })
-        val prices = root.getJSONArray("prices")
-        val points = ArrayList<ChartPoint>(prices.length())
-
-        for (index in 0 until prices.length()) {
-            val pair = prices.getJSONArray(index)
-            points += ChartPoint(
-                timestampMillis = pair.getLong(0),
-                price = pair.getDouble(1),
-            )
-        }
-        return points
-    }
-
-    private fun chartFile(timeframe: Timeframe, currency: Currency): String {
-        val currencyName = currency.name.lowercase(Locale.US)
-        return "fake/chart_bitcoin_${timeframe.days}d_$currencyName.json"
-    }
-
-    private companion object {
-        const val FAKE_DELAY_MILLIS = 350L
-        const val SHORT_CHART_FILE = "fake/edge/chart_short_1d_usd.json"
-
-        val executor: ExecutorService = Executors.newSingleThreadExecutor()
-        val mainHandler = Handler(Looper.getMainLooper())
-    }
-}
-
-/** Debug-only test scenarios for the chart sandbox (docs/03-architecture.md section 13). */
-enum class ChartSandboxScenario {
-    NORMAL,
-    SHORT_CHART,
-    ERROR,
 }
 
 /**
- * TEMPORARY bridge between the debug sandbox and [TemporaryChartRepository].
+ * Temporary seam between the main-source chart fragment and the debug-only sandbox repository.
  *
- * Delete it together with [TemporaryChartRepository] when the real fake data source lands; the
- * production FAKE_SCENARIO build flag then selects the scenario.
+ * The release default is the normal fake repository. `ChartSandboxActivity` replaces [factory]
+ * with its scenario repository before it adds [PriceChartFragment]. Delete this object when
+ * `CryptoApp.chartRepository` lands.
  */
-object TemporaryChartConfig {
-    @Volatile
-    var scenario: ChartSandboxScenario = ChartSandboxScenario.NORMAL
+internal object TemporaryChartRepositoryProvider {
+
+    private val defaultFactory: (Context) -> ChartRepository = { context ->
+        TemporaryChartRepository(context)
+    }
 
     @Volatile
-    var initialCurrency: Currency = Currency.USD
+    var factory: (Context) -> ChartRepository = defaultFactory
+
+    fun create(context: Context): ChartRepository = factory(context)
+
+    /** Restores the normal fake repository after the debug sandbox closes. */
+    fun reset() {
+        factory = defaultFactory
+    }
+}
+
+/** Temporary background thread and main-thread poster shared by the chart fake repositories. */
+internal object TemporaryChartThreads {
+    val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    val mainHandler: Handler = Handler(Looper.getMainLooper())
+}
+
+internal const val TEMPORARY_CHART_DELAY_MILLIS = 350L
+
+internal fun chartFilePath(timeframe: Timeframe, currency: Currency): String =
+    "fake/chart_bitcoin_${timeframe.days}d_${currency.name.lowercase(Locale.US)}.json"
+
+internal fun readFakeChart(context: Context, path: String): List<ChartPoint> {
+    val root = JSONObject(context.assets.open(path).bufferedReader().use { it.readText() })
+    val prices = root.getJSONArray("prices")
+    val points = ArrayList<ChartPoint>(prices.length())
+
+    for (index in 0 until prices.length()) {
+        val pair = prices.getJSONArray(index)
+        points += ChartPoint(
+            timestampMillis = pair.getLong(0),
+            price = pair.getDouble(1),
+        )
+    }
+    return points
 }

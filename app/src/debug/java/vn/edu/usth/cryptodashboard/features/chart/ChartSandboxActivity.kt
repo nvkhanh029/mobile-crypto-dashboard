@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.domain.model.Currency
 
 /**
@@ -19,8 +20,11 @@ import vn.edu.usth.cryptodashboard.domain.model.Currency
  */
 class ChartSandboxActivity : AppCompatActivity() {
 
+    private var scenario = ChartSandboxScenario.NORMAL
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSandboxRepository()
         enableEdgeToEdge()
         setContentView(R.layout.activity_chart_sandbox)
 
@@ -45,16 +49,29 @@ class ChartSandboxActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.chartSandboxError).setOnClickListener {
             selectScenario(ChartSandboxScenario.ERROR)
         }
-        findViewById<MaterialButtonToggleGroup>(R.id.chartSandboxCurrencyGroup)
-            .addOnButtonCheckedListener { _, checkedId, isChecked ->
-                if (!isChecked) return@addOnButtonCheckedListener
-                TemporaryChartConfig.initialCurrency = when (checkedId) {
+        findViewById<MaterialButton>(R.id.chartSandboxFailOnce).setOnClickListener {
+            selectScenario(ChartSandboxScenario.FAIL_THEN_OK)
+        }
+
+        val currencySettings = CurrencySettings.getInstance(this)
+        val currencyGroup = findViewById<MaterialButtonToggleGroup>(R.id.chartSandboxCurrencyGroup)
+        currencyGroup.check(
+            if (currencySettings.currentCurrency() == Currency.VND) {
+                R.id.chartSandboxVnd
+            } else {
+                R.id.chartSandboxUsd
+            },
+        )
+        currencyGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            currencySettings.setCurrency(
+                when (checkedId) {
                     R.id.chartSandboxUsd -> Currency.USD
                     R.id.chartSandboxVnd -> Currency.VND
                     else -> error("Unknown currency button: $checkedId")
-                }
-                showChart()
-            }
+                },
+            )
+        }
 
         findViewById<TextView>(R.id.chartSandboxTitle).text =
             getString(R.string.chart_sandbox_title, COIN_ID)
@@ -62,14 +79,27 @@ class ChartSandboxActivity : AppCompatActivity() {
         if (savedInstanceState == null) showChart()
     }
 
-    private fun selectScenario(scenario: ChartSandboxScenario) {
-        TemporaryChartConfig.scenario = scenario
+    private fun installSandboxRepository() {
+        TemporaryChartRepositoryProvider.factory = { context ->
+            ChartSandboxRepository(context, scenario)
+        }
+    }
+
+    private fun selectScenario(newScenario: ChartSandboxScenario) {
+        scenario = newScenario
+        installSandboxRepository()
         showChart()
     }
 
+    override fun onDestroy() {
+        TemporaryChartRepositoryProvider.reset()
+        super.onDestroy()
+    }
+
     /**
-     * Replaces the fragment instead of recreating the Activity: the Fragment's ViewModel
-     * survives a configuration change and would keep showing the previous scenario or currency.
+     * Replaces the fragment when the scenario changes: the debug repository is created with the
+     * scenario, so the new fragment needs a new ViewModel and repository. Currency changes do not
+     * need this: the fragment observes [CurrencySettings] itself.
      */
     private fun showChart() {
         supportFragmentManager.beginTransaction()
