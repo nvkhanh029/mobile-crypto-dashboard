@@ -12,7 +12,7 @@
 - Domain code uses no Android types (`03` §2).
 - **Missing values are `null`, never 0.** An absent JSON key and a JSON `null` both become `null` (`04` §1.1). A real value of 0 stays 0 (FR-CD-06, FR-ML-09).
 - Every money amount, supply and percentage is `Double?`, because the API returns integers and decimals for the same field and `market_cap` can exceed `Int` (`04` §1.1). The formatters of `core/format` take `Double?`.
-- **Required fields:** `id`, `symbol` and `name` of a coin. If one of them is missing or has the wrong type, the mapper reports `AppError.InvalidData` (`03` §8.3). Every other field is nullable.
+- **Required fields:** `id`, `symbol` and `name` of a coin; every other field is nullable. What a mapper does with a missing or wrong value is in section 4.
 - **Threading rule (C1):** every repository callback, `onSuccess` and `onError`, is called on the main thread. The caller can update LiveData and Views directly. Network and JSON work happen on other threads inside the data layer (`03` §4, §5).
 - A repository call cannot be cancelled. A ViewModel that sends a new request ignores the answer of an older one (`03` §6, stale responses).
 - **This file does not copy signatures that exist in code.** The shared UI parts (`UiState`, `StateView`, `AttributionView`, the explanation dialog, the formatters), `CurrencySettings` and `FavoriteStore` are defined by their owners in their own files (C2, C3, C7); read the code on `main`. C5 and C6 are complete in `03` §12.
@@ -185,7 +185,7 @@ object ChartMapper {
 
 Rules:
 - **Input:** the whole response text. `CoinMapper.parseList` reads a `/coins/markets` array (the market list and coins by ID); `CoinDetailMapper.parse` reads a `/coins/{id}` object, and `currency` selects the key of the fields that are keyed by currency (`04` §4); `ChartMapper.parse` reads a `/market_chart` object and uses only `prices` (`04` §5).
-- **Failure:** a mapper throws `org.json.JSONException` when the text is not valid JSON, or when a value the model requires is missing or has the wrong type (the required fields are in section 1). The data source catches it on the background thread and reports `AppError.InvalidData`; nobody shows the message of the exception (`03` §8.3).
+- **Failure:** a mapper throws `org.json.JSONException` when the text is not valid JSON, when a required field (section 1) is missing or `null`, or when anything it reads has a JSON type other than the one `04` lists for it (a number written as a string, such as `"12"`, has the wrong type). An optional field that is absent or `null` is not a failure: it becomes `null`. The data source catches the exception on the background thread and reports `AppError.InvalidData`; nobody shows the message of the exception (`03` §8.3).
 - **Missing values** become `null` as in section 1. `CoinDetailMapper` removes the markup of the description (section 2).
 - A mapper runs on the background thread of the data source, never on the main thread (`03` §5).
 

@@ -228,7 +228,7 @@ Other classes receive what they need from `CryptoApp` (manual dependency injecti
 | HTTP 404 | `ClientError` with a network response | Request rejected | Observed in S2 |
 | HTTP 429 | `ClientError` (Volley treats 4xx other than 401/403 the same way) | Rate limited | **Prediction**, not observed; unit test with a fake error |
 | HTTP 5xx | `ServerError` | Server error | **Prediction**, not observed; unit test with a fake error |
-| Response is not valid JSON, or a required field has the wrong type | `JSONException` thrown by the mapper on the background thread (not a Volley error) | Invalid data | Edge-case file `markets_invalid.json` |
+| Response is not valid JSON, or a mapper rejects a value (05 §4) | `JSONException` thrown by the mapper on the background thread (not a Volley error) | Invalid data | Edge-case file `markets_invalid.json` |
 
 The 429 and 5xx rows are covered by a JVM unit test of `ErrorMapper` that builds Volley errors with a fake `NetworkResponse`; the real API is never pushed into those states on purpose.
 
