@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Timeframe chip of the price chart (CMP-10). Owner: Duy.
-    Colours, line thickness, corners and touch size come from Hải's roles; only the chip style
-    itself is chart-specific.
+    Apple-Stocks-style range picker: no outline, selected neutral capsule, unselected text only.
+    Colours, corners and touch size come from Hải's roles.
 -->
 <resources>
-    <style name="ChartTimeframeChip" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="ChartTimeframeChip" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/chart_chip_background</item>
+        <item name="android:button">@null</item>
         <item name="android:textColor">@color/chart_chip_text</item>
         <item name="android:gravity">center</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:minWidth">@dimen/chart_chip_min_width</item>
         <item name="android:minHeight">@dimen/touch_min</item>
-        <item name="android:insetTop">@dimen/chart_chip_inset</item>
-        <item name="android:insetBottom">@dimen/chart_chip_inset</item>
+        <item name="android:paddingTop">@dimen/chart_chip_inset</item>
+        <item name="android:paddingBottom">@dimen/chart_chip_inset</item>
         <item name="android:paddingStart">@dimen/space_xs</item>
         <item name="android:paddingEnd">@dimen/space_xs</item>
-        <item name="backgroundTint">@color/chart_chip_background</item>
-        <item name="strokeColor">@color/chart_chip_stroke</item>
-        <item name="strokeWidth">@dimen/divider_thickness</item>
-        <item name="cornerRadius">@dimen/corner_l</item>
     </style>
 </resources>

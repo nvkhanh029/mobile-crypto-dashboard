@@ -1,7 +1,9 @@
 package vn.edu.usth.cryptodashboard.features.chart
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -48,14 +50,12 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
         chart.extraBottomOffset = context.resources.getDimension(R.dimen.space_xs)
 
         val axisTextSize = dp(R.dimen.caption_text_size_min)
-        val dividerColor = ContextCompat.getColor(context, R.color.divider)
         val secondaryTextColor = ContextCompat.getColor(context, R.color.textSecondary)
 
         chart.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
             setDrawGridLines(false)
-            setDrawAxisLine(true)
-            axisLineColor = dividerColor
+            setDrawAxisLine(false)
             textColor = secondaryTextColor
             textSize = axisTextSize
             granularity = 1f
@@ -101,6 +101,15 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
             Entry(index.toFloat(), point.price.toFloat())
         }
 
+        val fillTopColor = ColorUtils.setAlphaComponent(
+            directionColor,
+            context.resources.getInteger(R.integer.chart_area_fill_alpha),
+        )
+        val fillGradient = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(fillTopColor, Color.TRANSPARENT),
+        )
+
         val dataSet = LineDataSet(entries, "").apply {
             color = directionColor
             lineWidth = dp(R.dimen.chart_line_width)
@@ -108,8 +117,7 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
             setDrawCircles(false)
             setDrawValues(false)
             setDrawFilled(true)
-            fillColor = directionColor
-            fillAlpha = context.resources.getInteger(R.integer.chart_area_fill_alpha)
+            fillDrawable = fillGradient
             isHighlightEnabled = true
             highLightColor = ContextCompat.getColor(context, R.color.textSecondary)
             highlightLineWidth = dp(R.dimen.divider_thickness)

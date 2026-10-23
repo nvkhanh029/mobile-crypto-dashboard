@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.ui.StateView
@@ -26,15 +26,15 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
     private var priceChart: PriceChart? = null
     private var chartView: PriceLineChart? = null
     private var stateView: StateView? = null
-    private var timeframeGroup: MaterialButtonToggleGroup? = null
+    private var timeframeGroup: RadioGroup? = null
 
     private var touchDownX = 0f
     private var touchDownY = 0f
     private var horizontalDrag = false
 
     private val timeframeCheckedListener =
-        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) viewModel.selectTimeframe(timeframeFor(checkedId))
+        RadioGroup.OnCheckedChangeListener { _, checkedId ->
+            viewModel.selectTimeframe(timeframeFor(checkedId))
         }
 
     private val chartTouchListener = View.OnTouchListener { view, event ->
@@ -78,7 +78,7 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
 
         val chart = view.findViewById<PriceLineChart>(R.id.chartView)
         val states = view.findViewById<StateView>(R.id.chartStateView)
-        val chips = view.findViewById<MaterialButtonToggleGroup>(R.id.chartTimeframeGroup)
+        val chips = view.findViewById<RadioGroup>(R.id.chartTimeframeGroup)
         chartView = chart
         stateView = states
         timeframeGroup = chips
@@ -105,10 +105,10 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
     }
 
     private fun setUpTimeframeChips() {
-        timeframeGroup?.addOnButtonCheckedListener(timeframeCheckedListener)
+        timeframeGroup?.setOnCheckedChangeListener(timeframeCheckedListener)
         viewModel.timeframe.observe(viewLifecycleOwner) { timeframe ->
             val chipId = chipFor(timeframe)
-            if (timeframeGroup?.checkedButtonId != chipId) timeframeGroup?.check(chipId)
+            if (timeframeGroup?.checkedRadioButtonId != chipId) timeframeGroup?.check(chipId)
         }
     }
 
@@ -147,7 +147,7 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
     }
 
     override fun onDestroyView() {
-        timeframeGroup?.removeOnButtonCheckedListener(timeframeCheckedListener)
+        timeframeGroup?.setOnCheckedChangeListener(null)
         chartView?.let { chart ->
             chart.setOnTouchListener(null)
             chart.parent?.requestDisallowInterceptTouchEvent(false)
