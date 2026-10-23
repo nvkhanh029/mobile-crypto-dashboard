@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.domain.model.Currency
 
 /**
  * Debug-only chart sandbox (docs/03-architecture.md section 13).
@@ -43,21 +45,33 @@ class ChartSandboxActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.chartSandboxError).setOnClickListener {
             selectScenario(ChartSandboxScenario.ERROR)
         }
+        findViewById<MaterialButtonToggleGroup>(R.id.chartSandboxCurrencyGroup)
+            .addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (!isChecked) return@addOnButtonCheckedListener
+                TemporaryChartConfig.initialCurrency = when (checkedId) {
+                    R.id.chartSandboxUsd -> Currency.USD
+                    R.id.chartSandboxVnd -> Currency.VND
+                    else -> error("Unknown currency button: $checkedId")
+                }
+                showChart()
+            }
 
         findViewById<TextView>(R.id.chartSandboxTitle).text =
             getString(R.string.chart_sandbox_title, COIN_ID)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.chartSandboxContainer, PriceChartFragment.newInstance(COIN_ID))
-                .commit()
-        }
+        if (savedInstanceState == null) showChart()
     }
 
     private fun selectScenario(scenario: ChartSandboxScenario) {
         TemporaryChartConfig.scenario = scenario
-        // Replace the fragment instead of recreating the Activity: the Fragment's ViewModel
-        // survives a configuration change and would keep showing the previous scenario.
+        showChart()
+    }
+
+    /**
+     * Replaces the fragment instead of recreating the Activity: the Fragment's ViewModel
+     * survives a configuration change and would keep showing the previous scenario or currency.
+     */
+    private fun showChart() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.chartSandboxContainer, PriceChartFragment.newInstance(COIN_ID))
             .commit()

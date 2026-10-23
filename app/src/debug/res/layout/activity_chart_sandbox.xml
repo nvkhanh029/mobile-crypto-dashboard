@@ -58,14 +58,65 @@
         app:layout_constraintStart_toEndOf="@id/chartSandboxShort"
         app:layout_constraintTop_toTopOf="@id/chartSandboxNormal" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/chartSandboxContainer"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/chartSandboxCurrencyGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_s"
+        app:checkedButton="@id/chartSandboxUsd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxNormal"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chartSandboxUsd"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/touch_min"
+            android:layout_weight="1"
+            android:text="@string/chart_sandbox_usd" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chartSandboxVnd"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/touch_min"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_weight="1"
+            android:text="@string/chart_sandbox_vnd" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!--
+        Detail hosts the chart in a scrolling screen. This scroll container reproduces that, so the
+        sandbox can check that dragging the marker does not scroll the page (FR-CD-04).
+    -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/chartSandboxScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/space_m"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartSandboxNormal" />
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxCurrencyGroup">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/chartSandboxContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/chart_sandbox_scroll_extra" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
