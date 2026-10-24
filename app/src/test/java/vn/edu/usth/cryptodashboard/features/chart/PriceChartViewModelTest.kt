@@ -98,12 +98,14 @@ class PriceChartViewModelTest {
     }
 
     @Test
-    fun `quick timeframe switch ignores the stale response`() {
+    fun `quick timeframe switch drops old data and ignores the stale response`() {
         val repository = FakeChartRepository()
         val viewModel = PriceChartViewModel(COIN_ID, repository, Currency.USD)
+        repository.succeed(0, twoPoints())
 
         viewModel.selectTimeframe(Timeframe.H1)
         viewModel.selectTimeframe(Timeframe.D7)
+        assertEquals(UiState.Loading, viewModel.state.value)
         assertEquals(
             listOf(Timeframe.H24, Timeframe.H1, Timeframe.D7),
             repository.requests.map { it.timeframe },
@@ -115,6 +117,21 @@ class PriceChartViewModelTest {
         repository.succeed(2, listOf(point(30, 20.0), point(0, 21.0)))
         val state = viewModel.state.value as UiState.Success
         assertEquals(listOf(20.0, 21.0), state.data.map { it.price })
+    }
+
+    @Test
+    fun `a stale error is ignored after a timeframe switch`() {
+        val repository = FakeChartRepository()
+        val viewModel = PriceChartViewModel(COIN_ID, repository, Currency.USD)
+
+        viewModel.selectTimeframe(Timeframe.H1)
+        viewModel.selectTimeframe(Timeframe.D7)
+        repository.fail(1, AppError.NoConnection)
+
+        assertEquals(UiState.Loading, viewModel.state.value)
+
+        repository.succeed(2, twoPoints())
+        assertTrue(viewModel.state.value is UiState.Success)
     }
 
     @Test

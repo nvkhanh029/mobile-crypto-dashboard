@@ -28,7 +28,7 @@ class PriceLineChart @JvmOverloads constructor(
     }
     private val dotStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = resources.getDimension(R.dimen.chart_highlight_dot_stroke_width)
+        strokeWidth = resources.getDimension(R.dimen.divider_thickness)
         color = ContextCompat.getColor(context, R.color.background)
     }
 
@@ -50,10 +50,5 @@ class PriceLineChart @JvmOverloads constructor(
         dotFillPaint.color = highlightDotColor
         canvas.drawCircle(x, y, dotRadius + dotStrokePaint.strokeWidth / 2f, dotStrokePaint)
         canvas.drawCircle(x, y, dotRadius, dotFillPaint)
-    }
-
-    override fun performClick(): Boolean {
-        super.performClick()
-        return true
     }
 }

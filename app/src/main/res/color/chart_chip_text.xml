@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Selected timeframe chip uses onAccent text (CMP-10). -->
+<!-- Apple-Stocks-style range picker: selected text primary, unselected secondary. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/onAccent" android:state_checked="true" />
-    <item android:color="@color/textPrimary" />
+    <item android:color="@color/textPrimary" android:state_checked="true" />
+    <item android:color="@color/textSecondary" />
 </selector>

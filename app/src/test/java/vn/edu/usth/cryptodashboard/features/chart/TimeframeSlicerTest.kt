@@ -49,6 +49,17 @@ class TimeframeSlicerTest {
     }
 
     @Test
+    fun `h1 finds the latest timestamp even when it is not the last element`() {
+        // The repository contract promises time order, but the slicer must not depend on the
+        // latest point happening to be the last element.
+        val points = listOf(point(30, 1.0), point(0, 2.0), point(120, 3.0))
+
+        val sliced = TimeframeSlicer.slice(points, Timeframe.H1)
+
+        assertEquals(listOf(1.0, 2.0), sliced.map { it.price })
+    }
+
+    @Test
     fun `h1 keeps a single recent point`() {
         val points = listOf(point(90, 1.0), point(0, 2.0))
 

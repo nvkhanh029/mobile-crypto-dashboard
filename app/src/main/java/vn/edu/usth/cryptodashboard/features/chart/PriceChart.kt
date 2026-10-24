@@ -21,6 +21,9 @@ interface PriceChart {
         animate: Boolean = true,
     )
 
+    /** Hides the touch marker and the highlighted point without removing the chart data. */
+    fun hideMarker()
+
     /** Removes the line, the marker and any highlighted point. */
     fun clear()
 }
