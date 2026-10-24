@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="detail_title">Chi tiết đồng tiền</string>
+    <string name="detail_back">Quay lại</string>
+    <string name="detail_back_symbol">‹</string>
+    <string name="detail_missing_value">—</string>
+    <string name="detail_missing_description">Không có mô tả.</string>
+    <string name="detail_percent_value">%1$s%2$s%%</string>
+    <string name="detail_statistics_heading">Thống kê</string>
+    <string name="detail_about_heading">Giới thiệu</string>
+    <string name="detail_read_more">Đọc thêm</string>
+    <string name="detail_show_less">Thu gọn</string>
+    <string name="detail_disclaimer">Chỉ nhằm mục đích cung cấp thông tin. Đây không phải lời khuyên tài chính.</string>
+    <string name="detail_market_cap">Vốn hóa thị trường</string>
+    <string name="detail_volume_24h">Khối lượng giao dịch 24 giờ</string>
+    <string name="detail_circulating_supply">Lượng lưu hành</string>
+    <string name="detail_total_supply">Tổng cung</string>
+    <string name="detail_max_supply">Nguồn cung tối đa</string>
+    <string name="detail_all_time_high">Giá cao nhất mọi thời đại</string>
+    <string name="detail_all_time_low">Giá thấp nhất mọi thời đại</string>
+    <string name="detail_info_symbol">ⓘ</string>
+    <string name="detail_content_desc_explain_stat">Giải thích %1$s</string>
+    <string name="detail_stat_market_cap_explanation">Tổng giá trị của các đồng tiền đang lưu hành, được tính bằng giá nhân với lượng lưu hành.</string>
+    <string name="detail_stat_volume_24h_explanation">Tổng giá trị đồng tiền được giao dịch trong 24 giờ qua.</string>
+    <string name="detail_stat_circulating_supply_explanation">Số lượng đồng tiền hiện có và đang được giao dịch trên thị trường.</string>
+    <string name="detail_stat_total_supply_explanation">Số lượng đồng tiền đã được tạo ra, trừ những đồng bị loại bỏ vĩnh viễn khỏi lưu thông.</string>
+    <string name="detail_stat_max_supply_explanation">Số lượng đồng tiền tối đa có thể tồn tại.</string>
+    <string name="detail_stat_all_time_high_explanation">Mức giá cao nhất từng được ghi nhận của đồng tiền này.</string>
+    <string name="detail_stat_all_time_low_explanation">Mức giá thấp nhất từng được ghi nhận của đồng tiền này.</string>
+    <string name="detail_favorite_add">Thêm vào danh sách theo dõi</string>
+    <string name="detail_favorite_remove">Xóa khỏi danh sách theo dõi</string>
+    <string name="detail_refresh_failed">Không thể tải lại dữ liệu đồng tiền này. Đang hiển thị dữ liệu đã tải trước đó.</string>
+    <string name="detail_retry">Thử lại</string>
+</resources>

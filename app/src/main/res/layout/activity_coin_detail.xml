@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/detailRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/detailToolbar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/top_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/space_s"
+        android:paddingEnd="@dimen/space_s"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/detailBackButton"
+            style="@style/Body"
+            android:layout_width="@dimen/touch_min"
+            android:layout_height="@dimen/touch_min"
+            android:clickable="true"
+            android:contentDescription="@string/detail_back"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/detail_back_symbol" />
+
+        <TextView
+            android:id="@+id/detailToolbarTitle"
+            style="@style/Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/detail_title" />
+
+        <vn.edu.usth.cryptodashboard.core.currency.CurrencySelectorView
+            android:id="@+id/detailCurrencySelector"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/touch_min"
+            android:minWidth="56dp" />
+
+        <vn.edu.usth.cryptodashboard.core.favorite.FavoriteButton
+            android:id="@+id/detailFavoriteButton"
+            android:layout_width="@dimen/touch_min"
+            android:layout_height="@dimen/touch_min"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/detail_favorite_add"
+            android:padding="@dimen/space_s"
+            android:src="@drawable/ic_star_outline" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/detailScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/detailToolbar"
+        app:layout_constraintBottom_toTopOf="@id/detailFooter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/detailContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_m">
+
+            <TextView
+                android:id="@+id/detailCoinName"
+                style="@style/Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_missing_value" />
+
+            <TextView
+                android:id="@+id/detailCoinSymbol"
+                style="@style/Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_missing_value" />
+
+            <TextView
+                android:id="@+id/detailCurrentPrice"
+                style="@style/Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                android:text="@string/detail_missing_value" />
+
+            <TextView
+                android:id="@+id/detailPriceChange"
+                style="@style/Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_missing_value" />
+
+            <!-- Reserved for PriceChartFragment.newInstance(coinId) after PR #9 merges. -->
+            <FrameLayout
+                android:id="@+id/detailChartContainer"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="@dimen/space_m" />
+
+            <TextView
+                style="@style/Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                android:text="@string/detail_statistics_heading" />
+
+            <LinearLayout
+                android:id="@+id/detailStatsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                style="@style/Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                android:text="@string/detail_about_heading" />
+
+            <TextView
+                android:id="@+id/detailDescription"
+                style="@style/Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detail_missing_description" />
+
+            <Button
+                android:id="@+id/detailDescriptionToggle"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/touch_min"
+                android:text="@string/detail_read_more"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/detailDisclaimer"
+                style="@style/Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                android:text="@string/detail_disclaimer" />
+        </LinearLayout>
+    </ScrollView>
+
+    <vn.edu.usth.cryptodashboard.core.ui.StateView
+        android:id="@+id/detailStateView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/detailToolbar"
+        app:layout_constraintBottom_toTopOf="@id/detailFooter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <vn.edu.usth.cryptodashboard.core.ui.AttributionView
+        android:id="@+id/detailFooter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
