@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -21,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.app.CryptoApp
 import vn.edu.usth.cryptodashboard.core.ui.AttributionView
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
@@ -40,18 +40,9 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
     private var shownErrorVersion = -1L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // TEMPORARY until CryptoApp provides the repository: MainActivity already hosts this
-        // Fragment, so without a host the screen stays empty instead of crashing the app.
-        // Use MarketPreviewActivity (debug) to run the Market screen until integration.
-        val host = requireActivity() as? MarketFeatureHost
-            ?: requireActivity().application as? MarketFeatureHost
-        if (host == null) {
-            Log.w(TAG, "No MarketDependencies yet; the Market screen needs CryptoApp.")
-            view.findViewById<View>(R.id.marketList).visibility = View.GONE
-            return
-        }
-        val dependencies = host.marketDependencies
-        model = ViewModelProvider(this, marketViewModelFactory(dependencies.marketRepository))
+        // Shared objects come from CryptoApp (05 section 6): repository, favorites, currency.
+        val app = requireActivity().application as CryptoApp
+        model = ViewModelProvider(this, marketViewModelFactory(app.marketRepository))
             .get(MarketViewModel::class.java)
         val list = view.findViewById<RecyclerView>(R.id.marketList)
         val refresh = view.findViewById<SwipeRefreshLayout>(R.id.marketRefresh)
@@ -63,8 +54,9 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
             MarketSortField.PRICE to view.findViewById<Chip>(R.id.marketSortPrice),
             MarketSortField.CHANGE_24H to view.findViewById<Chip>(R.id.marketSortChange),
         )
+        // Coin icons: null shows the placeholder until CryptoApp.coinImageLoader exists (C8).
         val adapter = CoinListAdapter(
-            dependencies.favoriteStore, viewLifecycleOwner, dependencies.coinImageLoader,
+            app.favoriteStore, viewLifecycleOwner, imageLoader = null,
             onCoinClick = { coinId ->
                 startActivity(Intent(requireContext(), CoinDetailActivity::class.java)
                     .putExtra(CoinDetailActivity.EXTRA_COIN_ID, coinId))
@@ -181,7 +173,7 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
             }
         }
         model.refreshing.observe(viewLifecycleOwner) { refresh.isRefreshing = it }
-        dependencies.currency.observe(viewLifecycleOwner) { model.setCurrency(it) }
+        app.currencySettings.currency.observe(viewLifecycleOwner) { model.setCurrency(it) }
     }
 
     override fun onDestroyView() {
@@ -207,7 +199,6 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
 
     private companion object {
         const val SEARCH_DELAY_MILLIS = 300L
-        const val TAG = "MarketListFragment"
     }
 }
 
