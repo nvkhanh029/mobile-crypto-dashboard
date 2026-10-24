@@ -1,9 +1,73 @@
 package vn.edu.usth.cryptodashboard.features.watchlist
 
+import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.app.CryptoApp
+import vn.edu.usth.cryptodashboard.core.ui.AttributionView
+import vn.edu.usth.cryptodashboard.core.ui.StateView
+import vn.edu.usth.cryptodashboard.core.ui.UiState
 
-/**
- * Temporary placeholder for Bảo Linh's Watchlist screen.
- */
-class WatchlistFragment : Fragment(R.layout.fragment_watchlist)
+class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
+
+    private lateinit var viewModel: WatchlistViewModel
+
+    // The shared objects live in CryptoApp (docs/05-interfaces.md section 6).
+    private val app: CryptoApp
+        get() = requireActivity().application as CryptoApp
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(
+            this,
+            watchlistViewModelFactory(app.marketRepository),
+        )[WatchlistViewModel::class.java]
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val recycler = view.findViewById<RecyclerView>(R.id.watchlistRecycler)
+        val stateView = view.findViewById<StateView>(R.id.watchlistStateView)
+        val attribution = view.findViewById<AttributionView>(R.id.watchlistAttribution)
+
+        app.favoriteStore.favoriteIds.observe(viewLifecycleOwner) { ids ->
+            viewModel.onFavoritesChanged(ids)
+        }
+
+        app.currencySettings.currency.observe(viewLifecycleOwner) { currency ->
+            viewModel.onCurrencyChanged(currency)
+        }
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            stateView.render(
+                state,
+                onRetryClick = { viewModel.refresh() },
+                // TODO: call (requireActivity() as? MarketTabNavigator)?.showMarketTab()
+                // after Hai's MarketTabNavigator is merged into main. An empty handler keeps the button.
+                onEmptyActionClick = { },
+            )
+
+            val hideList = state is UiState.Loading ||
+                    state is UiState.Empty ||
+                    (state is UiState.Error<*> && state.previousData == null)
+            recycler.visibility = if (hideList) View.GONE else View.VISIBLE
+
+            attribution.showUpdatedTime((state as? UiState.Success<*>)?.updatedAtMillis)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // onHiddenChanged is not called the first time the fragment is added.
+        viewModel.onScreenVisibleChanged(!isHidden)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        viewModel.onScreenVisibleChanged(!hidden)
+    }
+}
