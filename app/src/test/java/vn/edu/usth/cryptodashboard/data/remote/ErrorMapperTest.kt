@@ -98,4 +98,10 @@ class ErrorMapperTest {
     fun volleyErrorWithoutResponse_fallsBackToServerError() {
         assertEquals(AppError.ServerError, ErrorMapper.map(VolleyError()))
     }
+
+    @Test
+    fun unknownThrowable_mapsToServerError() {
+        // Any other failure, not a VolleyError and not a JSONException, is a server error.
+        assertEquals(AppError.ServerError, ErrorMapper.map(IllegalStateException()))
+    }
 }
