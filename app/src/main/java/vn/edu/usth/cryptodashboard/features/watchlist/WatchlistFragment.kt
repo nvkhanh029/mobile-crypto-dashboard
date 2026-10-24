@@ -43,14 +43,13 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
             stateView.render(
                 state,
                 onRetryClick = { viewModel.refresh() },
-                // Empty handler on purpose: the way to switch to the Market tab is not decided yet.
+                // TODO: call (requireActivity() as? MarketTabNavigator)?.showMarketTab() after Hai's PR is merged.
                 onEmptyActionClick = { },
             )
-            recycler.visibility = if (state is UiState.Empty || state is UiState.Loading) {
-                View.GONE
-            } else {
-                View.VISIBLE
-            }
+            val hideList = state is UiState.Loading ||
+                    state is UiState.Empty ||
+                    (state is UiState.Error<*> && state.previousData == null)
+            recycler.visibility = if (hideList) View.GONE else View.VISIBLE
             attribution.showUpdatedTime((state as? UiState.Success<*>)?.updatedAtMillis)
         }
     }
