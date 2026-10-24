@@ -2,8 +2,10 @@ package vn.edu.usth.cryptodashboard.app
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import vn.edu.usth.cryptodashboard.BuildConfig
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.favorite.FavoriteStore
 import vn.edu.usth.cryptodashboard.core.favorite.SharedPrefsFavoriteStore
@@ -27,8 +29,26 @@ import vn.edu.usth.cryptodashboard.domain.repository.MarketRepository
  *
  * Get it with `application as CryptoApp` in an Activity and
  * `requireActivity().application as CryptoApp` in a Fragment. `coinImageLoader` is added with C8.
+ *
+ * The data mode comes from `local.properties` through `BuildConfig` (`docs/fake-data.md` §5.1).
+ * Only fake data sources exist so far, so `USE_FAKE_DATA=false` stops the app at startup.
  */
 class CryptoApp : Application() {
+
+    /** Read in [onCreate], so an unknown `FAKE_SCENARIO` stops the app at startup. */
+    private lateinit var fakeScenario: Scenario
+    private val fakeDelayMs: Long = BuildConfig.FAKE_DELAY_MS
+
+    override fun onCreate() {
+        super.onCreate()
+        check(BuildConfig.USE_FAKE_DATA) {
+            "USE_FAKE_DATA=false is not supported yet: the remote data sources are not written. " +
+                "Remove the line or set USE_FAKE_DATA=true in local.properties."
+        }
+        fakeScenario = Scenario.fromName(BuildConfig.FAKE_SCENARIO)
+        Log.i(TAG, "Data source: FAKE")
+        Log.i(TAG, "Fake scenario: ${fakeScenario.name.lowercase()}, delay $fakeDelayMs ms")
+    }
 
     /**
      * The single `CurrencySettings`. It still goes through the deprecated `getInstance` so that
@@ -45,8 +65,8 @@ class CryptoApp : Application() {
 
     val marketRepository: MarketRepository by lazy {
         MarketRepositoryImpl(
-            MarketListFakeDataSource(fakeReader, FAKE_SCENARIO, FAKE_DELAY_MS, executor, mainThread),
-            CoinsByIdsFakeDataSource(fakeReader, FAKE_SCENARIO, FAKE_DELAY_MS, executor, mainThread),
+            MarketListFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
+            CoinsByIdsFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
             rateLimitGate,
             mainThread,
             clock,
@@ -55,7 +75,7 @@ class CryptoApp : Application() {
 
     val coinDetailRepository: CoinDetailRepository by lazy {
         CoinDetailRepositoryImpl(
-            CoinDetailFakeDataSource(fakeReader, FAKE_SCENARIO, FAKE_DELAY_MS, executor, mainThread),
+            CoinDetailFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
             rateLimitGate,
             mainThread,
             clock,
@@ -64,7 +84,7 @@ class CryptoApp : Application() {
 
     val chartRepository: ChartRepository by lazy {
         ChartRepositoryImpl(
-            ChartFakeDataSource(fakeReader, FAKE_SCENARIO, FAKE_DELAY_MS, executor, mainThread),
+            ChartFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
             rateLimitGate,
             mainThread,
             clock,
@@ -80,10 +100,6 @@ class CryptoApp : Application() {
 
     private companion object {
         const val FAVORITES_PREFERENCES = "favorites"
-
-        // TEMPORARY: fixed until the build reads FAKE_SCENARIO and FAKE_DELAY_MS from
-        // local.properties into BuildConfig (`docs/fake-data.md`, `docs/03-architecture.md` §10).
-        val FAKE_SCENARIO = Scenario.NORMAL
-        const val FAKE_DELAY_MS = 800L
+        const val TAG = "CryptoApp"
     }
 }
