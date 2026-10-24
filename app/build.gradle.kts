@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.material)
+    implementation(libs.mpandroidchart)
     implementation(libs.volley)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.junit)

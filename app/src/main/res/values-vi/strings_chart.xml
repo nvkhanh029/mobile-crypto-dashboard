@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chart strings (SCR-05). Owner: Duy. Vietnamese. -->
+<resources>
+    <string name="chart_content_description">Biểu đồ giá</string>
+    <string name="chart_not_enough_data">Không đủ dữ liệu</string>
+</resources>

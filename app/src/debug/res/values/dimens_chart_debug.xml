@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug-only sizes for the chart sandbox. -->
+<resources>
+    <!-- Makes the sandbox page scrollable, like the Coin Detail screen that hosts the chart. -->
+    <dimen name="chart_sandbox_scroll_extra">360dp</dimen>
+</resources>
