@@ -10,6 +10,7 @@ import vn.edu.usth.cryptodashboard.app.CryptoApp
 import vn.edu.usth.cryptodashboard.core.ui.AttributionView
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
+import vn.edu.usth.cryptodashboard.core.ui.MarketTabNavigator
 
 class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
 
@@ -46,9 +47,7 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
             stateView.render(
                 state,
                 onRetryClick = { viewModel.refresh() },
-                // TODO: call (requireActivity() as? MarketTabNavigator)?.showMarketTab()
-                // after Hai's MarketTabNavigator is merged into main. An empty handler keeps the button.
-                onEmptyActionClick = { },
+                onEmptyActionClick = { (activity as? MarketTabNavigator)?.showMarketTab() },
             )
 
             val hideList = state is UiState.Loading ||
