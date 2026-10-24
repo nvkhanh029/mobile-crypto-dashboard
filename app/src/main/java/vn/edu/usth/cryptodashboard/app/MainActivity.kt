@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer
 import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySelectorView
-import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.ui.ExplanationDialog
 import vn.edu.usth.cryptodashboard.features.marketlist.MarketListFragment
 import vn.edu.usth.cryptodashboard.features.watchlist.WatchlistFragment
@@ -21,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewSwitch: MaterialButtonToggleGroup
     private lateinit var currencySelector: CurrencySelectorView
 
-    private val currencySettings by lazy { CurrencySettings.getInstance(this) }
+    private val currencySettings by lazy { (application as CryptoApp).currencySettings }
 
     private var selectedTab = R.id.tabMarket
 
