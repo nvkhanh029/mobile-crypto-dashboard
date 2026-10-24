@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import vn.edu.usth.cryptodashboard.R
-import vn.edu.usth.cryptodashboard.core.favorite.FavoriteStore
+import vn.edu.usth.cryptodashboard.app.CryptoApp
 import vn.edu.usth.cryptodashboard.core.ui.AttributionView
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
@@ -15,17 +15,17 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
 
     private lateinit var viewModel: WatchlistViewModel
 
-    // TODO: replace this line with the way the star button gets the FavoriteStore.
-    private val favoriteStore: FavoriteStore
-        get() = TODO("Paste how the star button gets FavoriteStore")
+    // The shared objects live in CryptoApp (docs/05-interfaces.md section 6).
+    private val app: CryptoApp
+        get() = requireActivity().application as CryptoApp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TEMPORARY repository until CryptoApp exists.
         viewModel = ViewModelProvider(
             this,
-            watchlistViewModelFactory(TemporaryMarketRepository()),
+            watchlistViewModelFactory(app.marketRepository),
         )[WatchlistViewModel::class.java]
+        app.favoriteStore.add("bitcoin") // TEMP for testing, DELETE before commit
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,21 +35,28 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
         val stateView = view.findViewById<StateView>(R.id.watchlistStateView)
         val attribution = view.findViewById<AttributionView>(R.id.watchlistAttribution)
 
-        favoriteStore.favoriteIds.observe(viewLifecycleOwner) { ids ->
+        app.favoriteStore.favoriteIds.observe(viewLifecycleOwner) { ids ->
             viewModel.onFavoritesChanged(ids)
+        }
+
+        app.currencySettings.currency.observe(viewLifecycleOwner) { currency ->
+            viewModel.onCurrencyChanged(currency)
         }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             stateView.render(
                 state,
                 onRetryClick = { viewModel.refresh() },
-                // TODO: call (requireActivity() as? MarketTabNavigator)?.showMarketTab() after Hai's PR is merged.
+                // TODO: call (requireActivity() as? MarketTabNavigator)?.showMarketTab()
+                // after Hai's MarketTabNavigator is merged into main. An empty handler keeps the button.
                 onEmptyActionClick = { },
             )
+
             val hideList = state is UiState.Loading ||
                     state is UiState.Empty ||
                     (state is UiState.Error<*> && state.previousData == null)
             recycler.visibility = if (hideList) View.GONE else View.VISIBLE
+
             attribution.showUpdatedTime((state as? UiState.Success<*>)?.updatedAtMillis)
         }
     }
