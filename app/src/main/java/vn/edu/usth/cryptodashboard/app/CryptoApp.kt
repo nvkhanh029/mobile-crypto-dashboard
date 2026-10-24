@@ -3,12 +3,17 @@ package vn.edu.usth.cryptodashboard.app
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.BasicNetwork
+import com.android.volley.toolbox.HurlStack
+import com.android.volley.toolbox.NoCache
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import vn.edu.usth.cryptodashboard.BuildConfig
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.favorite.FavoriteStore
 import vn.edu.usth.cryptodashboard.core.favorite.SharedPrefsFavoriteStore
+import vn.edu.usth.cryptodashboard.core.image.CoinImageLoader
 import vn.edu.usth.cryptodashboard.data.fake.AssetFakeFileReader
 import vn.edu.usth.cryptodashboard.data.fake.ChartFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.CoinDetailFakeDataSource
@@ -28,7 +33,7 @@ import vn.edu.usth.cryptodashboard.domain.repository.MarketRepository
  * Creates the shared objects once and exposes them as properties (`docs/05-interfaces.md` §6).
  *
  * Get it with `application as CryptoApp` in an Activity and
- * `requireActivity().application as CryptoApp` in a Fragment. `coinImageLoader` is added with C8.
+ * `requireActivity().application as CryptoApp` in a Fragment.
  *
  * The data mode comes from `local.properties` through `BuildConfig` (`docs/fake-data.md` §5.1).
  * Only fake data sources exist so far, so `USE_FAKE_DATA=false` stops the app at startup.
@@ -91,12 +96,20 @@ class CryptoApp : Application() {
         )
     }
 
+    /** Coin icons, in memory only, on the shared queue (contract C8). */
+    val coinImageLoader: CoinImageLoader by lazy { CoinImageLoader(requestQueue) }
+
     // Used only by the data layer, never exposed (`docs/05-interfaces.md` §6).
     private val clock: () -> Long = { System.currentTimeMillis() }
     private val executor: ExecutorService by lazy { Executors.newSingleThreadExecutor() }
     private val mainThread by lazy { HandlerMainThreadPoster() }
     private val fakeReader by lazy { AssetFakeFileReader(assets) }
     private val rateLimitGate by lazy { RateLimitGate(clock) }
+
+    /** `NoCache`: no response is written to disk (`docs/03-architecture.md` §8.1, D7). */
+    private val requestQueue: RequestQueue by lazy {
+        RequestQueue(NoCache(), BasicNetwork(HurlStack())).also { it.start() }
+    }
 
     private companion object {
         const val FAVORITES_PREFERENCES = "favorites"
