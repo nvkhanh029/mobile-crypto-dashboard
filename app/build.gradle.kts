@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.material)
     implementation(libs.volley)
+    implementation(libs.androidx.swiperefreshlayout)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.junit)
     testImplementation(libs.org.json)
