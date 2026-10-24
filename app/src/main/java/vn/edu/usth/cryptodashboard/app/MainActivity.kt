@@ -12,10 +12,11 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySelectorView
 import vn.edu.usth.cryptodashboard.core.ui.ExplanationDialog
+import vn.edu.usth.cryptodashboard.core.ui.MarketTabNavigator
 import vn.edu.usth.cryptodashboard.features.marketlist.MarketListFragment
 import vn.edu.usth.cryptodashboard.features.watchlist.WatchlistFragment
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MarketTabNavigator {
 
     private lateinit var viewSwitch: MaterialButtonToggleGroup
     private lateinit var currencySelector: CurrencySelectorView
@@ -63,6 +64,10 @@ class MainActivity : AppCompatActivity() {
         })
         currencySelector.onCurrencySelected = currencySettings::setCurrency
         currencySelector.showCurrency(currencySettings.currentCurrency())
+    }
+
+    override fun showMarketTab() {
+        viewSwitch.check(R.id.tabMarket)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
