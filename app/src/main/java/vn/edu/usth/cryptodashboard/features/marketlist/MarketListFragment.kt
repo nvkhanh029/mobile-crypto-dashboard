@@ -54,9 +54,8 @@ class MarketListFragment : Fragment(R.layout.fragment_market_list) {
             MarketSortField.PRICE to view.findViewById<Chip>(R.id.marketSortPrice),
             MarketSortField.CHANGE_24H to view.findViewById<Chip>(R.id.marketSortChange),
         )
-        // Coin icons: null shows the placeholder until CryptoApp.coinImageLoader exists (C8).
         val adapter = CoinListAdapter(
-            app.favoriteStore, viewLifecycleOwner, imageLoader = null,
+            app.favoriteStore, viewLifecycleOwner, imageLoader = app.coinImageLoader,
             onCoinClick = { coinId ->
                 startActivity(Intent(requireContext(), CoinDetailActivity::class.java)
                     .putExtra(CoinDetailActivity.EXTRA_COIN_ID, coinId))
