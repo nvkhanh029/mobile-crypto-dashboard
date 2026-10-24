@@ -25,7 +25,6 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
             this,
             watchlistViewModelFactory(app.marketRepository),
         )[WatchlistViewModel::class.java]
-        app.favoriteStore.add("bitcoin") // TEMP for testing, DELETE before commit
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
