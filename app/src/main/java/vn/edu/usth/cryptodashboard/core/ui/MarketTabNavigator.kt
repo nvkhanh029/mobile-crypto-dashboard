@@ -5,6 +5,11 @@ package vn.edu.usth.cryptodashboard.core.ui
  *
  * `MainActivity` implements this contract; the Watchlist empty state calls
  * [showMarketTab] instead of knowing about `MainActivity` or its pill toggle.
+ *
+ * From a Fragment, use the safe cast so a host that is not `MainActivity` does not crash:
+ * `(activity as? MarketTabNavigator)?.showMarketTab()`.
+ *
+ * Do not use a hard cast (`activity as MarketTabNavigator`).
  */
 interface MarketTabNavigator {
 
