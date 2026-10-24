@@ -16,48 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chartSandboxNormal"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/touch_min"
-        android:layout_marginTop="@dimen/space_s"
-        android:layout_marginEnd="@dimen/space_xs"
-        android:paddingStart="@dimen/space_s"
-        android:paddingEnd="@dimen/space_s"
-        android:text="@string/chart_sandbox_normal"
-        app:layout_constraintEnd_toStartOf="@id/chartSandboxShort"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartSandboxTitle" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chartSandboxShort"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/touch_min"
-        android:layout_marginStart="@dimen/space_xs"
-        android:layout_marginEnd="@dimen/space_xs"
-        android:paddingStart="@dimen/space_s"
-        android:paddingEnd="@dimen/space_s"
-        android:text="@string/chart_sandbox_short"
-        app:layout_constraintEnd_toStartOf="@id/chartSandboxError"
-        app:layout_constraintStart_toEndOf="@id/chartSandboxNormal"
-        app:layout_constraintTop_toTopOf="@id/chartSandboxNormal" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chartSandboxError"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/touch_min"
-        android:layout_marginStart="@dimen/space_xs"
-        android:paddingStart="@dimen/space_s"
-        android:paddingEnd="@dimen/space_s"
-        android:text="@string/chart_sandbox_error"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/chartSandboxShort"
-        app:layout_constraintTop_toTopOf="@id/chartSandboxNormal" />
-
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/chartSandboxCurrencyGroup"
         android:layout_width="0dp"
@@ -66,7 +24,7 @@
         app:checkedButton="@id/chartSandboxUsd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartSandboxNormal"
+        app:layout_constraintTop_toBottomOf="@id/chartSandboxTitle"
         app:selectionRequired="true"
         app:singleSelection="true">
 

@@ -10,7 +10,7 @@ import vn.edu.usth.cryptodashboard.domain.repository.ChartRepository
  * Factory of [PriceChartViewModel] (docs/05-interfaces.md section 6).
  *
  * Only the chart feature creates it, so nobody edits another member's file to register the chart
- * ViewModel. C7 (CurrencySettings) will pass the saved currency as [initialCurrency].
+ * ViewModel. [initialCurrency] is the currency already saved in the shared `CurrencySettings`.
  */
 fun priceChartViewModelFactory(
     coinId: String,

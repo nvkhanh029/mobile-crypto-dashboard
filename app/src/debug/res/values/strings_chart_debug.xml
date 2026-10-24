@@ -6,9 +6,6 @@
 <resources>
     <string name="chart_sandbox_title" translatable="false">Chart sandbox: %1$s</string>
     <string name="chart_sandbox_activity_label" translatable="false">Chart sandbox</string>
-    <string name="chart_sandbox_normal" translatable="false">Normal</string>
-    <string name="chart_sandbox_short" translatable="false">Short chart</string>
-    <string name="chart_sandbox_error" translatable="false">Error</string>
     <string name="chart_sandbox_usd" translatable="false">USD</string>
     <string name="chart_sandbox_vnd" translatable="false">VND</string>
 </resources>

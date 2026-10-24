@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
+import vn.edu.usth.cryptodashboard.app.CryptoApp
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
 import vn.edu.usth.cryptodashboard.domain.model.Timeframe
@@ -59,18 +60,30 @@ class PriceChartFragment : Fragment(R.layout.fragment_price_chart) {
         timeframeGroup = chips
         priceChart = MpAndroidPriceChart(chart)
 
-        // TODO(chart): replace with (requireActivity().application as CryptoApp).chartRepository
-        //  when Vân Khánh's CryptoApp exposes chartRepository. See TemporaryChartRepository.
-        val repository = TemporaryChartRepository(requireContext().applicationContext)
+        // One shared instance from CryptoApp (contract C5, docs/05-interfaces.md section 6).
+        val app = requireActivity().application as CryptoApp
 
         viewModel = ViewModelProvider(
             this,
-            priceChartViewModelFactory(coinId, repository, TemporaryChartConfig.initialCurrency),
+            priceChartViewModelFactory(
+                coinId = coinId,
+                repository = app.chartRepository,
+                initialCurrency = app.currencySettings.currentCurrency(),
+            ),
         )[PriceChartViewModel::class.java]
 
         setUpTimeframeChips()
         setUpChartTouch()
+        observeCurrency()
         observeViewModel()
+    }
+
+    /** FR-CUR-05: a currency change in the top bar reloads the chart with Loading. */
+    private fun observeCurrency() {
+        val app = requireActivity().application as CryptoApp
+        app.currencySettings.currency.observe(viewLifecycleOwner) { currency ->
+            viewModel.setCurrency(currency)
+        }
     }
 
     private fun setUpTimeframeChips() {
