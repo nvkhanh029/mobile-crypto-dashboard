@@ -94,16 +94,24 @@ The errors go through the repository like real ones. In particular, after `RATE_
 ## 5. How to use it
 
 ### 5.1 Selecting the mode
-Two entries in the developer's own `local.properties` (not committed):
+Entries in the developer's own `local.properties` at the repository root (not committed):
 
 ```
-USE_FAKE_DATA=true            # true (default) or false
-FAKE_SCENARIO=normal          # see list below
-FAKE_DELAY_MS=800             # simulated response time, to see loading states
-CG_API_KEY=                   # only needed when USE_FAKE_DATA=false
+# true (default) or false
+USE_FAKE_DATA=true
+# see the list below
+FAKE_SCENARIO=normal
+# simulated response time in milliseconds, to see loading states
+FAKE_DELAY_MS=800
+# only needed when USE_FAKE_DATA=false
+CG_API_KEY=
 ```
 
-If `local.properties` or a value is missing (as on CI), the defaults are `USE_FAKE_DATA=true`, `FAKE_SCENARIO=normal`, `FAKE_DELAY_MS=800`. The build must not fail without a key.
+A comment must be on its own line: in `local.properties`, text after a value (such as `# ...`) becomes part of the value.
+
+If `local.properties` or a value is missing or empty (as on CI), the defaults are `USE_FAKE_DATA=true`, `FAKE_SCENARIO=normal`, `FAKE_DELAY_MS=800`. The build must not fail without a key. A value that cannot be read (`USE_FAKE_DATA` other than `true`/`false`, `FAKE_DELAY_MS` not a whole number of 0 or more, `FAKE_SCENARIO` with characters other than letters, digits and `_`) stops the build with a message naming the key.
+
+The values are copied into `BuildConfig` when the app is built, so after changing `local.properties` run the app again.
 
 The value of `FAKE_SCENARIO` is the name of the scenario in lower case (`rate_limited` is the scenario `RATE_LIMITED` of section 4). A value that matches no scenario stops the app at startup with the message `Unknown FAKE_SCENARIO: …`; it never falls back to `normal`.
 
