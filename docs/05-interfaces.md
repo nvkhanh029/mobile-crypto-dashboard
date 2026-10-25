@@ -15,7 +15,7 @@
 - **Required fields:** `id`, `symbol` and `name` of a coin, and `prices` of a chart response; every other field is nullable. What a mapper does with a missing or wrong value is in section 4.
 - **Threading rule (C1):** every repository callback, `onSuccess` and `onError`, is called on the main thread. The caller can update LiveData and Views directly. Network and JSON work happen on other threads inside the data layer (`03` §4, §5).
 - A repository call cannot be cancelled. A ViewModel that sends a new request ignores the answer of an older one (`03` §6, stale responses).
-- **This file does not copy signatures that exist in code.** The shared UI parts (`UiState`, `StateView`, `AttributionView`, the explanation dialog, the formatters), `CurrencySettings` and `FavoriteStore` are defined by their owners in their own files (C2, C3, C7); read the code on `main`. C5 and C6 are complete in `03` §12.
+- **This file does not copy signatures that exist in code.** The shared UI parts (`UiState`, `StateView`, `AttributionView`, the explanation dialog, the formatters), `CurrencySettings`, `FavoriteStore` and the coin row with its adapter are defined by their owners in their own files (C2, C3, C4, C7); read the code on `main`. The contract of the coin row (C4) is in `03` §12. C5 and C6 are complete in `03` §12.
 
 ---
 
