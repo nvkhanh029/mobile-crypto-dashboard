@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/detailToolbarTitle"
-            style="@style/Body"
+            style="@style/TitleBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -43,14 +43,14 @@
             android:id="@+id/detailCurrencySelector"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/touch_min"
-            android:minWidth="56dp" />
+            android:minWidth="@dimen/touch_min" />
 
         <vn.edu.usth.cryptodashboard.core.favorite.FavoriteButton
             android:id="@+id/detailFavoriteButton"
             android:layout_width="@dimen/touch_min"
             android:layout_height="@dimen/touch_min"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/detail_favorite_add"
+            android:contentDescription="@string/favorite_add"
             android:padding="@dimen/space_s"
             android:src="@drawable/ic_star_outline" />
     </LinearLayout>
@@ -72,40 +72,65 @@
             android:orientation="vertical"
             android:padding="@dimen/space_m">
 
-            <TextView
-                android:id="@+id/detailCoinName"
-                style="@style/Body"
+            <LinearLayout
+                android:id="@+id/detailCoinHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/detail_missing_value" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/detailCoinSymbol"
-                style="@style/Caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/detail_missing_value" />
+                <com.android.volley.toolbox.NetworkImageView
+                    android:id="@+id/detailCoinIcon"
+                    android:layout_width="@dimen/coin_icon_size"
+                    android:layout_height="@dimen/coin_icon_size"
+                    android:scaleType="fitCenter" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_s"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/detailCoinName"
+                        style="@style/RowTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="@string/detail_missing_value" />
+
+                    <TextView
+                        android:id="@+id/detailCoinSymbol"
+                        style="@style/RowSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="@string/detail_missing_value" />
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/detailCurrentPrice"
-                style="@style/Body"
+                style="@style/PriceLarge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_s"
                 android:text="@string/detail_missing_value" />
 
-            <TextView
+            <vn.edu.usth.cryptodashboard.core.ui.PriceChangeLabel
                 android:id="@+id/detailPriceChange"
-                style="@style/Caption"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/detail_missing_value" />
+                android:layout_marginTop="@dimen/space_xs" />
 
             <!-- Reserved for PriceChartFragment.newInstance(coinId) after PR #9 merges. -->
             <FrameLayout
                 android:id="@+id/detailChartContainer"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="@dimen/chart_height"
                 android:layout_marginTop="@dimen/space_m" />
 
             <TextView

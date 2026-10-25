@@ -38,8 +38,10 @@ class CoinDetailViewModel(
             return
         }
 
-        // Never leave values from the previous currency visible while the new one loads.
-        _uiState.value = UiState.Loading
+        // Keep same-currency content visible during refresh; currency changes start clean.
+        if (lastContent == null || lastSuccessfulCurrency != currency) {
+            _uiState.value = UiState.Loading
+        }
         repository.getCoinDetail(coinId, currency, object : RepositoryCallback<CoinDetail> {
             override fun onSuccess(data: CoinDetail, fetchedAtMillis: Long) {
                 if (request != requestVersion) return

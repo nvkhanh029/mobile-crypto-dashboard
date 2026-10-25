@@ -1,7 +1,6 @@
 package vn.edu.usth.cryptodashboard.features.detail
 
 import android.os.Bundle
-import android.text.Html
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -10,14 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import com.android.volley.toolbox.NetworkImageView
 import com.google.android.material.snackbar.Snackbar
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.app.CryptoApp
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySelectorView
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.favorite.FavoriteButton
+import vn.edu.usth.cryptodashboard.core.format.PriceFormatter
 import vn.edu.usth.cryptodashboard.core.ui.AttributionView
 import vn.edu.usth.cryptodashboard.core.ui.ExplanationDialog
+import vn.edu.usth.cryptodashboard.core.ui.PriceChangeLabel
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
 import vn.edu.usth.cryptodashboard.domain.model.CoinDetail
@@ -37,15 +39,17 @@ class CoinDetailActivity : AppCompatActivity() {
     private lateinit var stateView: StateView
     private lateinit var contentGroup: LinearLayout
     private lateinit var toolbarTitle: TextView
+    private lateinit var coinIcon: NetworkImageView
     private lateinit var coinName: TextView
     private lateinit var coinSymbol: TextView
     private lateinit var currentPrice: TextView
-    private lateinit var priceChange: TextView
+    private lateinit var priceChange: PriceChangeLabel
     private lateinit var statsContainer: LinearLayout
     private lateinit var descriptionText: TextView
     private lateinit var descriptionToggle: Button
     private lateinit var favoriteButton: FavoriteButton
     private lateinit var currencySelector: CurrencySelectorView
+    private lateinit var app: CryptoApp
     private var selectedCurrency = Currency.USD
     private var descriptionExpanded = false
     private var currentDescription: String = ""
@@ -64,6 +68,7 @@ class CoinDetailActivity : AppCompatActivity() {
         stateView = findViewById(R.id.detailStateView)
         contentGroup = findViewById(R.id.detailContent)
         toolbarTitle = findViewById(R.id.detailToolbarTitle)
+        coinIcon = findViewById(R.id.detailCoinIcon)
         coinName = findViewById(R.id.detailCoinName)
         coinSymbol = findViewById(R.id.detailCoinSymbol)
         currentPrice = findViewById(R.id.detailCurrentPrice)
@@ -78,8 +83,18 @@ class CoinDetailActivity : AppCompatActivity() {
         toolbarTitle.setText(R.string.detail_title)
         findViewById<View>(R.id.detailBackButton).setOnClickListener { finish() }
 
-        val app = application as CryptoApp
-        favoriteButton.bind(coinId, app.favoriteStore, this)
+        app = application as CryptoApp
+        favoriteButton.onLimitReached = {
+            Snackbar.make(findViewById(R.id.detailRoot), R.string.favorite_full, Snackbar.LENGTH_LONG).show()
+        }
+        if (coinId.isBlank()) {
+            favoriteButton.visibility = View.GONE
+            favoriteButton.isEnabled = false
+        } else {
+            favoriteButton.isEnabled = true
+            favoriteButton.visibility = View.VISIBLE
+            favoriteButton.bind(coinId, app.favoriteStore, this)
+        }
         findViewById<AttributionView>(R.id.detailFooter).showUpdatedTime(null)
 
         // TODO (after PR #9 merges): host PriceChartFragment.newInstance(coinId) in
@@ -112,7 +127,7 @@ class CoinDetailActivity : AppCompatActivity() {
                             findViewById(R.id.detailRoot),
                             R.string.detail_refresh_failed,
                             Snackbar.LENGTH_LONG,
-                        ).setAction(R.string.detail_retry) { viewModel.retry() }.show()
+                        ).setAction(R.string.retry) { viewModel.retry() }.show()
                     }
                 }
                 is UiState.Empty -> contentGroup.visibility = View.GONE
@@ -132,8 +147,14 @@ class CoinDetailActivity : AppCompatActivity() {
         coinSymbol.text = coin.symbol.uppercase().ifBlank {
             getString(R.string.detail_missing_value)
         }
-        currentPrice.text = CoinDetailStatsMapper.formatPrice(coin.currentPrice, selectedCurrency)
-        priceChange.text = coin.priceChangePercentage24h.toSignedPercent()
+        coinIcon.setDefaultImageResId(R.drawable.ic_coin_placeholder)
+        coinIcon.setErrorImageResId(R.drawable.ic_coin_placeholder)
+        coinIcon.setImageUrl(coin.imageUrl, app.coinImageLoader)
+        currentPrice.text = PriceFormatter.format(
+            coin.currentPrice,
+            selectedCurrency,
+        )
+        priceChange.setChangePercent(coin.priceChangePercentage24h)
         renderStats(content)
         renderDescription(coin)
     }
@@ -141,23 +162,21 @@ class CoinDetailActivity : AppCompatActivity() {
     private fun renderStats(content: CoinDetailContent) {
         statsContainer.removeAllViews()
         content.stats.forEachIndexed { index, row ->
-            val labelRes = when (row.key) {
-                CoinDetailStatKey.MARKET_CAP -> R.string.detail_market_cap
-                CoinDetailStatKey.VOLUME_24H -> R.string.detail_volume_24h
-                CoinDetailStatKey.CIRCULATING_SUPPLY -> R.string.detail_circulating_supply
-                CoinDetailStatKey.TOTAL_SUPPLY -> R.string.detail_total_supply
-                CoinDetailStatKey.MAX_SUPPLY -> R.string.detail_max_supply
-                CoinDetailStatKey.ALL_TIME_HIGH -> R.string.detail_all_time_high
-                CoinDetailStatKey.ALL_TIME_LOW -> R.string.detail_all_time_low
-            }
-            val explanationRes = when (row.key) {
-                CoinDetailStatKey.MARKET_CAP -> R.string.detail_stat_market_cap_explanation
-                CoinDetailStatKey.VOLUME_24H -> R.string.detail_stat_volume_24h_explanation
-                CoinDetailStatKey.CIRCULATING_SUPPLY -> R.string.detail_stat_circulating_supply_explanation
-                CoinDetailStatKey.TOTAL_SUPPLY -> R.string.detail_stat_total_supply_explanation
-                CoinDetailStatKey.MAX_SUPPLY -> R.string.detail_stat_max_supply_explanation
-                CoinDetailStatKey.ALL_TIME_HIGH -> R.string.detail_stat_all_time_high_explanation
-                CoinDetailStatKey.ALL_TIME_LOW -> R.string.detail_stat_all_time_low_explanation
+            val (labelRes, explanationRes) = when (row.key) {
+                CoinDetailStatKey.MARKET_CAP ->
+                    R.string.dialog_statistic_market_cap_title to R.string.dialog_statistic_market_cap_text
+                CoinDetailStatKey.VOLUME_24H ->
+                    R.string.dialog_statistic_volume_24h_title to R.string.dialog_statistic_volume_24h_text
+                CoinDetailStatKey.CIRCULATING_SUPPLY ->
+                    R.string.dialog_statistic_circulating_supply_title to R.string.dialog_statistic_circulating_supply_text
+                CoinDetailStatKey.TOTAL_SUPPLY ->
+                    R.string.dialog_statistic_total_supply_title to R.string.dialog_statistic_total_supply_text
+                CoinDetailStatKey.MAX_SUPPLY ->
+                    R.string.dialog_statistic_max_supply_title to R.string.dialog_statistic_max_supply_text
+                CoinDetailStatKey.ALL_TIME_HIGH ->
+                    R.string.dialog_statistic_ath_title to R.string.dialog_statistic_ath_text
+                CoinDetailStatKey.ALL_TIME_LOW ->
+                    R.string.dialog_statistic_atl_title to R.string.dialog_statistic_atl_text
             }
             val label = getString(labelRes)
             val rowLayout = LinearLayout(this).apply {
@@ -167,32 +186,27 @@ class CoinDetailActivity : AppCompatActivity() {
                 setPadding(resources.getDimensionPixelSize(R.dimen.space_s), 0,
                     resources.getDimensionPixelSize(R.dimen.space_s), 0)
                 setOnClickListener {
-                    ExplanationDialog.show(this@CoinDetailActivity, label, getString(explanationRes))
+                    ExplanationDialog.show(this@CoinDetailActivity, labelRes, explanationRes)
                 }
-                contentDescription = getString(R.string.detail_content_desc_explain_stat, label)
+                contentDescription = getString(R.string.content_desc_explain_statistic, label)
                 isClickable = true
                 isFocusable = true
-                foreground = androidx.core.content.ContextCompat.getDrawable(
-                    this@CoinDetailActivity, android.R.drawable.list_selector_background,
-                )
             }
             val labelView = TextView(this).apply {
                 setText(labelRes)
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+                setTextAppearance(R.style.StatLabel)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.END
             }
             val infoView = TextView(this).apply {
                 text = getString(R.string.detail_info_symbol)
-                contentDescription = getString(R.string.detail_content_desc_explain_stat, label)
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+                contentDescription = getString(R.string.content_desc_explain_statistic, label)
+                setTextAppearance(R.style.Body)
                 setPadding(resources.getDimensionPixelSize(R.dimen.space_s), 0,
                     resources.getDimensionPixelSize(R.dimen.space_s), 0)
             }
             val valueView = TextView(this).apply {
                 text = row.value
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
+                setTextAppearance(R.style.StatValue)
                 gravity = android.view.Gravity.END or android.view.Gravity.CENTER_VERTICAL
             }
             rowLayout.addView(labelView)
@@ -206,11 +220,9 @@ class CoinDetailActivity : AppCompatActivity() {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         resources.getDimensionPixelSize(R.dimen.divider_thickness),
                     )
-                    val typedValue = android.util.TypedValue()
-                    theme.resolveAttribute(com.google.android.material.R.attr.colorOutlineVariant, typedValue, true)
-                    setBackgroundColor(if (typedValue.resourceId != 0) {
-                        androidx.core.content.ContextCompat.getColor(this@CoinDetailActivity, typedValue.resourceId)
-                    } else typedValue.data)
+                    setBackgroundColor(
+                        androidx.core.content.ContextCompat.getColor(this@CoinDetailActivity, R.color.divider),
+                    )
                 }
                 statsContainer.addView(divider)
             }
@@ -219,9 +231,8 @@ class CoinDetailActivity : AppCompatActivity() {
 
     private fun renderDescription(coin: CoinDetail) {
         currentDescription = coin.description
-            ?.let { Html.fromHtml(it, Html.FROM_HTML_MODE_LEGACY).toString().trim() }
-            .orEmpty()
-            .ifBlank { getString(R.string.detail_missing_description) }
+            ?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.detail_missing_description)
         descriptionExpanded = false
         descriptionText.text = currentDescription
         descriptionText.maxLines = 4
@@ -247,10 +258,4 @@ class CoinDetailActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun Double?.toSignedPercent(): String {
-        if (this == null || !isFinite()) return getString(R.string.detail_missing_value)
-        val sign = if (this >= 0.0) "+" else ""
-        val number = java.math.BigDecimal.valueOf(this).stripTrailingZeros().toPlainString()
-        return getString(R.string.detail_percent_value, sign, number)
-    }
 }
