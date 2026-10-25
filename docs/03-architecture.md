@@ -77,7 +77,8 @@ data/
                      (market list, coins by ID, coin detail, chart)         Vân Khánh
   mapper/            JSON mappers (CoinMapper, CoinDetailMapper,
                      ChartMapper), used by remote and fake                  Vân Khánh
-  remote/            remote data sources, CoinGeckoRequest, ErrorMapper     Vân Khánh
+  remote/            remote data sources, CoinGeckoRequest                  Vân Khánh
+                     ErrorMapper and its unit test                          Hải
   fake/              fake data sources (read JSON from assets/fake)         Vân Khánh
   repository/        repository implementations, RefreshPolicy              Vân Khánh
 features/
@@ -217,18 +218,19 @@ Other classes receive what they need from `CryptoApp` (manual dependency injecti
 ### 8.3 Errors (FR-ERR)
 `ErrorMapper` turns every failure of the remote data source into one `AppError` with a category from `01`: no connection, timeout, rate limited, server error, request rejected, invalid data. This table is the single place where the mapping is defined; `05-interfaces.md` only refers to it. The fake data source creates the same `AppError` directly (it has no Volley error to map).
 
-**Rule: status first, class second.** If the Volley error carries a network response (`error.networkResponse != null`), classify by its HTTP status code: 429 → rate limited, 5xx → server error, any other 4xx → request rejected. Only when there is no response, classify by the kind of failure. `ErrorMapper` never reads the response body (CoinGecko error bodies come in two different shapes, `{"error":"coin not found"}` and `{"status":{"error_code":10002,...}}`, and the documentation gives no example of either) and never logs or shows the message of a `JSONException`, because that message can contain an excerpt of the data.
+**Rule: status first, class second.** If the Volley error carries a network response (`error.networkResponse != null`), classify by its HTTP status code: 429 → rate limited, 5xx → server error, any other 4xx → request rejected. Only when there is no response, classify by the kind of failure. A failure that matches no row of the table is mapped to server error. `ErrorMapper` never reads the response body (CoinGecko error bodies come in two different shapes, `{"error":"coin not found"}` and `{"status":{"error_code":10002,...}}`, and the documentation gives no example of either) and never logs or shows the message of a `JSONException`, because that message can contain an excerpt of the data.
 
 | Situation | What Volley gives | `AppError` category | Evidence |
 |---|---|---|---|
-| Airplane mode / no network | `NoConnectionError` | No connection | Observed in S2 |
+| Airplane mode / no network | `NoConnectionError` (a subclass of `NetworkError`; any `NetworkError` without a response is treated the same) | No connection | Observed in S2 |
 | TLS failure (certificate not trusted) | `NoConnectionError` | No connection (known limitation, D16) | Observed in S2 |
 | No response within the timeout | `TimeoutError` | Timeout | Observed in S2 |
 | HTTP 401 (missing or wrong key) | `AuthFailureError` with a network response | Request rejected | Observed in S2 |
 | HTTP 404 | `ClientError` with a network response | Request rejected | Observed in S2 |
 | HTTP 429 | `ClientError` (Volley treats 4xx other than 401/403 the same way) | Rate limited | **Prediction**, not observed; unit test with a fake error |
 | HTTP 5xx | `ServerError` | Server error | **Prediction**, not observed; unit test with a fake error |
-| Response is not valid JSON, or a required field has the wrong type | `JSONException` thrown by the mapper on the background thread (not a Volley error) | Invalid data | Edge-case file `markets_invalid.json` |
+| Response is not valid JSON, or a mapper rejects a value (05 §4) | `JSONException` thrown by the mapper on the background thread (not a Volley error), or Volley's `ParseError` | Invalid data | Edge-case file `markets_invalid.json` |
+| Any other failure (for example a 3xx status, or a `VolleyError` without a response and without a more specific class) | Other `VolleyError` | Server error | Team decision; no such case observed |
 
 The 429 and 5xx rows are covered by a JVM unit test of `ErrorMapper` that builds Volley errors with a fake `NetworkResponse`; the real API is never pushed into those states on purpose.
 

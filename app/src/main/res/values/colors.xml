@@ -10,7 +10,7 @@
       onPositive    on positive    ~5.0:1
       onNegative    on negative    ~6.5:1
       onNeutral     on neutral     ~9.1:1
-      onAccent      on accent      ~6.5:1
+      onAccent      on accent      ~9.8:1
 
     `onAccent` is the text colour on `accent`, used by the selected timeframe chip (CMP-10) and
     the selected segment of the view switch (CMP-13).
@@ -26,7 +26,7 @@
     <color name="textSecondary">#FFA0A0A0</color>
 
     <!-- Accent: selected chip, links, progress -->
-    <color name="accent">#FF5B9BFF</color>
+    <color name="accent">#FF75C4F6</color>
     <color name="onAccent">#FF0B1220</color>
 
     <!-- Direction colours (02 section 2.2; colour is never the only signal) -->
