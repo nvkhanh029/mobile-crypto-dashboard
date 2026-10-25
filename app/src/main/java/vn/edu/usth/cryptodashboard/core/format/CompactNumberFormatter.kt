@@ -3,6 +3,9 @@ package vn.edu.usth.cryptodashboard.core.format
 import vn.edu.usth.cryptodashboard.domain.model.Currency
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.math.abs
 
 /**
@@ -10,6 +13,8 @@ import kotlin.math.abs
  *
  * Pass a currency for money (market cap or volume) and `null` for supply, which never carries
  * a currency symbol. A value of 0 has no decimals; a missing value is an em dash.
+ * The number uses the grouping separator `,` (fixed Locale.US), so a value of 1,000T or more
+ * shows as `42,399.86T`, not `42399.86T`.
  */
 object CompactNumberFormatter {
 
@@ -39,11 +44,15 @@ object CompactNumberFormatter {
 
         val numberText = buildString {
             if (isNegative) append('-')
-            append(roundedValue.toPlainString())
+            append(withGrouping(roundedValue))
             append(COMPACT_SUFFIXES[suffixPosition])
         }
         return addCurrencySymbol(numberText, currency)
     }
+
+    /** The value is already rounded to 2 decimals, so formatting does not round again. */
+    private fun withGrouping(roundedValue: BigDecimal): String =
+        DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US)).format(roundedValue)
 
     private fun addCurrencySymbol(numberText: String, currency: Currency?): String =
         when (currency) {
