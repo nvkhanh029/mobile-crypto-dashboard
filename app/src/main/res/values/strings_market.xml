@@ -1,0 +1,13 @@
+<resources>
+    <string name="market_search_hint">Search coins</string>
+    <string name="market_sort_cap">Market cap</string>
+    <string name="market_sort_price">Price</string>
+    <string name="market_sort_change">24h %</string>
+    <string name="market_sorted_ascending">%1$s, sorted ascending</string>
+    <string name="market_sorted_descending">%1$s, sorted descending</string>
+    <string name="market_no_matches">No coins found</string>
+    <string name="market_no_coins">No coins to show</string>
+    <string name="market_row_subtitle">%1$s · MC %2$s</string>
+    <string name="market_data_unavailable">Data unavailable</string>
+</resources>
+
