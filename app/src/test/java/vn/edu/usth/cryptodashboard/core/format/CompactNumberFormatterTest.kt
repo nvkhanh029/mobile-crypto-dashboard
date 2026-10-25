@@ -32,6 +32,14 @@ class CompactNumberFormatterTest {
     }
 
     @Test
+    fun valuesOfOneThousandTrillionOrMoreUseTheGroupingSeparator() {
+        assertEquals("42,399.86T ₫", CompactNumberFormatter.format(4.239_986e16, Currency.VND))
+        assertEquals("$1,234.57T", CompactNumberFormatter.format(1.234_567e15, Currency.USD))
+        assertEquals("-$1,234.50T", CompactNumberFormatter.format(-1.2345e15, Currency.USD))
+        assertEquals("12,345.00T", CompactNumberFormatter.format(1.2345e16))
+    }
+
+    @Test
     fun zeroAndMissingValuesFollowTheFormattingRules() {
         assertEquals("0", CompactNumberFormatter.format(0.0))
         assertEquals("$0", CompactNumberFormatter.format(0.0, Currency.USD))
