@@ -1,6 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Temporary placeholder for An Khánh's Market list screen. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background" />
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:focusable="true" android:focusableInTouchMode="true">
+    <!-- CMP-06: search field on a rounded surface, no outline; search icon and clear (x) button. -->
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/marketSearchBox"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_s" android:layout_marginEnd="@dimen/space_s"
+        android:layout_marginTop="@dimen/space_s"
+        app:hintEnabled="false"
+        app:boxBackgroundColor="@color/surface"
+        app:boxStrokeWidth="0dp" app:boxStrokeWidthFocused="0dp"
+        app:boxCornerRadiusTopStart="@dimen/corner_pill" app:boxCornerRadiusTopEnd="@dimen/corner_pill"
+        app:boxCornerRadiusBottomStart="@dimen/corner_pill" app:boxCornerRadiusBottomEnd="@dimen/corner_pill"
+        app:startIconDrawable="@drawable/ic_market_search" app:endIconMode="clear_text"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/marketSearch"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="@dimen/touch_min" android:maxLines="1" android:ellipsize="end"
+            android:hint="@string/market_search_hint"
+            android:inputType="text" android:imeOptions="actionSearch"
+            android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <!--
+        CMP-05: three text-only sort items on one line (no chip frame or fill). The active item is
+        accent with the direction arrow; the others are textSecondary (set in code). 48 dp touch target.
+    -->
+    <com.google.android.material.chip.ChipGroup android:id="@+id/marketSortBar"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:paddingStart="@dimen/space_xs" android:paddingEnd="@dimen/space_xs"
+        app:singleLine="true" app:chipSpacingHorizontal="@dimen/space_xs"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/marketSearchBox">
+        <com.google.android.material.chip.Chip android:id="@+id/marketSortCap"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:maxLines="1" android:text="@string/market_sort_cap" android:checkable="false"
+            android:textColor="@color/textSecondary"
+            app:chipBackgroundColor="@android:color/transparent"
+            app:chipStrokeColor="@android:color/transparent"
+            app:chipSurfaceColor="@android:color/transparent"
+            app:chipIconVisible="true" app:chipIconSize="@dimen/icon_size_small"
+            app:chipIconTint="@color/accent"
+            app:ensureMinTouchTargetSize="true" />
+        <com.google.android.material.chip.Chip android:id="@+id/marketSortPrice"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:maxLines="1" android:text="@string/market_sort_price" android:checkable="false"
+            android:textColor="@color/textSecondary"
+            app:chipBackgroundColor="@android:color/transparent"
+            app:chipStrokeColor="@android:color/transparent"
+            app:chipSurfaceColor="@android:color/transparent"
+            app:chipIconVisible="true" app:chipIconSize="@dimen/icon_size_small"
+            app:chipIconTint="@color/accent"
+            app:ensureMinTouchTargetSize="true" />
+        <com.google.android.material.chip.Chip android:id="@+id/marketSortChange"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:maxLines="1" android:text="@string/market_sort_change" android:checkable="false"
+            android:textColor="@color/textSecondary"
+            app:chipBackgroundColor="@android:color/transparent"
+            app:chipStrokeColor="@android:color/transparent"
+            app:chipSurfaceColor="@android:color/transparent"
+            app:chipIconVisible="true" app:chipIconSize="@dimen/icon_size_small"
+            app:chipIconTint="@color/accent"
+            app:ensureMinTouchTargetSize="true" />
+    </com.google.android.material.chip.ChipGroup>
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:id="@+id/marketRefresh"
+        android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/marketSortBar"
+        app:layout_constraintBottom_toTopOf="@id/marketFooter"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:focusable="true" android:focusableInTouchMode="true">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/marketList"
+                android:layout_width="0dp" android:layout_height="0dp"
+                android:clipToPadding="false"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+            <vn.edu.usth.cryptodashboard.core.ui.StateView android:id="@+id/marketState"
+                android:layout_width="0dp" android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <vn.edu.usth.cryptodashboard.core.ui.AttributionView android:id="@+id/marketFooter"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
