@@ -55,13 +55,8 @@ class CryptoApp : Application() {
         Log.i(TAG, "Fake scenario: ${fakeScenario.name.lowercase()}, delay $fakeDelayMs ms")
     }
 
-    /**
-     * The single `CurrencySettings`. It still goes through the deprecated `getInstance` so that
-     * callers on open branches that have not moved to `CryptoApp` yet share the same instance;
-     * both go away together once those callers have moved.
-     */
-    @Suppress("DEPRECATION")
-    val currencySettings: CurrencySettings by lazy { CurrencySettings.getInstance(this) }
+    /** The single `CurrencySettings`; no other code creates one. */
+    val currencySettings: CurrencySettings by lazy { CurrencySettings(this) }
 
     /** Created on first use, so the saved favorites are not read during app startup. */
     val favoriteStore: FavoriteStore by lazy {
