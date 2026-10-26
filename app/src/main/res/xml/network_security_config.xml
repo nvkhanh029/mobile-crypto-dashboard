@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    HTTPS on Android 7.0 (API 24): the device does not trust the roots that the
+    CoinGecko hosts need, so they are added for coingecko.com and its subdomains
+    (api.coingecko.com, coin-images.coingecko.com). The system certificates stay
+    trusted. Certificate checks are never disabled.
+    See docs/03-architecture.md section 8.1 and D15.
+-->
+<network-security-config>
+    <domain-config>
+        <domain includeSubdomains="true">coingecko.com</domain>
+        <trust-anchors>
+            <certificates src="@raw/isrg_root_x1" />
+            <certificates src="@raw/isrg_root_x2" />
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
