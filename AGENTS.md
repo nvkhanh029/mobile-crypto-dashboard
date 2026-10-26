@@ -92,8 +92,8 @@ The docs are the source of truth. If the code and the docs disagree, stop and te
 ## 8. Ownership and contracts
 | Area | Owner | Folders and files |
 |---|---|---|
-| Data layer, CryptoApp, coin icon loader, build files | Vân Khánh | `data/`, `domain/`, `core/image`, `app/CryptoApp`, `res/xml/`, `res/raw/`, Gradle files |
-| UI foundation, MainActivity, formatters, StateView, currency, shared resources | Hải | `core/ui`, `core/format`, `core/currency`, `app/MainActivity`, and the shared values in `res/` (theme, colors, dimens, text styles, shared drawables, the common `strings.xml`) |
+| Data layer, CryptoApp, coin icon loader, build files | Vân Khánh | `data/` (except `ErrorMapper`), `domain/`, `core/image`, `app/CryptoApp`, `res/xml/`, `res/raw/`, Gradle files |
+| UI foundation, MainActivity, formatters, StateView, currency, shared resources | Hải | `core/ui`, `core/format`, `core/currency`, `app/MainActivity`, `data/remote/ErrorMapper` and its unit test, and the shared values in `res/` (theme, colors, dimens, text styles, shared drawables, the common `strings.xml`) |
 | Market list | An Khánh | `features/marketlist`, and the layouts, drawables and strings file of its screens |
 | Coin detail | Kiên | `features/detail`, and the layouts, drawables and strings file of its screen |
 | Price chart | Duy | `features/chart`, and the layouts, drawables and strings file of its screen |

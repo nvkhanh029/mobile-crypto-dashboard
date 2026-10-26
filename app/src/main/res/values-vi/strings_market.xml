@@ -1,0 +1,13 @@
+<resources>
+    <string name="market_search_hint">Tìm đồng tiền</string>
+    <string name="market_sort_cap">Vốn hóa</string>
+    <string name="market_sort_price">Giá</string>
+    <string name="market_sort_change">24h %</string>
+    <string name="market_sorted_ascending">%1$s, sắp xếp tăng dần</string>
+    <string name="market_sorted_descending">%1$s, sắp xếp giảm dần</string>
+    <string name="market_no_matches">Không tìm thấy đồng tiền</string>
+    <string name="market_no_coins">Chưa có đồng tiền để hiển thị</string>
+    <string name="market_row_subtitle">%1$s · MC %2$s</string>
+    <string name="market_data_unavailable">Không có dữ liệu</string>
+</resources>
+
