@@ -2,6 +2,7 @@ package vn.edu.usth.cryptodashboard.features.watchlist
 
 import android.os.Bundle
 import android.view.View
+import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +12,9 @@ import vn.edu.usth.cryptodashboard.core.ui.AttributionView
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
 import vn.edu.usth.cryptodashboard.core.ui.MarketTabNavigator
+import vn.edu.usth.cryptodashboard.features.marketlist.CoinListAdapter
+import vn.edu.usth.cryptodashboard.features.marketlist.CoinRow
+import vn.edu.usth.cryptodashboard.features.detail.CoinDetailActivity
 
 class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
 
@@ -34,6 +38,18 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
         val recycler = view.findViewById<RecyclerView>(R.id.watchlistRecycler)
         val stateView = view.findViewById<StateView>(R.id.watchlistStateView)
         val attribution = view.findViewById<AttributionView>(R.id.watchlistAttribution)
+        val adapter = CoinListAdapter(
+            favoriteStore = app.favoriteStore,
+            lifecycleOwner = viewLifecycleOwner,
+            imageLoader = app.coinImageLoader,
+            onCoinClick = { coinId ->
+                startActivity(
+                    Intent(requireContext(), CoinDetailActivity::class.java)
+                        .putExtra(CoinDetailActivity.EXTRA_COIN_ID, coinId)
+                )
+            },
+        )
+        recycler.adapter = adapter
 
         app.favoriteStore.favoriteIds.observe(viewLifecycleOwner) { ids ->
             viewModel.onFavoritesChanged(ids)
@@ -54,6 +70,22 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
                     state is UiState.Empty ||
                     (state is UiState.Error<*> && state.previousData == null)
             recycler.visibility = if (hideList) View.GONE else View.VISIBLE
+
+            val rows = when (state) {
+                is UiState.Success -> state.data
+                is UiState.Error -> state.previousData
+                else -> null
+            }
+            val currency = app.currencySettings.currency.value
+            if (rows != null && currency != null) {
+                adapter.submitList(rows.map { row ->
+
+                    when (row) {
+                        is WatchlistRow.Loaded -> CoinRow(row.coin.id, row.coin, currency)
+                        is WatchlistRow.Unavailable -> CoinRow(row.coinId, null, currency)
+                    }
+                })
+            }
 
             attribution.showUpdatedTime((state as? UiState.Success<*>)?.updatedAtMillis)
         }
