@@ -15,7 +15,7 @@
 - **Required fields:** `id`, `symbol` and `name` of a coin, and `prices` of a chart response; every other field is nullable. What a mapper does with a missing or wrong value is in section 4.
 - **Threading rule (C1):** every repository callback, `onSuccess` and `onError`, is called on the main thread. The caller can update LiveData and Views directly. Network and JSON work happen on other threads inside the data layer (`03` §4, §5).
 - A repository call cannot be cancelled. A ViewModel that sends a new request ignores the answer of an older one (`03` §6, stale responses).
-- **This file does not copy signatures that exist in code.** The shared UI parts (`UiState`, `StateView`, `AttributionView`, the explanation dialog, the formatters), `CurrencySettings` and `FavoriteStore` are defined by their owners in their own files (C2, C3, C7); read the code on `main`. C5 and C6 are complete in `03` §12.
+- **This file does not copy signatures that exist in code.** The shared UI parts (`UiState`, `StateView`, `AttributionView`, the explanation dialog, the formatters), `CurrencySettings`, `FavoriteStore` and the coin row with its adapter are defined by their owners in their own files (C2, C3, C4, C7); read the code on `main`. The contract of the coin row (C4) is in `03` §12. C5 and C6 are complete in `03` §12.
 
 ---
 
@@ -256,7 +256,7 @@ A ViewModel that needs an ID (Detail, chart) takes it as a constructor parameter
 
 ## 7. Fake data sources (`data/fake`)
 
-The four fake data sources of section 4 implement the same interfaces as the remote ones. `Scenario`, `FakeFileReader`, `MainThreadPoster` and the four fake data sources are in `data/fake`. They are plain Kotlin classes: they use no `Context` and no `Handler`, so the same classes run in the app and in JVM unit tests (`fake-data.md` §5.3). They get everything they need through their constructor:
+The four fake data sources of section 4 implement the same interfaces as the remote ones. `Scenario`, `FakeFileReader` and the four fake data sources are in `data/fake`; `MainThreadPoster` is in `data/thread`, because the repositories and the remote data sources use it too (`03` §3, D23). They are plain Kotlin classes: they use no `Context` and no `Handler`, so the same classes run in the app and in JVM unit tests (`fake-data.md` §5.3). They get everything they need through their constructor:
 
 ```kotlin
 enum class Scenario {
@@ -290,10 +290,10 @@ class MarketListFakeDataSource(
 
 | Parameter | In the app (`CryptoApp`) | In a JVM unit test |
 |---|---|---|
-| `reader` | reads from `assets` through the `AssetManager` | reads `src/main/assets` from the disk |
+| `reader` | `AssetFakeFileReader`: reads from `assets` through the `AssetManager` | reads `src/main/assets` from the disk |
 | `delayMs` | `BuildConfig.FAKE_DELAY_MS` | 0 |
 | `executor` | the shared background `ExecutorService` | any `Executor`, for example one that runs the task at once |
-| `mainThread` | posts to the main looper with `Handler.postDelayed` | runs the action at once and ignores the delay |
+| `mainThread` | `HandlerMainThreadPoster`: posts to the main looper with `Handler.postDelayed` | runs the action at once and ignores the delay |
 
 Rules:
 - **Threading:** the file is read and parsed (with the mappers of section 4) on `executor`; `onSuccess` and `onError` are delivered with `mainThread.post(delayMs, …)`, so they arrive on the main thread after the delay (`03` §5).

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:minHeight="@dimen/touch_min"
+    android:paddingStart="@dimen/space_s" android:paddingEnd="@dimen/space_s"
+    android:paddingTop="@dimen/space_s" android:paddingBottom="@dimen/space_s"
+    android:clickable="true" android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+    <!-- Rank: small secondary text (CMP-01), smaller than RowSubtitle to leave room for the name. -->
+    <TextView android:id="@+id/marketRowRank"
+        android:textAppearance="?attr/textAppearanceLabelSmall"
+        android:textColor="@color/textSecondary"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:maxLines="1" android:ellipsize="end" android:minWidth="@dimen/market_rank_min_width"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/marketRowDivider"
+        tools:text="100" />
+    <com.android.volley.toolbox.NetworkImageView android:id="@+id/marketRowIcon"
+        android:layout_width="@dimen/coin_icon_size" android:layout_height="@dimen/coin_icon_size"
+        android:layout_marginStart="@dimen/space_xs"
+        android:src="@drawable/ic_coin_placeholder" android:scaleType="centerInside"
+        android:importantForAccessibility="no"
+        app:layout_constraintStart_toEndOf="@id/marketRowRank"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/marketRowDivider"
+        tools:ignore="ContentDescription" />
+    <!--
+        CMP-01 layout, as drawn in 02:
+          line 1: name ............ sparkline   price
+          line 2: SYMBOL · MC <cap> ...........  [change]
+        The sparkline sits on line 1, so line 2 has the full width for the market cap.
+        When the row is crowded (360 dp, VND), the name shrinks first; numbers are never cut.
+    -->
+    <TextView android:id="@+id/marketRowName" style="@style/RowTitle"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_s" android:layout_marginEnd="@dimen/space_s"
+        android:maxLines="1" android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/marketRowIcon"
+        app:layout_constraintEnd_toStartOf="@id/marketRowSparkline"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="A very long cryptocurrency name" />
+    <!-- Left edge of the price/change column: the sparkline ends here, whichever is wider. -->
+    <androidx.constraintlayout.widget.Barrier android:id="@+id/marketRowValuesStart"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        app:barrierDirection="start" app:constraint_referenced_ids="marketRowPrice,marketRowChange" />
+    <vn.edu.usth.cryptodashboard.features.marketlist.SparklineView android:id="@+id/marketRowSparkline"
+        android:layout_width="@dimen/sparkline_width" android:layout_height="@dimen/sparkline_height"
+        android:layout_marginEnd="@dimen/space_s"
+        android:contentDescription="@string/content_desc_price_trend"
+        app:layout_constraintEnd_toStartOf="@id/marketRowValuesStart"
+        app:layout_constraintTop_toTopOf="@id/marketRowPrice"
+        app:layout_constraintBottom_toBottomOf="@id/marketRowPrice" />
+    <TextView android:id="@+id/marketRowPrice" style="@style/Price"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:maxLines="1" android:gravity="end"
+        android:layout_marginEnd="@dimen/space_xs"
+        app:layout_constraintEnd_toStartOf="@id/marketRowStar"
+        app:layout_constraintTop_toTopOf="parent" tools:text="1,650,000 ₫" />
+    <androidx.constraintlayout.widget.Barrier android:id="@+id/marketRowFirstLine"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="marketRowName,marketRowPrice,marketRowSparkline" />
+    <TextView android:id="@+id/marketRowSubtitle" style="@style/RowSubtitle"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:maxLines="1" android:ellipsize="end"
+        android:layout_marginStart="@dimen/space_s" android:layout_marginEnd="@dimen/space_s"
+        android:layout_marginTop="@dimen/space_xs"
+        app:layout_constraintStart_toEndOf="@id/marketRowIcon"
+        app:layout_constraintEnd_toStartOf="@id/marketRowChange"
+        app:layout_constraintTop_toBottomOf="@id/marketRowFirstLine"
+        tools:text="BTC · MC 32.50T ₫" />
+    <vn.edu.usth.cryptodashboard.core.ui.PriceChangeLabel android:id="@+id/marketRowChange"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_xs" android:layout_marginTop="@dimen/space_xs"
+        app:layout_constraintEnd_toStartOf="@id/marketRowStar"
+        app:layout_constraintTop_toBottomOf="@id/marketRowFirstLine" />
+    <vn.edu.usth.cryptodashboard.core.favorite.FavoriteButton android:id="@+id/marketRowStar"
+        android:layout_width="@dimen/touch_min" android:layout_height="@dimen/touch_min"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="center" app:tint="@color/accent"
+        android:contentDescription="@string/favorite_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/marketRowDivider" />
+    <androidx.constraintlayout.widget.Barrier android:id="@+id/marketRowBottom"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="marketRowSubtitle,marketRowChange" />
+    <View android:id="@+id/marketRowDivider"
+        android:layout_width="0dp" android:layout_height="@dimen/divider_thickness"
+        android:layout_marginTop="@dimen/space_s" android:background="@color/divider"
+        app:layout_constraintTop_toBottomOf="@id/marketRowBottom"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+

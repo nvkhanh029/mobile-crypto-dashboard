@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.mpandroidchart)
     implementation(libs.volley)
+    implementation(libs.androidx.swiperefreshlayout)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.junit)
     testImplementation(libs.org.json)
