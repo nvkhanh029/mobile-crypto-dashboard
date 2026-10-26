@@ -18,7 +18,7 @@ import vn.edu.usth.cryptodashboard.data.fake.AssetFakeFileReader
 import vn.edu.usth.cryptodashboard.data.fake.ChartFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.CoinDetailFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.CoinsByIdsFakeDataSource
-import vn.edu.usth.cryptodashboard.data.fake.HandlerMainThreadPoster
+import vn.edu.usth.cryptodashboard.data.thread.HandlerMainThreadPoster
 import vn.edu.usth.cryptodashboard.data.fake.MarketListFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.Scenario
 import vn.edu.usth.cryptodashboard.data.repository.ChartRepositoryImpl

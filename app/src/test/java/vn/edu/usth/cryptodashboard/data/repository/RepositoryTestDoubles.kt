@@ -1,6 +1,6 @@
 package vn.edu.usth.cryptodashboard.data.repository
 
-import vn.edu.usth.cryptodashboard.data.fake.MainThreadPoster
+import vn.edu.usth.cryptodashboard.data.thread.MainThreadPoster
 import vn.edu.usth.cryptodashboard.data.source.ChartDataSource
 import vn.edu.usth.cryptodashboard.data.source.CoinDetailDataSource
 import vn.edu.usth.cryptodashboard.data.source.CoinsByIdsDataSource
