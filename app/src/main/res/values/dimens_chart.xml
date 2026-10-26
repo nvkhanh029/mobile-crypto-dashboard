@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Chart-only sizes (SCR-05). Shared roles from Hải's dimens.xml are used wherever one exists:
+    spacing (space_xs), line thickness (divider_thickness), text size (caption_text_size_min),
+    touch target (touch_min), corners (corner_l) and the chart height (chart_height).
+    Only chart-specific drawing/layout values with no shared role live here.
+-->
+<resources>
+    <dimen name="chart_line_width">2dp</dimen>
+    <dimen name="chart_highlight_dot_radius">3dp</dimen>
+    <dimen name="chart_marker_max_width">240dp</dimen>
+
+    <!-- Chips (CMP-10): 5 equal-width buttons must fit at 360 dp. -->
+    <dimen name="chart_chip_min_width">0dp</dimen>
+    <dimen name="chart_chip_inset">0dp</dimen>
+</resources>
