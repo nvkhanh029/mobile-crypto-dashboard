@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="detail_title">Coin detail</string>
+    <string name="detail_back">Back</string>
+    <string name="detail_back_symbol">‹</string>
+    <string name="detail_missing_value">—</string>
+    <string name="detail_missing_description">No description available.</string>
+    <string name="detail_statistics_heading">Statistics</string>
+    <string name="detail_about_heading">About</string>
+    <string name="detail_read_more">Read more</string>
+    <string name="detail_show_less">Show less</string>
+    <string name="detail_disclaimer">For information only. Not financial advice.</string>
+    <string name="detail_info_symbol">ⓘ</string>
+    <string name="detail_refresh_failed">Could not refresh this coin. Showing the last loaded data.</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="detail_title">Chi tiết đồng tiền</string>
+    <string name="detail_back">Quay lại</string>
+    <string name="detail_back_symbol">‹</string>
+    <string name="detail_missing_value">—</string>
+    <string name="detail_missing_description">Không có mô tả.</string>
+    <string name="detail_statistics_heading">Thống kê</string>
+    <string name="detail_about_heading">Giới thiệu</string>
+    <string name="detail_read_more">Đọc thêm</string>
+    <string name="detail_show_less">Thu gọn</string>
+    <string name="detail_disclaimer">Chỉ nhằm mục đích cung cấp thông tin. Đây không phải lời khuyên tài chính.</string>
+    <string name="detail_info_symbol">ⓘ</string>
+    <string name="detail_refresh_failed">Không thể tải lại dữ liệu đồng tiền này. Đang hiển thị dữ liệu đã tải trước đó.</string>
+</resources>
