@@ -8,6 +8,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 import vn.edu.usth.cryptodashboard.data.mapper.ChartMapper
 import vn.edu.usth.cryptodashboard.data.source.DataSourceCallback
+import vn.edu.usth.cryptodashboard.data.thread.ImmediateMainThreadPoster
+import vn.edu.usth.cryptodashboard.data.thread.MainThreadPoster
 import vn.edu.usth.cryptodashboard.domain.model.AppError
 import vn.edu.usth.cryptodashboard.domain.model.ChartPoint
 import vn.edu.usth.cryptodashboard.domain.model.Currency

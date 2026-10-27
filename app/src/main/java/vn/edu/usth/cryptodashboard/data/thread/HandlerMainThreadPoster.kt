@@ -1,11 +1,11 @@
-package vn.edu.usth.cryptodashboard.data.fake
+package vn.edu.usth.cryptodashboard.data.thread
 
 import android.os.Handler
 import android.os.Looper
 
 /**
- * Delivers the answers of the fake data sources on the main thread after the delay
- * (`docs/05-interfaces.md` §7, `docs/03-architecture.md` §5).
+ * The app's [MainThreadPoster]: posts the action to the main looper with a [Handler]
+ * (`docs/03-architecture.md` §5). Used by the data sources and the repositories.
  */
 class HandlerMainThreadPoster : MainThreadPoster {
 

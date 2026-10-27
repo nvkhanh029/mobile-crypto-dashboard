@@ -1,4 +1,4 @@
-package vn.edu.usth.cryptodashboard.data.fake
+package vn.edu.usth.cryptodashboard.data.thread
 
 /** Test helper: runs the action at once and ignores the delay, so a test never waits. */
 class ImmediateMainThreadPoster : MainThreadPoster {

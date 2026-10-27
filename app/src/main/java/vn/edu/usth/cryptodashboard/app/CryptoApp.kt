@@ -18,7 +18,7 @@ import vn.edu.usth.cryptodashboard.data.fake.AssetFakeFileReader
 import vn.edu.usth.cryptodashboard.data.fake.ChartFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.CoinDetailFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.CoinsByIdsFakeDataSource
-import vn.edu.usth.cryptodashboard.data.fake.HandlerMainThreadPoster
+import vn.edu.usth.cryptodashboard.data.thread.HandlerMainThreadPoster
 import vn.edu.usth.cryptodashboard.data.fake.MarketListFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.Scenario
 import vn.edu.usth.cryptodashboard.data.repository.ChartRepositoryImpl
@@ -55,13 +55,8 @@ class CryptoApp : Application() {
         Log.i(TAG, "Fake scenario: ${fakeScenario.name.lowercase()}, delay $fakeDelayMs ms")
     }
 
-    /**
-     * The single `CurrencySettings`. It still goes through the deprecated `getInstance` so that
-     * callers on open branches that have not moved to `CryptoApp` yet share the same instance;
-     * both go away together once those callers have moved.
-     */
-    @Suppress("DEPRECATION")
-    val currencySettings: CurrencySettings by lazy { CurrencySettings.getInstance(this) }
+    /** The single `CurrencySettings`; no other code creates one. */
+    val currencySettings: CurrencySettings by lazy { CurrencySettings(this) }
 
     /** Created on first use, so the saved favorites are not read during app startup. */
     val favoriteStore: FavoriteStore by lazy {
