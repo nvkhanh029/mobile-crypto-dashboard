@@ -5,6 +5,7 @@ import org.json.JSONException
 import vn.edu.usth.cryptodashboard.data.mapper.CoinDetailMapper
 import vn.edu.usth.cryptodashboard.data.source.CoinDetailDataSource
 import vn.edu.usth.cryptodashboard.data.source.DataSourceCallback
+import vn.edu.usth.cryptodashboard.data.thread.MainThreadPoster
 import vn.edu.usth.cryptodashboard.domain.model.AppError
 import vn.edu.usth.cryptodashboard.domain.model.CoinDetail
 import vn.edu.usth.cryptodashboard.domain.model.Currency

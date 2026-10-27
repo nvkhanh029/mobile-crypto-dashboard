@@ -3,7 +3,7 @@ package vn.edu.usth.cryptodashboard.data.repository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import vn.edu.usth.cryptodashboard.data.fake.ImmediateMainThreadPoster
+import vn.edu.usth.cryptodashboard.data.thread.ImmediateMainThreadPoster
 import vn.edu.usth.cryptodashboard.domain.model.AppError
 import vn.edu.usth.cryptodashboard.domain.model.Coin
 import vn.edu.usth.cryptodashboard.domain.model.Currency
