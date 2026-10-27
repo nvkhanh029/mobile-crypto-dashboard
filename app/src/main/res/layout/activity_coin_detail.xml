@@ -126,11 +126,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_xs" />
 
-            <!-- Reserved for PriceChartFragment.newInstance(coinId) after PR #9 merges. -->
+            <!-- PriceChartFragment is attached here by CoinDetailActivity. -->
             <FrameLayout
                 android:id="@+id/detailChartContainer"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/chart_height"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_m" />
 
             <TextView
