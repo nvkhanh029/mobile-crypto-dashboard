@@ -38,6 +38,15 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
         val recycler = view.findViewById<RecyclerView>(R.id.watchlistRecycler)
         val stateView = view.findViewById<StateView>(R.id.watchlistStateView)
         val attribution = view.findViewById<AttributionView>(R.id.watchlistAttribution)
+        val refresh = view.findViewById<SwipeRefreshLayout>(R.id.watchlistRefresh)
+
+        refresh.setColorSchemeResources(R.color.accent)
+        refresh.setProgressBackgroundColorSchemeResource(R.color.surface)
+        refresh.setOnChildScrollUpCallback { _, _ -> recycler.canScrollVertically(-1) }
+        refresh.setOnRefreshListener { viewModel.refresh() }
+
+        viewModel.refreshing.observe(viewLifecycleOwner) { refresh.isRefreshing = it }
+
         val adapter = CoinListAdapter(
             favoriteStore = app.favoriteStore,
             lifecycleOwner = viewLifecycleOwner,
@@ -60,6 +69,10 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
         }
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
+            snackbar?.dismiss()
+
+            refresh.isEnabled = state !is UiState.Loading && state !is UiState.Empty
+
             stateView.render(
                 state,
                 onRetryClick = { viewModel.refresh() },
@@ -79,7 +92,6 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
             val currency = app.currencySettings.currency.value
             if (rows != null && currency != null) {
                 adapter.submitList(rows.map { row ->
-
                     when (row) {
                         is WatchlistRow.Loaded -> CoinRow(row.coin.id, row.coin, currency)
                         is WatchlistRow.Unavailable -> CoinRow(row.coinId, null, currency)
@@ -87,13 +99,19 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
                 })
             }
 
-            attribution.showUpdatedTime((state as? UiState.Success<*>)?.updatedAtMillis)
+            if (state is UiState.Error<*> && state.previousData != null) {
+                snackbar = Snackbar.make(view, errorMessage(state.error), Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.retry) { viewModel.refresh() }
+                    .setAnchorView(attribution)
+                    .also { it.show() }
+            }
+
+            attribution.showUpdatedTime(viewModel.updatedAtMillis)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // onHiddenChanged is not called the first time the fragment is added.
         viewModel.onScreenVisibleChanged(!isHidden)
     }
 
