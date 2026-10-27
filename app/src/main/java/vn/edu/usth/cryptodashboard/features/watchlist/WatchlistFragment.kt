@@ -1,24 +1,28 @@
 package vn.edu.usth.cryptodashboard.features.watchlist
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.app.CryptoApp
+import vn.edu.usth.cryptodashboard.domain.model.AppError
 import vn.edu.usth.cryptodashboard.core.ui.AttributionView
+import vn.edu.usth.cryptodashboard.core.ui.MarketTabNavigator
 import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
-import vn.edu.usth.cryptodashboard.core.ui.MarketTabNavigator
+import vn.edu.usth.cryptodashboard.features.detail.CoinDetailActivity
 import vn.edu.usth.cryptodashboard.features.marketlist.CoinListAdapter
 import vn.edu.usth.cryptodashboard.features.marketlist.CoinRow
-import vn.edu.usth.cryptodashboard.features.detail.CoinDetailActivity
 
 class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
 
     private lateinit var viewModel: WatchlistViewModel
+    private var snackbar: Snackbar? = null
 
     // The shared objects live in CryptoApp (docs/05-interfaces.md section 6).
     private val app: CryptoApp
@@ -110,6 +114,12 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
         }
     }
 
+    override fun onDestroyView() {
+        snackbar?.dismiss()
+        snackbar = null
+        super.onDestroyView()
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.onScreenVisibleChanged(!isHidden)
@@ -118,5 +128,14 @@ class WatchlistFragment : Fragment(R.layout.fragment_watchlist) {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         viewModel.onScreenVisibleChanged(!hidden)
+    }
+
+    private fun errorMessage(error: AppError): Int = when (error) {
+        is AppError.NoConnection -> R.string.error_no_connection
+        is AppError.Timeout -> R.string.error_timeout
+        is AppError.RateLimited -> R.string.error_rate_limited
+        is AppError.ServerError -> R.string.error_server
+        is AppError.RequestRejected -> R.string.error_request_rejected
+        is AppError.InvalidData -> R.string.error_invalid_data
     }
 }
