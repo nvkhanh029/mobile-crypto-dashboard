@@ -17,9 +17,14 @@ import java.util.Locale
  * whole `market_data`, `image` and `description` objects. Unknown fields are ignored
  * (the response has dozens of fields the app does not read).
  *
- * Fields keyed by currency (`current_price`, `market_cap`, `total_volume`, `ath`, `atl`)
- * are read only under the key of [currency] (`usd` or `vnd`). If that key is missing the
- * value is `null`: the value of the other currency is never used instead.
+ * Fields keyed by currency (`current_price`, `price_change_percentage_24h_in_currency`,
+ * `market_cap`, `total_volume`, `ath`, `atl`) are read only under the key of [currency]
+ * (`usd` or `vnd`). If that key is missing the value is `null`: the value of the other
+ * currency is never used instead.
+ *
+ * The 24h % is read from `price_change_percentage_24h_in_currency`, not from the single
+ * `price_change_percentage_24h`, which follows the USD price: in VND the single value
+ * differs from the 24h % of the Market list (docs/04-api-contract.md section 4).
  *
  * The description is plain text: markup is removed with a plain Kotlin regex
  * (`android.text.Html` does not run in JVM tests). Only tags are removed; HTML entities
@@ -54,7 +59,7 @@ object CoinDetailMapper {
             imageUrl = root.optionalObject(IMAGE)?.optionalString(IMAGE_LARGE),
             description = plainText(root.optionalObject(DESCRIPTION)?.optionalString(DESCRIPTION_EN)),
             currentPrice = marketData.valueFor("current_price", code),
-            priceChangePercentage24h = marketData?.optionalDouble("price_change_percentage_24h"),
+            priceChangePercentage24h = marketData.valueFor("price_change_percentage_24h_in_currency", code),
             marketCap = marketData.valueFor("market_cap", code),
             totalVolume = marketData.valueFor("total_volume", code),
             circulatingSupply = marketData?.optionalDouble("circulating_supply"),

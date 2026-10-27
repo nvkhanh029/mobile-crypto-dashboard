@@ -66,7 +66,7 @@ class CoinDetailMapperTest {
     }
 
     @Test
-    fun percentChange_isTheSingleValueNotKeyedByCurrency() {
+    fun percentChange_capturedFiles_readTheValueOfTheRequestedCurrency() {
         // Values from docs/04 section 4 (captured files, equal for usd and vnd).
         assertEquals(0.15581, parseFile("detail_bitcoin.json", Currency.USD).priceChangePercentage24h!!, 1e-4)
         assertEquals(0.03334, parseFile("detail_ethereum.json", Currency.USD).priceChangePercentage24h!!, 1e-4)
@@ -183,6 +183,8 @@ class CoinDetailMapperTest {
     fun currencyKey_isChosenByTheRequestedCurrency() {
         val json = coin(
             ",\"market_data\":{\"current_price\":{\"usd\":1,\"vnd\":2}," +
+                    "\"price_change_percentage_24h\":9.9," +
+                    "\"price_change_percentage_24h_in_currency\":{\"usd\":1.02,\"vnd\":1.08}," +
                     "\"market_cap\":{\"usd\":10,\"vnd\":20}," +
                     "\"total_volume\":{\"usd\":100,\"vnd\":200}," +
                     "\"ath\":{\"usd\":1000,\"vnd\":2000}," +
@@ -193,11 +195,13 @@ class CoinDetailMapperTest {
         val vnd = CoinDetailMapper.parse(json, Currency.VND)
 
         assertEquals(1.0, usd.currentPrice!!, 0.0)
+        assertEquals(1.02, usd.priceChangePercentage24h!!, 0.0)
         assertEquals(10.0, usd.marketCap!!, 0.0)
         assertEquals(100.0, usd.totalVolume!!, 0.0)
         assertEquals(1000.0, usd.allTimeHigh!!, 0.0)
         assertEquals(0.5, usd.allTimeLow!!, 0.0)
         assertEquals(2.0, vnd.currentPrice!!, 0.0)
+        assertEquals(1.08, vnd.priceChangePercentage24h!!, 0.0)
         assertEquals(20.0, vnd.marketCap!!, 0.0)
         assertEquals(200.0, vnd.totalVolume!!, 0.0)
         assertEquals(2000.0, vnd.allTimeHigh!!, 0.0)
@@ -206,12 +210,17 @@ class CoinDetailMapperTest {
 
     @Test
     fun requestedCurrencyMissing_isNullAndTheOtherCurrencyIsNeverUsed() {
-        val json = coin(",\"market_data\":{\"current_price\":{\"usd\":1},\"market_cap\":{\"usd\":10}}")
+        val json = coin(
+            ",\"market_data\":{\"current_price\":{\"usd\":1},\"market_cap\":{\"usd\":10}," +
+                    "\"price_change_percentage_24h\":0.5,\"price_change_percentage_24h_in_currency\":{\"usd\":0.5}}"
+        )
 
         val vnd = CoinDetailMapper.parse(json, Currency.VND)
 
         assertNull(vnd.currentPrice)
         assertNull(vnd.marketCap)
+        // Neither the usd key nor the single (USD) value is used for VND.
+        assertNull(vnd.priceChangePercentage24h)
     }
 
     @Test
@@ -224,7 +233,8 @@ class CoinDetailMapperTest {
     @Test
     fun zeroStaysZero() {
         val json = coin(
-            ",\"market_data\":{\"current_price\":{\"usd\":0},\"price_change_percentage_24h\":0," +
+            ",\"market_data\":{\"current_price\":{\"usd\":0}," +
+                    "\"price_change_percentage_24h_in_currency\":{\"usd\":0}," +
                     "\"total_supply\":0,\"max_supply\":0}"
         )
 
@@ -272,7 +282,7 @@ class CoinDetailMapperTest {
         assertThrows(JSONException::class.java) { parse(coin(",\"market_data\":{\"current_price\":5}")) }
         assertThrows(JSONException::class.java) { parse(coin(",\"market_data\":{\"current_price\":{\"usd\":\"abc\"}}")) }
         assertThrows(JSONException::class.java) { parse(coin(",\"market_data\":{\"circulating_supply\":\"x\"}")) }
-        assertThrows(JSONException::class.java) { parse(coin(",\"market_data\":{\"price_change_percentage_24h\":[]}")) }
+        assertThrows(JSONException::class.java) { parse(coin(",\"market_data\":{\"price_change_percentage_24h_in_currency\":[]}")) }
         assertThrows(JSONException::class.java) { parse(coin(",\"image\":\"x\"")) }
         assertThrows(JSONException::class.java) { parse(coin(",\"image\":{\"large\":5}")) }
         assertThrows(JSONException::class.java) { parse(coin(",\"description\":\"x\"")) }

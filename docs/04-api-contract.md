@@ -88,7 +88,7 @@ Response: a JSON object with **32 or 33 top-level fields and 47 fields inside `m
 | `image.large` | string (URL) | no | icon in the header |
 | `description.en` | string, 1,634 to 2,738 characters in the three samples, contains `\n` line breaks | can be empty | description (FR-CD-07) |
 | `market_data.current_price[cur]` | number, int or decimal | not in the sample | header price |
-| `market_data.price_change_percentage_24h` | decimal, one value (not keyed by currency) | not in the sample | header 24h % |
+| `market_data.price_change_percentage_24h_in_currency[cur]` | decimal | not in the sample | header 24h % |
 | `market_data.market_cap[cur]` | number, int | not in the sample | statistics (FR-CD-06) |
 | `market_data.total_volume[cur]` | number, int | not in the sample | statistics |
 | `market_data.circulating_supply` | decimal | not in the sample | statistics |
@@ -106,7 +106,8 @@ Optional, only if FR-CD-09 (Could) is built:
 | `market_data.ath_change_percentage[cur]` | decimal | distance from the all-time high in % |
 
 Observed behaviour:
-- **The 24h % on Detail is the single value `market_data.price_change_percentage_24h`**, the same kind of value the list reads (`price_change_percentage_24h` of `/coins/markets`). The two screens can still show different numbers for the same coin, because the list and Detail are fetched separately, at different moments, and each keeps its own data for up to 60 s (`01` FR-DATA-01). In the three captured files it equals `price_change_percentage_24h_in_currency` for `usd` and for `vnd` (bitcoin 0.15581, ethereum 0.03334, solana 0.0183). Other coins and other times were not checked.
+- **The 24h % on Detail is `market_data.price_change_percentage_24h_in_currency[cur]`**, the value of the selected currency, which matches what the list reads (`price_change_percentage_24h` of `/coins/markets?vs_currency={cur}`). The single value `market_data.price_change_percentage_24h` (not keyed by currency) is not read: it is the USD value. Observed on 27 Oct 2026 about 20:46 UTC with the real API (bitcoin): on Detail the single value and `in_currency.usd` were both 1.05896 and `in_currency.vnd` was 1.02325; the list in VND gave 1.02247 about a minute earlier. In the three captured files the single value and both currency keys are equal (bitcoin 0.15581, ethereum 0.03334, solana 0.0183).
+- The two screens can still show slightly different prices and percentages for the same coin, because the list and Detail are fetched separately, at different moments, and each keeps its own data for up to 60 s (`01` FR-DATA-01). The provider also updates the two endpoints at different moments: in the observation above, `last_updated` of bitcoin was 20:45:53 on `/coins/{id}` and 20:46:40 on `/coins/markets`, and the list's VND value had moved from 1.02247 to 1.04667 within about a minute. When the whole market moves, every coin then differs in the same direction.
 - `ath_date` and `atl_date` in `/coins/{id}` are objects keyed by currency. In `/coins/markets` they are plain strings (and the app does not read them there).
 - The `atl_date` of bitcoin differs between `usd` and `vnd` in the sample (the all-time low is a different day in each currency), so always read the key of the selected currency.
 - The descriptions of all six real coins tested contain `\n` line breaks and **no HTML tags** (three of them are captured files). The app still removes markup (FR-CD-07); `fake/edge/detail_ethereum_edited.json` has an edited link for that test.
@@ -159,5 +160,4 @@ The classification table is in `03` §8.3 and is the only place where it is defi
 
 ## 8. Open points
 
-1. Whether the 24h % on Detail always equals the per-currency value for other coins (section 4).
-2. 429 and 5xx behaviour, and whether icons cost credits when they are not cached (section 6, `03` §17).
+1. 429 and 5xx behaviour, and whether icons cost credits when they are not cached (section 6, `03` §17).
