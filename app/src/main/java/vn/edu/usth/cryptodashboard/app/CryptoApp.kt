@@ -21,10 +21,20 @@ import vn.edu.usth.cryptodashboard.data.fake.CoinsByIdsFakeDataSource
 import vn.edu.usth.cryptodashboard.data.thread.HandlerMainThreadPoster
 import vn.edu.usth.cryptodashboard.data.fake.MarketListFakeDataSource
 import vn.edu.usth.cryptodashboard.data.fake.Scenario
+import vn.edu.usth.cryptodashboard.data.remote.ChartRemoteDataSource
+import vn.edu.usth.cryptodashboard.data.remote.CoinDetailRemoteDataSource
+import vn.edu.usth.cryptodashboard.data.remote.CoinsByIdsRemoteDataSource
+import vn.edu.usth.cryptodashboard.data.remote.MarketListRemoteDataSource
+import vn.edu.usth.cryptodashboard.data.remote.RemoteLoader
+import vn.edu.usth.cryptodashboard.data.remote.VolleyApiFetcher
 import vn.edu.usth.cryptodashboard.data.repository.ChartRepositoryImpl
 import vn.edu.usth.cryptodashboard.data.repository.CoinDetailRepositoryImpl
 import vn.edu.usth.cryptodashboard.data.repository.MarketRepositoryImpl
 import vn.edu.usth.cryptodashboard.data.repository.RateLimitGate
+import vn.edu.usth.cryptodashboard.data.source.ChartDataSource
+import vn.edu.usth.cryptodashboard.data.source.CoinDetailDataSource
+import vn.edu.usth.cryptodashboard.data.source.CoinsByIdsDataSource
+import vn.edu.usth.cryptodashboard.data.source.MarketListDataSource
 import vn.edu.usth.cryptodashboard.domain.repository.ChartRepository
 import vn.edu.usth.cryptodashboard.domain.repository.CoinDetailRepository
 import vn.edu.usth.cryptodashboard.domain.repository.MarketRepository
@@ -36,23 +46,47 @@ import vn.edu.usth.cryptodashboard.domain.repository.MarketRepository
  * `requireActivity().application as CryptoApp` in a Fragment.
  *
  * The data mode comes from `local.properties` through `BuildConfig` (`docs/fake-data.md` §5.1).
- * Only fake data sources exist so far, so `USE_FAKE_DATA=false` stops the app at startup.
+ * [onCreate] chooses the fake or the remote data sources once; the repositories on top of them are
+ * the same classes in both modes, and no other class checks the flag (`docs/03-architecture.md` D19).
  */
 class CryptoApp : Application() {
 
-    /** Read in [onCreate], so an unknown `FAKE_SCENARIO` stops the app at startup. */
-    private lateinit var fakeScenario: Scenario
-    private val fakeDelayMs: Long = BuildConfig.FAKE_DELAY_MS
+    // The data sources, chosen once in [onCreate] (fake or remote).
+    private lateinit var marketListSource: MarketListDataSource
+    private lateinit var coinsByIdsSource: CoinsByIdsDataSource
+    private lateinit var coinDetailSource: CoinDetailDataSource
+    private lateinit var chartSource: ChartDataSource
 
     override fun onCreate() {
         super.onCreate()
-        check(BuildConfig.USE_FAKE_DATA) {
-            "USE_FAKE_DATA=false is not supported yet: the remote data sources are not written. " +
-                "Remove the line or set USE_FAKE_DATA=true in local.properties."
-        }
-        fakeScenario = Scenario.fromName(BuildConfig.FAKE_SCENARIO)
+        if (BuildConfig.USE_FAKE_DATA) useFakeDataSources() else useRemoteDataSources()
+    }
+
+    /** An unknown `FAKE_SCENARIO` stops the app here, at startup (`docs/fake-data.md` §5.1). */
+    private fun useFakeDataSources() {
+        val scenario = Scenario.fromName(BuildConfig.FAKE_SCENARIO)
+        val delayMs = BuildConfig.FAKE_DELAY_MS
+        marketListSource = MarketListFakeDataSource(fakeReader, scenario, delayMs, executor, mainThread)
+        coinsByIdsSource = CoinsByIdsFakeDataSource(fakeReader, scenario, delayMs, executor, mainThread)
+        coinDetailSource = CoinDetailFakeDataSource(fakeReader, scenario, delayMs, executor, mainThread)
+        chartSource = ChartFakeDataSource(fakeReader, scenario, delayMs, executor, mainThread)
         Log.i(TAG, "Data source: FAKE")
-        Log.i(TAG, "Fake scenario: ${fakeScenario.name.lowercase()}, delay $fakeDelayMs ms")
+        Log.i(TAG, "Fake scenario: ${scenario.name.lowercase()}, delay $delayMs ms")
+    }
+
+    /** Without a key every request would fail with 401, so the app stops here with a clear message. */
+    private fun useRemoteDataSources() {
+        check(BuildConfig.CG_API_KEY.isNotBlank()) {
+            "USE_FAKE_DATA=false needs CG_API_KEY in local.properties. " +
+                "Add the key, or remove USE_FAKE_DATA=false to use the fake data."
+        }
+        val loader = RemoteLoader(VolleyApiFetcher(requestQueue, BuildConfig.CG_API_KEY), executor, mainThread)
+        marketListSource = MarketListRemoteDataSource(loader)
+        coinsByIdsSource = CoinsByIdsRemoteDataSource(loader)
+        coinDetailSource = CoinDetailRemoteDataSource(loader)
+        chartSource = ChartRemoteDataSource(loader)
+        // The key is never logged (`AGENTS.md` §7).
+        Log.i(TAG, "Data source: REAL")
     }
 
     /** The single `CurrencySettings`; no other code creates one. */
@@ -65,8 +99,8 @@ class CryptoApp : Application() {
 
     val marketRepository: MarketRepository by lazy {
         MarketRepositoryImpl(
-            MarketListFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
-            CoinsByIdsFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
+            marketListSource,
+            coinsByIdsSource,
             rateLimitGate,
             mainThread,
             clock,
@@ -75,7 +109,7 @@ class CryptoApp : Application() {
 
     val coinDetailRepository: CoinDetailRepository by lazy {
         CoinDetailRepositoryImpl(
-            CoinDetailFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
+            coinDetailSource,
             rateLimitGate,
             mainThread,
             clock,
@@ -84,7 +118,7 @@ class CryptoApp : Application() {
 
     val chartRepository: ChartRepository by lazy {
         ChartRepositoryImpl(
-            ChartFakeDataSource(fakeReader, fakeScenario, fakeDelayMs, executor, mainThread),
+            chartSource,
             rateLimitGate,
             mainThread,
             clock,
