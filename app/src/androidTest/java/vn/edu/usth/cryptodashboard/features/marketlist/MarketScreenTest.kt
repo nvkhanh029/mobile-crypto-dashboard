@@ -80,7 +80,9 @@ class MarketScreenTest {
         }
         onView(withId(R.id.marketRowStar)).perform(click())
         onView(withId(R.id.marketRowName)).perform(click())
-        onView(withText("Coin ID: bitcoin")).check(matches(isDisplayed()))
+        // The real Detail screen: its toolbar shows at once, the coin name once the data has loaded.
+        onView(withId(R.id.detailToolbar)).check(matches(isDisplayed()))
+        awaitCheck { onView(withId(R.id.detailToolbarTitle)).check(matches(withText("Bitcoin"))) }
         pressBack()
         onView(withId(R.id.marketSearch)).check(matches(withText("  bTc  ")))
         selectCurrency(Currency.VND)
@@ -345,6 +347,20 @@ class MarketScreenTest {
             SystemClock.sleep(50L)
         }
         fail("Market screen did not reach the expected state")
+    }
+
+    /** Repeats an Espresso check for up to 10 s; screens opened from the list load their data after they appear. */
+    private fun awaitCheck(check: () -> Unit) {
+        val deadline = SystemClock.uptimeMillis() + 10_000L
+        while (true) {
+            try {
+                check()
+                return
+            } catch (e: Throwable) { // AssertionError or NoMatchingViewException: try again until the deadline
+                if (SystemClock.uptimeMillis() >= deadline) throw e
+                SystemClock.sleep(50L)
+            }
+        }
     }
 
     private fun text(id: Int, vararg args: Any): String {
