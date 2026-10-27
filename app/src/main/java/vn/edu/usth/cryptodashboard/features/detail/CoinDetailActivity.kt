@@ -24,11 +24,13 @@ import vn.edu.usth.cryptodashboard.core.ui.StateView
 import vn.edu.usth.cryptodashboard.core.ui.UiState
 import vn.edu.usth.cryptodashboard.domain.model.CoinDetail
 import vn.edu.usth.cryptodashboard.domain.model.Currency
+import vn.edu.usth.cryptodashboard.features.chart.PriceChartFragment
 
 class CoinDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_COIN_ID = "coin_id"
+        private const val CHART_FRAGMENT_TAG = "price_chart"
     }
 
     private val currencySettings: CurrencySettings by lazy {
@@ -97,8 +99,17 @@ class CoinDetailActivity : AppCompatActivity() {
         }
         findViewById<AttributionView>(R.id.detailFooter).showUpdatedTime(null)
 
-        // TODO (after PR #9 merges): host PriceChartFragment.newInstance(coinId) in
-        // detailChartContainer using supportFragmentManager. Keep the reserved layout space until then.
+        // The chart owns its timeframe controls, data loading, and retry state.
+        // Add it once; FragmentManager restores it automatically after configuration changes.
+        if (coinId.isNotBlank() && savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.detailChartContainer,
+                    PriceChartFragment.newInstance(coinId),
+                    CHART_FRAGMENT_TAG,
+                )
+                .commit()
+        }
 
         viewModel = ViewModelProvider(
             this,

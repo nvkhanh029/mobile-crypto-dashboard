@@ -36,6 +36,15 @@ val fakeDelayMs: Long = localSetting("FAKE_DELAY_MS", "800").let { value ->
         ?: error("FAKE_DELAY_MS in local.properties must be a whole number of milliseconds (0 or more), not \"$value\"")
 }
 
+// The Demo API key (docs/fake-data.md §5.1). An empty or missing value gives "", so CI builds
+// without a key. Only the characters are checked, so the value can go into BuildConfig as a Java
+// string. The value is never printed, not even in the error message (AGENTS.md §7).
+val cgApiKey: String = localSetting("CG_API_KEY", "").also { value ->
+    require(value.matches(Regex("[A-Za-z0-9_-]*"))) {
+        "CG_API_KEY in local.properties may contain only letters, digits, - and _ (the value is not shown)"
+    }
+}
+
 android {
     namespace = "vn.edu.usth.cryptodashboard"
     compileSdk {
@@ -56,6 +65,7 @@ android {
         buildConfigField("boolean", "USE_FAKE_DATA", useFakeData.toString())
         buildConfigField("String", "FAKE_SCENARIO", "\"$fakeScenario\"")
         buildConfigField("long", "FAKE_DELAY_MS", "${fakeDelayMs}L")
+        buildConfigField("String", "CG_API_KEY", "\"$cgApiKey\"")
     }
 
     buildFeatures {
