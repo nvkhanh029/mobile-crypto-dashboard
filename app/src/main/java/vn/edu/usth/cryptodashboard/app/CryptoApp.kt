@@ -2,6 +2,7 @@ package vn.edu.usth.cryptodashboard.app
 
 import android.app.Application
 import android.content.Context
+import android.os.StrictMode
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.BasicNetwork
@@ -59,7 +60,18 @@ class CryptoApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) enableStrictMode()
         if (BuildConfig.USE_FAKE_DATA) useFakeDataSources() else useRemoteDataSources()
+    }
+
+    /**
+     * Debug builds only: StrictMode writes a line to Logcat (tag `StrictMode`) for disk or network
+     * work on the main thread and for leaked objects. It only logs, it never stops the app. Used to
+     * check NFR-03 (`docs/07-test-plan.md`, M27).
+     */
+    private fun enableStrictMode() {
+        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build())
+        StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build())
     }
 
     /** An unknown `FAKE_SCENARIO` stops the app here, at startup (`docs/fake-data.md` §5.1). */
