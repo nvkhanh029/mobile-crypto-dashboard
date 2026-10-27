@@ -8,11 +8,11 @@ import vn.edu.usth.cryptodashboard.domain.model.Currency
 /**
  * Stores the selected currency and exposes it as LiveData.
  *
- * The single instance is `CryptoApp.currencySettings`. [getInstance] is deprecated and is removed
- * once its last callers have moved to `CryptoApp`. SharedPreferences keeps the value across app
- * restarts (FR-CUR-02).
+ * Create it only in `CryptoApp`: the single instance is `CryptoApp.currencySettings`
+ * (`docs/05-interfaces.md` §6), so every screen observes the same value. SharedPreferences keeps
+ * the value across app restarts (FR-CUR-02).
  */
-class CurrencySettings private constructor(context: Context) {
+class CurrencySettings(context: Context) {
 
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     private val _currency = MutableLiveData(readSavedCurrency())
@@ -33,17 +33,5 @@ class CurrencySettings private constructor(context: Context) {
     companion object {
         private const val PREFERENCES_NAME = "currency_settings"
         private const val KEY_CURRENCY = "currency"
-
-        @Volatile
-        private var instance: CurrencySettings? = null
-
-        @Deprecated(
-            "Use CryptoApp.currencySettings: (application as CryptoApp).currencySettings in an " +
-                "Activity, (requireActivity().application as CryptoApp).currencySettings in a Fragment."
-        )
-        fun getInstance(context: Context): CurrencySettings =
-            instance ?: synchronized(this) {
-                instance ?: CurrencySettings(context.applicationContext).also { instance = it }
-            }
     }
 }
