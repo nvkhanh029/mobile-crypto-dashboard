@@ -101,15 +101,14 @@ Used by Market and Watchlist. One layout, one adapter (contract C4).
 
 ```
 ┌───────────────────────────────────────────────────────────┐
-│ 1  ◉  Bitcoin                  ╱╲_╱╲╱      $67,234.50  ☆  │
-│       BTC · MC $1.30T                      [ +2.35% ]     │
+│ ◉  Bitcoin                  ╱╲_╱╲╱      $67,234.50  ☆     │
+│    BTC · MC $1.30T                      [ +2.35% ]        │
 └───────────────────────────────────────────────────────────┘
- rank icon name / symbol·cap     sparkline   price / change  star
+  icon name / symbol·cap     sparkline   price / change  star
 ```
 
 | Element | Content and rules |
 |---|---|
-| Rank | Provider's rank, small, secondary text. Does not change when the list is sorted. Missing → `—`. |
 | Icon | Coin image. Placeholder shown while loading or if loading fails. |
 | Name | `RowTitle`, one line, **shortened with an ellipsis first** when space runs out. |
 | Second line | `SYMBOL · MC <market cap>` in `RowSubtitle` (for example `BTC · MC $1.30T`, compact format of §5.2). Missing market cap → `BTC · MC —`. |
@@ -132,7 +131,7 @@ Behaviour:
 - Percent values do not change with the currency (FR-CUR-03).
 
 ### CMP-03 Sparkline  *(FR-ML-02)*
-- Line only, no axes, no labels, no touch. Drawn on a Canvas (`03` §11).
+- A line with a faint fill under it, no axes, no labels, no touch. The fill has the colour of the line at low opacity at the line and fades to nothing at the bottom. Drawn on a Canvas (`03` §11).
 - Colour: `positive` if the last value is higher than the first, `negative` if lower, `neutral` if equal or fewer than 2 points. (This is the 7-day trend; the change label is the 24h change, so the two can differ.)
 - The same width on every row (one named dimension) so lines align down the list.
 
@@ -154,7 +153,6 @@ One row of three chips under the search field: **Market cap**, **Price**, **24h 
 - The active chip is highlighted and shows an arrow: ↓ descending, ↑ ascending (content description says "sorted descending/ascending").
 - Tapping the **active** chip reverses its direction. Tapping **another** chip makes it active, descending.
 - Sorting applies to the list after the search filter (FR-ML-05). Ties are ordered by rank ascending. Rows with a missing value in the sort field go last in both directions (FR-ML-09).
-- Rank numbers on the rows are not changed by sorting (FR-ML-01).
 - The sort is kept when the user switches tabs or returns from Detail; it is not saved across app restarts.
 - The three chips fit on one row at 360 dp without scrolling.
 
@@ -225,7 +223,7 @@ A Material dialog with a title, a short text and one button **Got it**. One comp
 
 | Use | Opened from | Title | Content |
 |---|---|---|---|
-| How to read this list | the ⓘ icon at the start of the main top bar (both tabs) | "How to read this list" | the five lines of the first table below |
+| How to read this list | the ⓘ icon at the start of the main top bar (both tabs) | "How to read this list" | the four lines of the first table below |
 | Statistic explanation | the ⓘ icon in a CMP-11 row | the statistic name | the one sentence of the second table below |
 
 Behaviour:
@@ -239,7 +237,6 @@ Behaviour:
 
 | Item | Text |
 |---|---|
-| Rank | The number on the left is the coin's rank by market cap. 1 is the largest. |
 | MC | MC is the market cap: the total value of all coins in circulation (price × circulating supply). |
 | Change label | The coloured label is the price change over the last 24 hours. Green with + means up, red with - means down. |
 | Trend line | The small line is the price trend over the last 7 days. It can point a different way than the 24-hour change. |
@@ -299,9 +296,9 @@ Owner: An Khánh.
 │ ⓘ   [Market|Watchlist] USD ▾ │  top bar (SCR-01)
 │ [🔍 Search coins        ✕]   │  CMP-06
 │ [Market cap ↓] [Price] [24h%]│  CMP-05
-│ 1 ◉ Bitcoin   ╱╲╱   $67,234  │
+│ ◉ Bitcoin   ╱╲╱   $67,234    │
 │   BTC · MC $1.30T  [+2.35%]  │  CMP-01 rows
-│ 2 ◉ Ethereum  ╲╱╲   $2,345   │
+│ ◉ Ethereum  ╲╱╲   $2,345     │
 │   ...                        │
 ├──────────────────────────────┤
 │ Powered by CoinGecko  🕒 14:32│  CMP-08
@@ -409,8 +406,9 @@ Chart:
 - **Colour** (S, FR-CD-05): `positive` if the last price of the period ≥ the first, `negative` otherwise. If FR-CD-05 is not built, one fixed colour.
 - **Area fill** (S, FR-CD-11): the same colour at low opacity from the line to the bottom.
 - **Reference line** (C, FR-CD-12): dashed horizontal line at the first price of the period.
+- **Grid** (§9, item 12): faint horizontal lines at the price labels and vertical lines at the time labels, drawn behind the line.
 - **Axis labels** (S, FR-CD-13): 3–4 price labels along the right edge (price format of §5.2); time labels along the bottom with the time format below.
-- **Touch** (FR-CD-04): touching or dragging shows a vertical marker and a dot at the nearest data point and a label with its price (same format as the header) and its time. The label stays inside the chart bounds. Lifting the finger hides everything. While the marker is active the page does not scroll.
+- **Touch** (FR-CD-04): touching or dragging shows a vertical marker and a dot at the nearest data point and a label with its price (same format as the header) and its time. The label stays inside the chart bounds. Lifting the finger hides everything. A drag that starts vertically scrolls the page; once a drag is mostly horizontal, the page does not scroll until the finger is lifted.
 
 | Timeframe | Time format (axis labels and marker) |
 |---|---|
@@ -454,7 +452,6 @@ Use these when checking a layout at 360×640 dp and 411×891 dp (the fake files 
 | Short and long symbols | `BTC`, `USDT`, a 6-character symbol |
 | Very small price | `$0.00001234` (8 decimals) |
 | Large VND values | `1,650,000 ₫` price, `32.50T ₫` market cap |
-| Rank | `1` and `100` |
 | Change | positive, negative, zero, missing |
 | Missing fields | use `markets_missing_fields_usd.json` and `detail_missing_fields.json` |
 | Few results | `markets_short_usd.json` (3 coins), `markets_empty.json` |
@@ -521,3 +518,4 @@ These are not stated in `01`; they hold for this document.
 9. Detail has no pull-to-refresh. Its currency selector is a Should (FR-CUR-05).
 10. Sort and search text are kept while the app is running and are not saved across restarts.
 11. The two tabs are switched with a pill toggle in the top bar (CMP-13); there is no bottom navigation, no separate tab row and no swiping between tabs.
+12. The price chart (SCR-05) draws a faint grid behind the line. It helps to read the price and time labels and is not a requirement of `01`.

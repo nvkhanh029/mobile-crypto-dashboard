@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Opacity of the fill under the sparkline on the coin row (CMP-03), 0..255. Larger shows the fill more. -->
+<resources>
+    <integer name="sparkline_fill_alpha">110</integer>
+</resources>

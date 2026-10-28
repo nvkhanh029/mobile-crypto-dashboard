@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Sizes used only by the Market coin row (CMP-01). Shared sizes live in dimens.xml (UI foundation). -->
-<resources>
-    <!-- Rank column: narrow enough to give the coin name more room at 360 dp, wide enough for "100". -->
-    <dimen name="market_rank_min_width">22dp</dimen>
-</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sizes used only by the Coin Detail screen (SCR-04). Shared sizes live in dimens.xml. -->
+<resources>
+    <!--
+        Size of the back arrow symbol in the Detail top bar. The touch target stays touch_min (48 dp);
+        only the symbol is larger.
+    -->
+    <dimen name="detail_back_symbol_size">32sp</dimen>
+</resources>

@@ -2,11 +2,14 @@ package vn.edu.usth.cryptodashboard.features.marketlist
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import vn.edu.usth.cryptodashboard.R
 
 /** CMP-03 / FR-ML-02. The seven-day trend is independent of the 24h percentage. */
@@ -19,7 +22,11 @@ class SparklineView @JvmOverloads constructor(
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
     }
+    private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+    }
     private val path = Path()
+    private val fillPath = Path()
     private var points: List<Double> = emptyList()
 
     fun setPoints(values: List<Double>?) {
@@ -46,6 +53,8 @@ class SparklineView @JvmOverloads constructor(
 
     private fun rebuildPath() {
         path.reset()
+        fillPath.reset()
+        fill.shader = null
         if (points.size < 2) return
         val inset = line.strokeWidth / 2f
         val plotWidth = width - paddingLeft - paddingRight - line.strokeWidth
@@ -54,17 +63,39 @@ class SparklineView @JvmOverloads constructor(
         val low = points.min()
         val high = points.max()
         val span = high - low
+        var firstX = 0f
+        var lastX = 0f
         points.forEachIndexed { index, value ->
             val fraction = if (span == 0.0) 0.5 else (value - low) / span
             val x = paddingLeft + inset + plotWidth * index / (points.size - 1)
             val y = paddingTop + inset + plotHeight * (1.0 - fraction).toFloat()
-            if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
+            if (index == 0) {
+                path.moveTo(x, y)
+                firstX = x
+            } else {
+                path.lineTo(x, y)
+            }
+            lastX = x
         }
+        // The fill is the same line closed down to the bottom edge of the view.
+        val top = paddingTop.toFloat()
+        val bottom = (height - paddingBottom).toFloat()
+        fillPath.addPath(path)
+        fillPath.lineTo(lastX, bottom)
+        fillPath.lineTo(firstX, bottom)
+        fillPath.close()
+        val alpha = resources.getInteger(R.integer.sparkline_fill_alpha)
+        fill.shader = LinearGradient(
+            0f, top, 0f, bottom,
+            ColorUtils.setAlphaComponent(line.color, alpha),
+            ColorUtils.setAlphaComponent(line.color, 0),
+            Shader.TileMode.CLAMP,
+        )
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        canvas.drawPath(fillPath, fill)
         canvas.drawPath(path, line)
     }
 }
-

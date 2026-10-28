@@ -10,6 +10,12 @@
     <dimen name="chart_highlight_dot_radius">3dp</dimen>
     <dimen name="chart_marker_max_width">240dp</dimen>
 
+    <!--
+        Gap between the bottom edge of the plot and the time labels (FR-CD-13). The library default
+        is 5dp, which let the time label touch the lowest price label at the corner of the two axes.
+    -->
+    <dimen name="chart_time_axis_offset">12dp</dimen>
+
     <!-- Chips (CMP-10): 5 equal-width buttons must fit at 360 dp. -->
     <dimen name="chart_chip_min_width">0dp</dimen>
     <dimen name="chart_chip_inset">0dp</dimen>

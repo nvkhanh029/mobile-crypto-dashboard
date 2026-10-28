@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/detailRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/detailBackground">
 
     <LinearLayout
         android:id="@+id/detailToolbar"
@@ -27,7 +28,9 @@
             android:contentDescription="@string/detail_back"
             android:focusable="true"
             android:gravity="center"
-            android:text="@string/detail_back_symbol" />
+            android:includeFontPadding="false"
+            android:text="@string/detail_back_symbol"
+            android:textSize="@dimen/detail_back_symbol_size" />
 
         <TextView
             android:id="@+id/detailToolbarTitle"

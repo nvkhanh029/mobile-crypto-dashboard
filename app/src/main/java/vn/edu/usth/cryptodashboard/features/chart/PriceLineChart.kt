@@ -29,7 +29,7 @@ class PriceLineChart @JvmOverloads constructor(
     private val dotStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = resources.getDimension(R.dimen.divider_thickness)
-        color = ContextCompat.getColor(context, R.color.background)
+        color = ContextCompat.getColor(context, R.color.detailBackground)
     }
 
     /** Filled with the line colour, so the dot belongs to the chart and still stands out. */

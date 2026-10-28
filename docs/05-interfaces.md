@@ -81,7 +81,7 @@ enum class Timeframe(val days: Int) {
 ```
 
 Notes:
-- `Coin` is used by Market and Watchlist. `marketCapRank` is the provider's rank and does not change when the user sorts (FR-ML-01).
+- `Coin` is used by Market and Watchlist. `marketCapRank` is the provider's rank. It is not shown; it only orders ties when sorting (FR-ML-04).
 - `Coin.sparkline7d` has 168 points for most coins, but the length varies, so never assume a fixed length (`04` §1.1).
 - `CoinDetail.description` is **plain text**: the mapper removes markup, so the screen only shows it (FR-CD-07). `null` means no description (a missing key, `null` or an empty string).
 - `CoinDetail.totalSupply` and `maxSupply`: a `null` means the statistics row is not shown (FR-CD-06).

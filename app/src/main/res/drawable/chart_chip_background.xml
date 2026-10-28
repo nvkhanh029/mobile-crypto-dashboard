@@ -20,7 +20,7 @@
             android:insetTop="@dimen/space_m"
             android:insetBottom="@dimen/space_m">
             <shape android:shape="rectangle">
-                <solid android:color="@color/background" />
+                <solid android:color="@android:color/transparent" />
                 <corners android:radius="@dimen/corner_pill" />
             </shape>
         </inset>

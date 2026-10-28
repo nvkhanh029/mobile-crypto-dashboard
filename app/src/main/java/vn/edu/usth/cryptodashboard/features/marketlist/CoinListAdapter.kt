@@ -55,7 +55,6 @@ class CoinListAdapter(
     }
 
     inner class CoinViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val rank: TextView = view.findViewById(R.id.marketRowRank)
         private val icon: NetworkImageView = view.findViewById(R.id.marketRowIcon)
         private val name: TextView = view.findViewById(R.id.marketRowName)
         private val subtitle: TextView = view.findViewById(R.id.marketRowSubtitle)
@@ -67,8 +66,6 @@ class CoinListAdapter(
         fun bind(row: CoinRow) {
             val coin = row.coin
             val available = coin != null
-            rank.visibility = if (available) View.VISIBLE else View.INVISIBLE
-            rank.text = coin?.marketCapRank?.toString() ?: PriceFormatter.MISSING_VALUE
             name.text = coin?.name ?: row.coinId
             subtitle.text = if (coin == null) itemView.context.getString(R.string.market_data_unavailable)
             else itemView.context.getString(
