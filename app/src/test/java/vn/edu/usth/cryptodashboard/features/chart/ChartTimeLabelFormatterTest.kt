@@ -28,4 +28,13 @@ class ChartTimeLabelFormatterTest {
         assertEquals("14/11/2023", ChartTimeLabelFormatter.format(timestamp, Timeframe.M1, utc))
         assertEquals("14/11/2023", ChartTimeLabelFormatter.format(timestamp, Timeframe.Y1, utc))
     }
+
+    @Test
+    fun `axis labels are short for 1m and 1y and match the marker otherwise`() {
+        assertEquals("22:13", ChartTimeLabelFormatter.formatAxis(timestamp, Timeframe.H1, utc))
+        assertEquals("22:13", ChartTimeLabelFormatter.formatAxis(timestamp, Timeframe.H24, utc))
+        assertEquals("14/11 22:13", ChartTimeLabelFormatter.formatAxis(timestamp, Timeframe.D7, utc))
+        assertEquals("14/11", ChartTimeLabelFormatter.formatAxis(timestamp, Timeframe.M1, utc))
+        assertEquals("11/2023", ChartTimeLabelFormatter.formatAxis(timestamp, Timeframe.Y1, utc))
+    }
 }

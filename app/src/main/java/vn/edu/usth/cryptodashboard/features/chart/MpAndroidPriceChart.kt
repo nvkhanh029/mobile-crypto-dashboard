@@ -136,7 +136,7 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
         }
 
         chart.xAxis.valueFormatter = IndexAxisValueFormatter(
-            points.map { ChartTimeLabelFormatter.format(it.timestampMillis, timeframe) },
+            points.map { ChartTimeLabelFormatter.formatAxis(it.timestampMillis, timeframe) },
         )
         chart.xAxis.setLabelCount(xAxisLabelCount(timeframe), true)
         chart.axisRight.valueFormatter = object : ValueFormatter() {
@@ -169,7 +169,7 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
         chart.invalidate()
     }
 
-    /** FR-CD-13: long date labels need fewer ticks so they never overlap at 360 dp. */
+    /** FR-CD-13: the 7D labels are the longest, so they get fewer ticks to fit at 360 dp. */
     private fun xAxisLabelCount(timeframe: Timeframe): Int = when (timeframe) {
         Timeframe.H1, Timeframe.H24 -> X_AXIS_LABEL_COUNT_SHORT
         Timeframe.D7 -> X_AXIS_LABEL_COUNT_MEDIUM

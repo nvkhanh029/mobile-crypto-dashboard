@@ -127,7 +127,7 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 | FR-CD-10 | Short explanation of stats | S | Each statistic of FR-CD-06 (market cap, 24h trading volume, circulating supply, total supply, max supply, all-time high, all-time low) has an ⓘ icon after its label. Tapping the label area (touch target ≥ 48 dp) opens a dialog with a one-sentence, plain-language explanation of that statistic; "Got it" closes it. The text comes from string resources, English and Vietnamese (FR-UI-02). The explanation never says that a value is good or bad. |
 | FR-CD-11 | Area fill under the line | S | The area between the line and the bottom of the chart is filled with the chart colour at low opacity. Dropped if the chart library cannot do it (decided in S3). |
 | FR-CD-12 | Reference line | C | A dashed horizontal line at the first price of the selected period, so the user sees whether the price is above or below where the period started. |
-| FR-CD-13 | Axis labels | S | Price labels (3 to 4 values) along the right edge, formatted like the header price; time labels along the bottom, formatted per FR-CD-04. |
+| FR-CD-13 | Axis labels | S | Price labels (3 to 4 values) along the right edge, formatted like the header price; time labels along the bottom, formatted per FR-CD-04 except `dd/MM` for 1M and `MM/yyyy` for 1Y (shorter, so the labels fit at 360 dp). |
 
 ### 4.4 Watchlist (FR-WL)
 | ID | Requirement | Pri | Acceptance criteria |
