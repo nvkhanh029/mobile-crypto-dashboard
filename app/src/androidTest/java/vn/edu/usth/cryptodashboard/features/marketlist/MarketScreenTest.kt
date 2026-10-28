@@ -188,10 +188,11 @@ class MarketScreenTest {
             fun text(row: View, id: Int) = row.findViewById<TextView>(id).text.toString()
             assertEquals("—", text(rows[0], R.id.marketRowPrice))
             assertTrue(text(rows[1], R.id.marketRowSubtitle).endsWith("MC —"))
-            assertEquals("—", text(rows[2], R.id.marketRowRank))
+            // Row 2 has no rank: the rank is not shown, and the row must still look normal.
+            assertTrue(text(rows[2], R.id.marketRowName).isNotEmpty())
             assertEquals("—", text(rows[3], R.id.marketRowChange))
             assertEquals(View.VISIBLE, rows[4].findViewById<View>(R.id.marketRowSparkline).visibility)
-            for (row in rows) for (id in listOf(R.id.marketRowName, R.id.marketRowSubtitle, R.id.marketRowPrice, R.id.marketRowChange, R.id.marketRowRank)) {
+            for (row in rows) for (id in listOf(R.id.marketRowName, R.id.marketRowSubtitle, R.id.marketRowPrice, R.id.marketRowChange)) {
                 val value = text(row, id)
                 assertFalse("No null or NaN on screen: " + value, value.contains("null") || value.contains("NaN"))
             }
@@ -228,18 +229,12 @@ class MarketScreenTest {
         screen!!.onActivity { activity ->
             val list = activity.findViewById<RecyclerView>(R.id.marketList)
             val rows = (0..2).map { list.findViewHolderForAdapterPosition(it)!!.itemView }
-            assertEquals(View.INVISIBLE, rows[1].findViewById<View>(R.id.marketRowRank).visibility)
             assertEquals(textFrom(activity, R.string.market_data_unavailable),
                 rows[1].findViewById<TextView>(R.id.marketRowSubtitle).text.toString())
             for (id in listOf(R.id.marketRowIcon, R.id.marketRowName, R.id.marketRowSubtitle)) {
                 assertEquals("Columns must align across available and unavailable rows", 1,
                     rows.map { it.findViewById<View>(id).left }.distinct().size)
             }
-            val rank = rows[2].findViewById<TextView>(R.id.marketRowRank)
-            assertEquals("100", rank.text.toString())
-            assertEquals("Rank 100 must fit", 0, rank.layout.getEllipsisCount(0))
-            assertTrue(rank.paint.measureText(rank.text.toString()) <=
-                rank.width - rank.totalPaddingLeft - rank.totalPaddingRight)
             val name = rows[2].findViewById<TextView>(R.id.marketRowName)
             val price = rows[2].findViewById<TextView>(R.id.marketRowPrice)
             assertTrue("Long name retains space", name.width > 0)

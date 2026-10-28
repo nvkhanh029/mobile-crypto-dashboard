@@ -31,7 +31,7 @@
     <string name="dialog_got_it">Đã hiểu</string>
     <string name="dialog_how_to_read_title">Cách đọc danh sách này</string>
     <string name="content_desc_how_to_read">Cách đọc danh sách này</string>
-    <string name="dialog_how_to_read_body">Thứ hạng — Số bên trái là thứ hạng của coin theo vốn hóa thị trường. Số 1 là lớn nhất.\nMC — MC là vốn hóa thị trường: tổng giá trị của tất cả coin đang lưu hành (giá × lượng cung lưu hành).\nNhãn thay đổi — Nhãn màu là mức thay đổi giá trong 24 giờ qua. Màu xanh kèm dấu + là tăng, màu đỏ kèm dấu - là giảm.\nĐường xu hướng — Đường nhỏ là xu hướng giá trong 7 ngày qua. Nó có thể đi ngược chiều với mức thay đổi 24 giờ.\nNgôi sao — Chạm vào ngôi sao để thêm hoặc bỏ coin khỏi Watchlist của bạn.</string>
+    <string name="dialog_how_to_read_body">MC — MC là vốn hóa thị trường: tổng giá trị của tất cả coin đang lưu hành (giá × lượng cung lưu hành).\nNhãn thay đổi — Nhãn màu là mức thay đổi giá trong 24 giờ qua. Màu xanh kèm dấu + là tăng, màu đỏ kèm dấu - là giảm.\nĐường xu hướng — Đường nhỏ là xu hướng giá trong 7 ngày qua. Nó có thể đi ngược chiều với mức thay đổi 24 giờ.\nNgôi sao — Chạm vào ngôi sao để thêm hoặc bỏ coin khỏi Watchlist của bạn.</string>
 
     <string name="dialog_statistic_market_cap_title">Vốn hóa thị trường</string>
     <string name="dialog_statistic_market_cap_text">Tổng giá trị của tất cả coin đang lưu hành: giá × lượng cung lưu hành.</string>

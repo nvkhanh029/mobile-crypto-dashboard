@@ -33,7 +33,7 @@
     <string name="dialog_got_it">Got it</string>
     <string name="dialog_how_to_read_title">How to read this list</string>
     <string name="content_desc_how_to_read">How to read this list</string>
-    <string name="dialog_how_to_read_body">Rank — The number on the left is the coin\'s rank by market cap. 1 is the largest.\nMC — MC is the market cap: the total value of all coins in circulation (price × circulating supply).\nChange label — The coloured label is the price change over the last 24 hours. Green with + means up, red with - means down.\nTrend line — The small line is the price trend over the last 7 days. It can point a different way than the 24-hour change.\nStar — Tap the star to add or remove the coin in your Watchlist.</string>
+    <string name="dialog_how_to_read_body">MC — MC is the market cap: the total value of all coins in circulation (price × circulating supply).\nChange label — The coloured label is the price change over the last 24 hours. Green with + means up, red with - means down.\nTrend line — The small line is the price trend over the last 7 days. It can point a different way than the 24-hour change.\nStar — Tap the star to add or remove the coin in your Watchlist.</string>
 
     <string name="dialog_statistic_market_cap_title">Market cap</string>
     <string name="dialog_statistic_market_cap_text">The total value of all coins in circulation: price × circulating supply.</string>
