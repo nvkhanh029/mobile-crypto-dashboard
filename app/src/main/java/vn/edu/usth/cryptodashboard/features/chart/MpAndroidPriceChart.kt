@@ -51,13 +51,22 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
 
         val axisTextSize = dp(R.dimen.caption_text_size_min)
         val secondaryTextColor = ContextCompat.getColor(context, R.color.textSecondary)
+        val faintGridColor = ColorUtils.setAlphaComponent(
+            ContextCompat.getColor(context, R.color.divider),
+            context.resources.getInteger(R.integer.chart_grid_alpha),
+        )
+        val gridThickness = dp(R.dimen.divider_thickness)
 
         chart.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
-            setDrawGridLines(false)
+            setDrawGridLines(true)
+            gridColor = faintGridColor
+            gridLineWidth = gridThickness
             setDrawAxisLine(false)
             textColor = secondaryTextColor
             textSize = axisTextSize
+            // Pushes the time labels down so they do not touch the lowest price label (FR-CD-13).
+            yOffset = dp(R.dimen.chart_time_axis_offset)
             granularity = 1f
             isGranularityEnabled = true
             setAvoidFirstLastClipping(true)
@@ -65,7 +74,9 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
 
         chart.axisRight.apply {
             isEnabled = true
-            setDrawGridLines(false)
+            setDrawGridLines(true)
+            gridColor = faintGridColor
+            gridLineWidth = gridThickness
             setDrawAxisLine(false)
             textColor = secondaryTextColor
             textSize = axisTextSize

@@ -2,43 +2,22 @@
 <!--
     SCR-05 Price chart area (docs/02-ui-spec.md section 4). Owner: Duy.
     Only the chart area changes state; the chips stay usable while it loads (FR-CD-03).
-    The chart comes first and the range chips sit below it, like the Apple Stocks detail screen.
+    The timeframe chips (CMP-10) sit above the chart, the chart below them.
 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <FrameLayout
-        android:id="@+id/chartArea"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/chart_height"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <vn.edu.usth.cryptodashboard.features.chart.PriceLineChart
-            android:id="@+id/chartView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/chart_content_description" />
-
-        <vn.edu.usth.cryptodashboard.core.ui.StateView
-            android:id="@+id/chartStateView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
-
     <RadioGroup
         android:id="@+id/chartTimeframeGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_s"
         android:checkedButton="@id/chartChip24h"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartArea">
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
             android:id="@+id/chartChip1h"
@@ -84,5 +63,25 @@
             android:layout_weight="1"
             android:text="@string/chart_timeframe_1y" />
     </RadioGroup>
+
+    <FrameLayout
+        android:id="@+id/chartArea"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/chart_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartTimeframeGroup">
+
+        <vn.edu.usth.cryptodashboard.features.chart.PriceLineChart
+            android:id="@+id/chartView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/chart_content_description" />
+
+        <vn.edu.usth.cryptodashboard.core.ui.StateView
+            android:id="@+id/chartStateView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

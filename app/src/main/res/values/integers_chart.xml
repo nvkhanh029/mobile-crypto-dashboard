@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Area fill opacity of the price chart (FR-CD-11), 0..255. -->
+<!--
+    Opacity values of the price chart, 0..255.
+    chart_area_fill_alpha: area fill under the line (FR-CD-11).
+    chart_grid_alpha: faint grid lines behind the line; a higher number makes them easier to see.
+-->
 <resources>
     <integer name="chart_area_fill_alpha">90</integer>
+    <integer name="chart_grid_alpha">200</integer>
 </resources>
