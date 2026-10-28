@@ -1,7 +1,6 @@
 package vn.edu.usth.cryptodashboard.app
 
 import android.app.Application
-import android.content.Context
 import android.os.StrictMode
 import android.util.Log
 import com.android.volley.RequestQueue
@@ -104,9 +103,9 @@ class CryptoApp : Application() {
     /** The single `CurrencySettings`; no other code creates one. */
     val currencySettings: CurrencySettings by lazy { CurrencySettings(this) }
 
-    /** Created on first use, so the saved favorites are not read during app startup. */
+    /** Created on first use; the saved list is read on the executor, never on the main thread. */
     val favoriteStore: FavoriteStore by lazy {
-        SharedPrefsFavoriteStore(getSharedPreferences(FAVORITES_PREFERENCES, Context.MODE_PRIVATE))
+        SharedPrefsFavoriteStore(this, executor) { action -> mainThread.post(0, action) }
     }
 
     val marketRepository: MarketRepository by lazy {
@@ -153,7 +152,6 @@ class CryptoApp : Application() {
     }
 
     private companion object {
-        const val FAVORITES_PREFERENCES = "favorites"
         const val TAG = "CryptoApp"
     }
 }
