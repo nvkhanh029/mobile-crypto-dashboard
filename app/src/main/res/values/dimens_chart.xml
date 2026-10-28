@@ -19,4 +19,10 @@
     <!-- Chips (CMP-10): 5 equal-width buttons must fit at 360 dp. -->
     <dimen name="chart_chip_min_width">0dp</dimen>
     <dimen name="chart_chip_inset">0dp</dimen>
+    <!--
+        Space between the edge of the 48 dp chip and the selected pill. With 8dp on every side the
+        pill is 32dp high and leaves room around "24H", the widest label, at 360 dp.
+    -->
+    <dimen name="chart_chip_pill_inset_horizontal">8dp</dimen>
+    <dimen name="chart_chip_pill_inset_vertical">8dp</dimen>
 </resources>

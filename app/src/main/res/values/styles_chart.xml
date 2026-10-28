@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Timeframe chip of the price chart (CMP-10). Owner: Duy.
-    Apple-Stocks-style range picker: no outline, selected neutral capsule, unselected text only.
+    No outline; the selected chip is a pill filled with accent (onAccent text), the others text only.
     Colours, corners and touch size come from Hải's roles.
 -->
 <resources>

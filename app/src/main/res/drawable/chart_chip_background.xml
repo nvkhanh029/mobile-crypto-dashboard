@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Apple-Stocks-style range chip: smaller pill inside the 48 dp touch target. -->
+<!--
+    Timeframe chip (CMP-10): the selected chip is a pill filled with accent, inside the 48 dp
+    touch target. The pill size comes from chart_chip_pill_inset_horizontal / _vertical.
+-->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <inset
-            android:insetLeft="@dimen/space_s"
-            android:insetRight="@dimen/space_s"
-            android:insetTop="@dimen/space_m"
-            android:insetBottom="@dimen/space_m">
+            android:insetLeft="@dimen/chart_chip_pill_inset_horizontal"
+            android:insetRight="@dimen/chart_chip_pill_inset_horizontal"
+            android:insetTop="@dimen/chart_chip_pill_inset_vertical"
+            android:insetBottom="@dimen/chart_chip_pill_inset_vertical">
             <shape android:shape="rectangle">
-                <solid android:color="@color/divider" />
+                <solid android:color="@color/accent" />
                 <corners android:radius="@dimen/corner_pill" />
             </shape>
         </inset>
     </item>
     <item>
         <inset
-            android:insetLeft="@dimen/space_s"
-            android:insetRight="@dimen/space_s"
-            android:insetTop="@dimen/space_m"
-            android:insetBottom="@dimen/space_m">
+            android:insetLeft="@dimen/chart_chip_pill_inset_horizontal"
+            android:insetRight="@dimen/chart_chip_pill_inset_horizontal"
+            android:insetTop="@dimen/chart_chip_pill_inset_vertical"
+            android:insetBottom="@dimen/chart_chip_pill_inset_vertical">
             <shape android:shape="rectangle">
                 <solid android:color="@android:color/transparent" />
                 <corners android:radius="@dimen/corner_pill" />

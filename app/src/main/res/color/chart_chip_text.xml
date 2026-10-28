@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Apple-Stocks-style range picker: selected text primary, unselected secondary. -->
+<!-- Timeframe chip (CMP-10): onAccent on the selected accent pill, textSecondary otherwise. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/textPrimary" android:state_checked="true" />
+    <item android:color="@color/onAccent" android:state_checked="true" />
     <item android:color="@color/textSecondary" />
 </selector>
