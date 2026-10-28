@@ -410,11 +410,14 @@ Chart:
 - **Axis labels** (S, FR-CD-13): 3–4 price labels along the right edge (price format of §5.2); time labels along the bottom with the time format below.
 - **Touch** (FR-CD-04): touching or dragging shows a vertical marker and a dot at the nearest data point and a label with its price (same format as the header) and its time. The label stays inside the chart bounds. Lifting the finger hides everything. A drag that starts vertically scrolls the page; once a drag is mostly horizontal, the page does not scroll until the finger is lifted.
 
-| Timeframe | Time format (axis labels and marker) |
-|---|---|
-| 1H, 24H | `HH:mm` |
-| 7D | `dd/MM HH:mm` |
-| 1M, 1Y | `dd/MM/yyyy` |
+| Timeframe | Marker | Axis labels |
+|---|---|---|
+| 1H, 24H | `HH:mm` | `HH:mm` |
+| 7D | `dd/MM HH:mm` | `dd/MM HH:mm` |
+| 1M | `dd/MM/yyyy` | `dd/MM` |
+| 1Y | `dd/MM/yyyy` | `MM/yyyy` |
+
+The axis labels of 1M and 1Y are shorter than the marker so that the labels fit at 360 dp; the marker keeps the full date.
 
 States (shown **in the chart area only**; chips and the rest of the screen stay usable):
 

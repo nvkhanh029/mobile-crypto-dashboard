@@ -61,7 +61,7 @@ A test that needs a fake scenario is skipped unless `FAKE_SCENARIO` in `local.pr
 | FR-CD-10 | S | M07 |
 | FR-CD-11 | S | M08 |
 | FR-CD-12 | C | M08 (only if the requirement is built) |
-| FR-CD-13 | S | M08 |
+| FR-CD-13 | S | U `ChartTimeLabelFormatterTest`, `DateFormatterTest.chartLabelsUseTheDocumentedPatterns`; M08 |
 
 ### 2.3 Watchlist, currency
 

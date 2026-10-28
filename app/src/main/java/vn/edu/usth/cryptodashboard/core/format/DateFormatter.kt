@@ -17,6 +17,8 @@ object DateFormatter {
     const val TIME_PATTERN = "HH:mm"
     const val DATE_TIME_PATTERN = "dd/MM HH:mm"
     const val DATE_PATTERN = "dd/MM/yyyy"
+    const val DAY_MONTH_PATTERN = "dd/MM"
+    const val MONTH_YEAR_PATTERN = "MM/yyyy"
 
     fun formatLastUpdated(
         epochMilliseconds: Long,
@@ -37,6 +39,16 @@ object DateFormatter {
         epochMilliseconds: Long,
         timeZone: TimeZone = TimeZone.getDefault(),
     ): String = formatWithPattern(epochMilliseconds, DATE_PATTERN, timeZone)
+
+    fun formatDayMonth(
+        epochMilliseconds: Long,
+        timeZone: TimeZone = TimeZone.getDefault(),
+    ): String = formatWithPattern(epochMilliseconds, DAY_MONTH_PATTERN, timeZone)
+
+    fun formatMonthYear(
+        epochMilliseconds: Long,
+        timeZone: TimeZone = TimeZone.getDefault(),
+    ): String = formatWithPattern(epochMilliseconds, MONTH_YEAR_PATTERN, timeZone)
 
     fun formatWithPattern(
         epochMilliseconds: Long,

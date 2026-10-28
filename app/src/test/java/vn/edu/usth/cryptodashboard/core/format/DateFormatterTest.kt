@@ -20,6 +20,8 @@ class DateFormatterTest {
         assertEquals("14:32", DateFormatter.formatTime(epochMilliseconds, utc))
         assertEquals("13/10 14:32", DateFormatter.formatDateTime(epochMilliseconds, utc))
         assertEquals("13/10/2025", DateFormatter.formatDate(epochMilliseconds, utc))
+        assertEquals("13/10", DateFormatter.formatDayMonth(epochMilliseconds, utc))
+        assertEquals("10/2025", DateFormatter.formatMonthYear(epochMilliseconds, utc))
     }
 
     @Test

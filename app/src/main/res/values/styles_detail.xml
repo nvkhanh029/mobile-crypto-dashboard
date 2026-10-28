@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Coin Detail styles (SCR-04). Owner: Kiên.
+    Section headings ("Statistics", "About") are one step larger than the statistics rows
+    (StatLabel / StatValue, BodyMedium), so they read as titles of the list below them.
+-->
+<resources>
+    <style name="DetailSectionHeading" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+</resources>
