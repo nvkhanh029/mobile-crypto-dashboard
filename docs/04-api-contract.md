@@ -61,7 +61,7 @@ Response: a JSON array, one object per coin. Each object has **27 fields; the ap
 | `image` | string (URL) | no | icon; the URL contains `/large/`, the same image as `image.large` on Detail |
 | `current_price` | number, int or decimal | not in the sample | row price (sorting) |
 | `market_cap` | number, int, can exceed `Int` | not in the sample | row, sorting |
-| `market_cap_rank` | integer | not in the sample | rank in the row; does not change when the user sorts (FR-ML-01) |
+| `market_cap_rank` | integer | not in the sample | order of ties when sorting (FR-ML-04); not shown on the row |
 | `price_change_percentage_24h` | decimal | not in the sample | 24h % in the row, sorting |
 | `sparkline_in_7d.price` | array of numbers (168 or 133) | not in the sample | 7-day trend line (FR-ML-02) |
 

@@ -17,7 +17,7 @@ Priority legend: **M** = Must (demo cannot fail without it), **S** = Should (do 
 | O2 | Let a user inspect one coin: price history over several timeframes and key statistics. |
 | O3 | Let a user keep a personal list of favorite coins that survives app restarts. |
 | O4 | Stay usable when data is unavailable (no network, rate limit, missing fields) and work in USD and VND. |
-| O5 | Let a beginner understand every market term and number the app shows (rank, market cap, 24h change, trend line, volume, supply, all-time high and low) without leaving the app. |
+| O5 | Let a beginner understand every market term and number the app shows (market cap, 24h change, trend line, volume, supply, all-time high and low) without leaving the app. |
 
 ### 1.2 Target users
 Beginners who want to explore the crypto market. The app is for **monitoring and learning only**. It is not a trading platform.
@@ -101,15 +101,15 @@ These were assumptions before the spikes S1 (API capture) and S2 (network test).
 ### 4.2 Market List (FR-ML)
 | ID | Requirement | Pri | Acceptance criteria |
 |---|---|---|---|
-| FR-ML-01 | Show top 100 coins | M | "Top 100" = the first 100 coins returned by the data provider ordered by market cap rank at fetch time (may include stablecoins). Each row: rank, icon, name, symbol, price, 24h % change, market cap, sparkline. Rank is the provider's rank and does not change when the user sorts. If fewer than 100 coins are returned, show what was returned without error. |
-| FR-ML-02 | 7-day sparkline per row | M | Line chart without axes. Green if last value > first value, red if lower, neutral if equal or fewer than 2 points. A 24h % that is not zero is always shown with a sign next to it (a value that rounds to `0.00%` has no sign, §5.2), so colour is never the only indicator. |
+| FR-ML-01 | Show top 100 coins | M | "Top 100" = the first 100 coins returned by the data provider ordered by market cap rank at fetch time (may include stablecoins). Each row: icon, name, symbol, price, 24h % change, market cap, sparkline. The provider's rank is not shown; it only orders ties when sorting (FR-ML-04). If fewer than 100 coins are returned, show what was returned without error. |
+| FR-ML-02 | 7-day sparkline per row | M | Line chart without axes, with a faint fill under the line. Green if last value > first value, red if lower, neutral if equal or fewer than 2 points. A 24h % that is not zero is always shown with a sign next to it (a value that rounds to `0.00%` has no sign, §5.2), so colour is never the only indicator. |
 | FR-ML-03 | Search | M | Filters the loaded list by name or symbol, case-insensitive, "contains" match, leading/trailing spaces ignored, applied after 300 ms of no typing. No match → empty state "No coins found". Clearing the text restores the full list. |
 | FR-ML-04 | Sort | M | By price, 24h % change, or market cap. Default: market cap descending. Tapping the active criterion toggles ascending/descending; tapping another criterion starts descending. Active criterion and direction are visible. Ties are ordered by rank ascending. |
 | FR-ML-05 | Search and sort compose | M | Sorting applies only to the filtered result; changing the search text keeps the current sort. |
 | FR-ML-06 | Pull-to-refresh | M | Shows a refresh indicator. If the last successful fetch was less than 60 s ago, no network call is made and the indicator stops. Otherwise it fetches. Search text, sort and scroll position are preserved. On failure the existing rows stay visible and an error message is shown (FR-ERR). |
 | FR-ML-07 | Open detail | M | See FR-NAV-02. |
 | FR-ML-08 | Favorite star on each Market row | S | Toggles the coin in the Watchlist. State matches Detail and Watchlist immediately. If this requirement is not built, Market rows have no star; the star on Watchlist rows stays (FR-WL-01). |
-| FR-ML-09 | Missing data in rows | M | Any missing field (price, %, market cap, rank, sparkline) is shown as "—" (sparkline: empty placeholder). When sorting, rows with a missing value in the sort field go last in both directions. The app never shows "null", "NaN" or a crash. |
+| FR-ML-09 | Missing data in rows | M | Any missing field (price, %, market cap, sparkline) is shown as "—" (sparkline: empty placeholder). When sorting, rows with a missing value in the sort field go last in both directions. The app never shows "null", "NaN" or a crash. |
 | FR-ML-10 | Auto-refresh while visible | C | Only while the Market tab is visible; interval ≥ 5 minutes; stops when the app is in the background. |
 
 ### 4.3 Coin Detail (FR-CD)
@@ -184,7 +184,7 @@ Known limitation (decided 19 Oct 2026): the network library reports a failed sec
 |---|---|---|---|
 | FR-INFO-01 | Data attribution | M | Market, Watchlist and Detail show the text "Powered by CoinGecko" in a fixed footer bar at the bottom of the screen, in a legible font of size ≥ 10, visible without scrolling past data; tapping opens https://www.coingecko.com. Not hidden or obscured. Nothing in the app suggests CoinGecko endorses it. |
 | FR-INFO-02 | Disclaimer | M | Detail shows "For information only. Not financial advice." as the last block of the screen, below the description. It is part of the Detail content: it is shown whenever Detail shows its content (also when an inline error is shown over data that is already on screen, FR-ERR-03), and it is not shown while Detail is in the full-screen loading or error state, where there is no data to explain (`02` SCR-04). |
-| FR-INFO-03 | How to read the list | S | The main top bar, shared by the Market and the Watchlist tab, has an ⓘ icon at its left end (touch target ≥ 48 dp, content description "How to read this list"). Tapping it opens a dialog that explains, in one short sentence each: rank, market cap (MC), the 24h change label (sign and colour), the 7-day trend line (and that it can point a different way than the 24h change) and the star. The dialog is the same on both tabs; "Got it" closes it. The text comes from string resources, English and Vietnamese (FR-UI-02). The dialog needs no network and no data. |
+| FR-INFO-03 | How to read the list | S | The main top bar, shared by the Market and the Watchlist tab, has an ⓘ icon at its left end (touch target ≥ 48 dp, content description "How to read this list"). Tapping it opens a dialog that explains, in one short sentence each: market cap (MC), the 24h change label (sign and colour), the 7-day trend line (and that it can point a different way than the 24h change) and the star. The dialog is the same on both tabs; "Got it" closes it. The text comes from string resources, English and Vietnamese (FR-UI-02). The dialog needs no network and no data. |
 
 ### 4.9 Appearance and language
 | ID | Requirement | Pri | Acceptance criteria |
