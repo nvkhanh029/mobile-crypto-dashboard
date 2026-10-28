@@ -1,6 +1,7 @@
 package vn.edu.usth.cryptodashboard.features.chart
 
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.GradientDrawable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -9,13 +10,13 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.core.format.PriceFormatter
 import vn.edu.usth.cryptodashboard.domain.model.ChartPoint
 import vn.edu.usth.cryptodashboard.domain.model.Currency
 import vn.edu.usth.cryptodashboard.domain.model.Timeframe
+import kotlin.math.roundToInt
 
 /**
  * [PriceChart] implementation over MPAndroidChart v3.1.0 (docs/03-architecture.md D9).
@@ -28,6 +29,9 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
     private val context = chart.context
     private val density = context.resources.displayMetrics.density
     private val marker = ChartMarkerView(context)
+
+    /** Measures the first time label, to leave room for it at the left edge (see [show]). */
+    private val timeLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
         chart.marker = marker
@@ -69,8 +73,11 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
             yOffset = dp(R.dimen.chart_time_axis_offset)
             granularity = 1f
             isGranularityEnabled = true
-            setAvoidFirstLastClipping(true)
+            // Every label is centred on its grid line, the first and the last included, so the
+            // gaps look even. The library's "avoid first/last clipping" would shift them.
+            setAvoidFirstLastClipping(false)
         }
+        timeLabelPaint.textSize = chart.xAxis.textSize
 
         chart.axisRight.apply {
             isEnabled = true
@@ -135,9 +142,16 @@ class MpAndroidPriceChart(private val chart: PriceLineChart) : PriceChart {
             setDrawHorizontalHighlightIndicator(false)
         }
 
-        chart.xAxis.valueFormatter = IndexAxisValueFormatter(
-            points.map { ChartTimeLabelFormatter.formatAxis(it.timestampMillis, timeframe) },
-        )
+        // The label count is forced, so a label can fall between two points (for example 121.67
+        // on 366 points). The library's IndexAxisValueFormatter shows nothing there; the nearest
+        // point is used instead, so every grid line has a label.
+        val axisLabels = points.map { ChartTimeLabelFormatter.formatAxis(it.timestampMillis, timeframe) }
+        chart.xAxis.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String =
+                axisLabels.getOrNull(value.roundToInt()).orEmpty()
+        }
+        // The first label is centred on the left edge of the plot: half of it needs room there.
+        chart.extraLeftOffset = timeLabelPaint.measureText(axisLabels.first()) / 2f / density
         chart.xAxis.setLabelCount(xAxisLabelCount(timeframe), true)
         chart.axisRight.valueFormatter = object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String =
