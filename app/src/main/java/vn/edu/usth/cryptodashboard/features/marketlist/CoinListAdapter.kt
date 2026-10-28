@@ -49,6 +49,11 @@ class CoinListAdapter(
 
     override fun onBindViewHolder(holder: CoinViewHolder, position: Int) = holder.bind(getItem(position))
 
+    override fun onViewAttachedToWindow(holder: CoinViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        holder.reloadIcon()
+    }
+
     override fun onViewRecycled(holder: CoinViewHolder) {
         holder.recycle()
         super.onViewRecycled(holder)
@@ -62,6 +67,7 @@ class CoinListAdapter(
         private val change: PriceChangeLabel = view.findViewById(R.id.marketRowChange)
         private val sparkline: SparklineView = view.findViewById(R.id.marketRowSparkline)
         private val star: FavoriteButton = view.findViewById(R.id.marketRowStar)
+        private var iconUrl: String? = null
 
         fun bind(row: CoinRow) {
             val coin = row.coin
@@ -81,7 +87,8 @@ class CoinListAdapter(
             sparkline.setPoints(coin?.sparkline7d)
             icon.setDefaultImageResId(R.drawable.ic_coin_placeholder)
             icon.setErrorImageResId(R.drawable.ic_coin_placeholder)
-            if (imageLoader != null) icon.setImageUrl(coin?.imageUrl, imageLoader)
+            iconUrl = coin?.imageUrl
+            if (imageLoader != null) icon.setImageUrl(iconUrl, imageLoader)
             else icon.setImageResource(R.drawable.ic_coin_placeholder)
             itemView.setOnClickListener { onCoinClick(row.coinId) }
             star.visibility = if (showFavorites) View.VISIBLE else View.GONE
@@ -94,11 +101,23 @@ class CoinListAdapter(
             }
         }
 
+        /**
+         * Volley's NetworkImageView clears its bitmap when the row leaves the window and loads it
+         * again only in its own layout pass. RecyclerView can put a row back (scrolling back, a new
+         * sort order) without binding or laying out the icon again, so the icon stayed blank.
+         * Asking again here takes the bitmap from the memory cache, or shows the placeholder while
+         * it downloads. A request already running for the same URL is not repeated.
+         */
+        fun reloadIcon() {
+            if (imageLoader != null) icon.setImageUrl(iconUrl, imageLoader)
+        }
+
         fun recycle() {
             star.unbind()
             star.onLimitReached = null
             star.setOnClickListener(null)
             itemView.setOnClickListener(null)
+            iconUrl = null
             if (imageLoader != null) icon.setImageUrl(null, imageLoader)
         }
     }
