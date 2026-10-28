@@ -101,8 +101,10 @@ class CryptoApp : Application() {
         Log.i(TAG, "Data source: REAL")
     }
 
-    /** The single `CurrencySettings`; no other code creates one. */
-    val currencySettings: CurrencySettings by lazy { CurrencySettings(this) }
+    /** The single `CurrencySettings`; no other code creates one. Reads the file off the main thread. */
+    val currencySettings: CurrencySettings by lazy {
+        CurrencySettings(this, executor) { action -> mainThread.post(0, action) }
+    }
 
     /** Created on first use, so the saved favorites are not read during app startup. */
     val favoriteStore: FavoriteStore by lazy {

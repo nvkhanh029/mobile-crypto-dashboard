@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.button.MaterialButtonToggleGroup
 import vn.edu.usth.cryptodashboard.R
 import vn.edu.usth.cryptodashboard.core.currency.CurrencySelectorView
+import vn.edu.usth.cryptodashboard.core.currency.CurrencySettings
 import vn.edu.usth.cryptodashboard.core.ui.ExplanationDialog
 import vn.edu.usth.cryptodashboard.core.ui.MarketTabNavigator
 import vn.edu.usth.cryptodashboard.features.marketlist.MarketListFragment
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity(), MarketTabNavigator {
     private lateinit var viewSwitch: MaterialButtonToggleGroup
     private lateinit var currencySelector: CurrencySelectorView
 
-    private val currencySettings by lazy { (application as CryptoApp).currencySettings }
+    private lateinit var currencySettings: CurrencySettings
 
     private var selectedTab = R.id.tabMarket
 
@@ -43,13 +44,9 @@ class MainActivity : AppCompatActivity(), MarketTabNavigator {
         viewSwitch = findViewById(R.id.viewSwitch)
         currencySelector = findViewById(R.id.currencySelector)
 
-        ensureFragments()
-
-        viewSwitch.check(selectedTab)
         viewSwitch.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) showTab(checkedId)
         }
-        showTab(selectedTab)
 
         findViewById<ImageButton>(R.id.howToReadButton).setOnClickListener {
             ExplanationDialog.show(
@@ -59,11 +56,22 @@ class MainActivity : AppCompatActivity(), MarketTabNavigator {
             )
         }
 
+        currencySettings = (application as CryptoApp).currencySettings
         currencySettings.currency.observe(this, Observer { currency ->
             currencySelector.showCurrency(currency)
         })
         currencySelector.onCurrencySelected = currencySettings::setCurrency
         currencySelector.showCurrency(currencySettings.currentCurrency())
+
+        // The saved currency is read on a background thread (NFR-03), so the tabs are created only
+        // when it is known: creating them earlier would fetch the list once in USD and reload it in
+        // the saved currency, i.e. two /coins/markets requests at every cold start.
+        currencySettings.ready.observe(this, Observer { ready ->
+            if (!ready) return@Observer
+            ensureFragments()
+            viewSwitch.check(selectedTab)
+            showTab(selectedTab)
+        })
     }
 
     override fun showMarketTab() {
