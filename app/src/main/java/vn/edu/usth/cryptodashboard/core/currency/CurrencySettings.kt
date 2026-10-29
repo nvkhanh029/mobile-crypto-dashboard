@@ -53,13 +53,17 @@ class CurrencySettings(
     fun currentCurrency(): Currency = _currency.value ?: Currency.USD
 
     fun setCurrency(currency: Currency) {
-        if (_currency.value == currency) return
-        _currency.value = currency
         val prefs = preferences
         if (prefs == null) {
+            // The saved value is not known yet: remember the choice so load() applies it instead of
+            // the stored one. Done before the equality check, otherwise picking the current (default)
+            // value here would let load() overwrite it with a different saved value.
             pendingCurrency = currency
+            _currency.value = currency
             return
         }
+        if (_currency.value == currency) return
+        _currency.value = currency
         // apply(): the memory commit is synchronous, the file write is queued by the framework,
         // so nothing touches the disk on the main thread (NFR-03). commit() would block.
         prefs.edit().putString(KEY_CURRENCY, currency.name).apply()
