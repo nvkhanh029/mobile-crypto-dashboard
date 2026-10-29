@@ -68,8 +68,16 @@ class MainActivity : AppCompatActivity(), MarketTabNavigator {
         // the saved currency, i.e. two /coins/markets requests at every cold start.
         currencySettings.ready.observe(this, Observer { ready ->
             if (!ready) return@Observer
-            ensureFragments()
-            viewSwitch.check(selectedTab)
+            // Posted so the transaction runs after onResume: a transaction started while the
+            // activity is still starting can be reordered and the initial show/hide lost.
+            window.decorView.post {
+                ensureFragments()
+                // check() only fires the listener when the selection changes; the XML default is
+                // already Market, so showTab() must be called explicitly or both tabs stay added
+                // and the Watchlist is drawn over the Market list.
+                viewSwitch.check(selectedTab)
+                showTab(selectedTab)
+            }
         })
     }
 
