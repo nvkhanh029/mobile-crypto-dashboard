@@ -231,9 +231,11 @@ class CryptoApp : Application() {
 
 The first three types are in section 3 and `CoinImageLoader` is in section 5. `CurrencySettings` (C7, Hải) and `FavoriteStore` (C3, Bảo Linh) are defined in their own files.
 
+`CryptoApp` builds both stores with the shared executor and a main-thread poster: `CurrencySettings(context, executor, postToMain)` and `SharedPrefsFavoriteStore(context, executor, postToMain)`. Each one reads its preferences file once on the executor (NFR-03). `CurrencySettings.ready` turns true on the main thread when the saved currency is known, and `MainActivity` waits for it before creating the tabs, so the market list is not requested once in USD and again in the saved currency at a cold start. `FavoriteStore` has no `ready`: `favoriteIds` starts empty and is replaced by the saved list when the read ends.
+
 Rules:
 - The repository properties have the interface types. A member never knows whether the data is fake or real (`03` D19).
-- The `RequestQueue`, the `ExecutorService` and the `Handler` are not exposed: only the data layer uses them.
+- The `RequestQueue` is not exposed: only the data layer uses it. The `ExecutorService` and the `Handler` are not exposed as properties either: `CryptoApp` only passes them, in the constructor call, to the two stores above, which use them to read their preferences file; screens never use them (`03` §5).
 - **Getting the objects:** in a Fragment `requireActivity().application as CryptoApp`; in an Activity `application as CryptoApp`. The manifest declares `CryptoApp` as the application class (Vân Khánh).
 - A ViewModel never receives `CryptoApp` or a `Context`: its factory passes only the objects it needs (`03` §3, `AGENTS.md` §5).
 - **Each feature writes the factory of its own ViewModel** in its own package (`03` §6, D22). This is an example of the shape; the ViewModel and its constructor belong to the owner of the feature:

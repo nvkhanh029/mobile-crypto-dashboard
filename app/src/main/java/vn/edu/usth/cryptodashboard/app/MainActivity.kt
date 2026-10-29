@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity(), MarketTabNavigator {
             if (!ready) return@Observer
             ensureFragments()
             viewSwitch.check(selectedTab)
-            showTab(selectedTab)
         })
     }
 

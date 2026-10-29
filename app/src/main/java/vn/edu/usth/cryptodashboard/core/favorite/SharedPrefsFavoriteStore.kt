@@ -35,11 +35,6 @@ class SharedPrefsFavoriteStore(
     private val _favoriteIds = MutableLiveData(emptyList<String>())
     override val favoriteIds: LiveData<List<String>> = _favoriteIds
 
-    private val _ready = MutableLiveData(false)
-
-    /** True once the saved list has been read; always delivered on the main thread. */
-    val ready: LiveData<Boolean> = _ready
-
     /** Opened on [executor]; null until [load] finishes. */
     private var preferences: SharedPreferences? = null
 
@@ -101,7 +96,6 @@ class SharedPrefsFavoriteStore(
                 if (value != saved) {
                     prefs?.edit()?.putString(KEY_IDS, JSONArray(value).toString())?.apply()
                 }
-                _ready.value = true
             }
         }
     }
