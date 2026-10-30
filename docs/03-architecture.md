@@ -164,7 +164,7 @@ With fake data only the data source changes: the fake data source reads a JSON f
 ## 5. Threading rules
 
 1. **Network:** only through Volley's request queue (it runs requests off the main thread).
-2. **JSON parsing and any disk work:** on the single background `ExecutorService` created once in `CryptoApp`.
+2. **JSON parsing and any disk work:** on the single background `ExecutorService` created once in `CryptoApp`. That includes opening and reading the two preferences files (`favorites`, `currency_settings`): each is read once on this executor, never on the main thread (NFR-03).
 3. **Results to the UI:** posted back with a `Handler` on the main looper (`HandlerMainThreadPoster` in `data/thread`, behind the `MainThreadPoster` interface so JVM tests can run the action at once). Repository callbacks (and data source callbacks) always arrive on the main thread.
 4. **Views and LiveData `setValue`:** main thread only. Fragments and ViewModels never create threads.
 5. Verified in debug builds with StrictMode (NFR-03).
@@ -191,6 +191,8 @@ Each screen has one `ViewModel` (an Android Jetpack class) that exposes `LiveDat
 **Creating ViewModels:** a ViewModel that receives repositories (or a `coin_id`) in its constructor cannot be created by the default factory, so each owner writes a small factory for their own ViewModel in their feature package, with `viewModelFactory { initializer { … } }` (an Android `ViewModelProvider.Factory`, section 18). The factory takes the repositories from `CryptoApp`, which only exposes them as properties (`05-interfaces.md`). There is no shared factory, so nobody edits a file of another member to register a ViewModel (D22).
 
 **Stale responses:** each ViewModel keeps a request counter and ignores a response that is not from the latest request (FR-CD-03: quick timeframe switching; currency change while loading). This is needed in practice: S2 showed that responses can arrive in a different order from the requests.
+
+**Restored screens after a process kill:** Android recreates the fragments inside `super.onCreate()`, before `CurrencySettings` has read the saved currency, so a restored screen can send one extra request with the default USD and reloads when the saved currency is known. This is accepted (one extra request per restored screen) and no cache is added for it (FR-DATA-02).
 
 ---
 
@@ -297,11 +299,11 @@ Fake data sources implement the same data source interfaces as the remote ones, 
 |---|---|---|---|
 | C1 | Models and repository interfaces | Vân Khánh → all | Repositories take a currency and a callback; success carries the data and its fetch time; failure carries an `AppError` |
 | C2 | Formatters, `StateView`, `UiState`, `AttributionView` (footer bar), explanation dialog (CMP-12), style guide | Hải → all | Plain Kotlin formatters (no Android types); `UiState` with its four cases; `StateView` shows a `UiState`; `AttributionView` shows the footer bar (CMP-08) and takes the fetch time, or none (Detail), and each screen includes it in its own layout; the explanation dialog takes a title and a text (`02` CMP-12); one sample coin row as the style reference |
-| C3 | Favorites | Bảo Linh → An Khánh, Kiên | `FavoriteStore` (check whether a coin is a favorite, add, remove, toggle, the list of IDs as LiveData; the exact members are in the code, `05` §1) and `FavoriteButton` |
+| C3 | Favorites | Bảo Linh → An Khánh, Kiên | `FavoriteStore` (check whether a coin is a favorite, add, remove, toggle, the list of IDs as LiveData; the exact members are in the code, `05` §1) and `FavoriteButton`. `favoriteIds` starts empty; a change made while the file is being read is replayed on the saved list instead of replacing it, so saved favorites are never lost. `FavoriteStore` has no `ready`: screens just observe the list |
 | C4 | Coin row and adapter | An Khánh → Bảo Linh | Takes the coin data and reports the row tap. The star is a `FavoriteButton` (C3) bound to `FavoriteStore`: it toggles the store itself and reports when the limit of 50 stops an add, and a screen that removes rows (Watchlist) observes `favoriteIds`. The star is part of the row: always on Watchlist rows, on Market rows only if FR-ML-08 is built |
 | C5 | Chart | Duy → Kiên | `PriceChartFragment.newInstance(coinId)`: needs only the coin ID, shows timeframe selector, chart and its own states |
 | C6 | Open Detail | Kiên → An Khánh, Bảo Linh | Explicit `Intent`, string extra `coin_id` |
-| C7 | Currency | Hải → all ViewModels, Kiên | Current currency, change notification, and the selector view (main top bar, Detail top bar) |
+| C7 | Currency | Hải → all ViewModels, Kiên | Current currency, change notification, and the selector view (main top bar, Detail top bar). `CurrencySettings` takes the shared executor and a main-thread poster from `CryptoApp`; `ready` turns true once the saved value is known, so a screen can wait before its first request (FR-CUR-02) |
 | C8 | Coin icons | Vân Khánh → An Khánh, Kiên | `CoinImageLoader` from `CryptoApp`, used with Volley's `NetworkImageView` in the layout; placeholder and error drawables come from the shared resources (Hải) |
 
 The data source interfaces (section 3) are not a contract: only the repository implementations inside the Data layer use them.
