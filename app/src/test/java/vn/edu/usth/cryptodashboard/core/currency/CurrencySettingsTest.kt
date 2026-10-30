@@ -82,6 +82,21 @@ class CurrencySettingsTest {
     }
 
     @Test
+    fun loadingTheValueAlreadyShownDoesNotNotifyObserversAgain() {
+        // Regression: setValue always notifies, even for an equal value. After the process was
+        // killed and the saved currency equalled the default, Detail observed two emissions and
+        // sent two requests for one screen.
+        storage.saved = Currency.USD
+        val settings = newSettings()
+        val seen = mutableListOf<Currency>()
+        settings.currency.observeForever { seen += it }
+
+        runLoad()
+
+        assertEquals(listOf(Currency.USD), seen)
+    }
+
+    @Test
     fun choosingAnotherValueAfterTheReadWritesIt() {
         val settings = newSettings()
         runLoad()

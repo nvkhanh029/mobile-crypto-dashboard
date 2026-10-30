@@ -121,6 +121,9 @@ class SharedPrefsFavoriteStore(
                 val array = JSONArray(json)
                 List(array.length()) { i -> array.getString(i) }
             } catch (e: JSONException) {
+                // Do not hide a corrupt favourites file: the list starts empty, which looks like the
+                // user lost their favourites, so the reason must be in Logcat.
+                Log.w(TAG, "Corrupt favorites JSON, starting with an empty list", e)
                 emptyList()
             }
         }

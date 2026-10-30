@@ -62,7 +62,9 @@ class CurrencySettings internal constructor(
         // here would let load() overwrite it with a different saved value.
         if (!loaded) {
             pendingCurrency = currency
-            _currency.value = currency
+            // LiveData notifies its observers on every setValue, even for an equal value, which
+            // would make Detail request the chart twice after the process was killed.
+            if (_currency.value != currency) _currency.value = currency
             return
         }
         if (_currency.value == currency) return
@@ -84,7 +86,9 @@ class CurrencySettings internal constructor(
                 loaded = true
                 val value = pendingCurrency ?: saved
                 pendingCurrency = null
-                _currency.value = value
+                // Same guard as above: setting the value that is already there still notifies every
+                // observer, and Detail would ask for the chart again right after a cold start.
+                if (_currency.value != value) _currency.value = value
                 if (value != saved) storage.write(value)
                 _ready.value = true
             }
